@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BikeBuddy.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241119101133_BikeEntity")]
-    partial class BikeEntity
+    [Migration("20241119161042_new")]
+    partial class @new
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,6 +32,9 @@ namespace BikeBuddy.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BikeId"));
+
+                    b.Property<DateTime>("AvailableUpto")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("BikeAddress")
                         .IsRequired()
@@ -56,6 +59,12 @@ namespace BikeBuddy.Migrations
                     b.Property<string>("BikeNumber")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("KycStatus")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("RegistrationDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
                         .IsRequired()

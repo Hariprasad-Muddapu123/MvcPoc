@@ -1,4 +1,4 @@
-﻿@model BikeViewModel;
+﻿@model RegisterBikeViewModel;
 @{
     Layout = "_BikeBuddyLayout";
 }
@@ -23,33 +23,33 @@
                 <form asp-action="Rent" asp-controller="RentRide" enctype="multipart/form-data" method="post">
                     <div class="mb-4">
                         <label class="block text-gray-700">Bike Model<span class="text-danger">*</span></label>
-                        <input asp-for="BikeModel" class="w-full p-2 border border-orange-500 rounded" placeholder="Enter Your Bike Model" type="text" />
+                        <input asp-for="NewBike.BikeModel" class="w-full p-2 border border-orange-500 rounded" placeholder="Enter Your Bike Model" type="text" />
                     </div>
 
                     <div class="mb-4">
                         <label class="block text-gray-700">Bike Number<span class="text-danger">*</span></label>
-                        <input asp-for="BikeNumber" class="w-full p-2 border border-orange-500 rounded" placeholder="Enter Your Bike Number" type="text" />
+                        <input asp-for="NewBike.BikeNumber" class="w-full p-2 border border-orange-500 rounded" placeholder="Enter Your Bike Number" type="text" />
                     </div>
                     <div class="mb-4">
                         <label class="block text-gray-700">Bike Location<span class="text-danger">*</span></label>
-                        <input asp-for="BikeLocation" class="w-full p-2 border border-orange-500 rounded" placeholder="Enter Your Location" type="text" />
+                        <input asp-for="NewBike.BikeLocation" class="w-full p-2 border border-orange-500 rounded" placeholder="Enter Your Location" type="text" />
                     </div>
                     <div class="mb-4">
                         <label class="block text-gray-700">Bike Address<span class="text-danger">*</span></label>
-                        <input asp-for="BikeAddress" class="w-full p-2 border border-orange-500 rounded" placeholder="Enter Your Address" type="text" />
+                        <input asp-for="NewBike.BikeAddress" class="w-full p-2 border border-orange-500 rounded" placeholder="Enter Your Address" type="text" />
                     </div>
                     <div class="mb-4">
                         <label class="block text-gray-700">Available Upto<span class="text-danger">*</span></label>
-                        <input asp-for="AvailableUpto" class="w-full p-2 border border-orange-500 rounded" placeholder="Select a date" type="date" />
+                        <input asp-for="NewBike.AvailableUpto" class="w-full p-2 border border-orange-500 rounded" placeholder="Select a date" type="date" />
                     </div>
                     
                     <div class="mb-4">
                         <label class="block text-gray-700">Bike Image<span class="text-danger">*</span></label>
-                        <input asp-for="BikeImage" class="w-full p-2 border border-orange-500 rounded" type="file" />
+                        <input asp-for="NewBike.BikeImage" class="w-full p-2 border border-orange-500 rounded" type="file" />
                     </div>
                     <div class="mb-6">
                         <label class="block text-gray-700">Bike Documents<span class="text-danger">*</span></label>
-                        <input asp-for="BikeDocuments" class="w-full p-2 border border-orange-500 rounded" type="file" />
+                        <input asp-for="NewBike.BikeDocuments" class="w-full p-2 border border-orange-500 rounded" type="file" />
                     </div>
                     <button type="submit" class="w-full bg-orange-500 text-white p-2 rounded hover:bg-orange-600">
                         Register
@@ -71,27 +71,27 @@
         <h2 class="text-2xl font-bold text-center text-gray-800">
             Registered Bikes
         </h2>
-        @* <div class="flex">
+        <div class="flex justify-content-center space-x-5 mb-5 flex-wrap ">
+        @foreach (var bike in Model.UserBikes)
+        {
+         <div class="flex card mb-5">
             <div class="bg-gray-100 p-4 rounded shadow-md">
+                    <p class="text-orange-500 flex justify-content-center">Status: @bike.KycStatus</p>
+
                 <img alt="Bike Iamge"
-                     src="@(Model.BikeImageBytes != null ? $"data:image/png;base64,{Convert.ToBase64String(Model.BikeImageBytes)}" : "/images/default-profile.png")"
+                     src="@(bike.BikeImageBytes != null ? $"data:image/png;base64,{Convert.ToBase64String(bike.BikeImageBytes)}" : "/images/default-profile.png")"
                      class="w-full h-auto mb-4" />
-                 <img alt="Yamaha Fascino 125" class="w-full h-auto mb-4" src="~/Images/Fascino 125 FI.webp" />
-                <h3 class="text-xl font-bold text-gray-800">@Model.BikeModel</h3>
-                <p class="text-gray-700">Available upto: @Model.AvailableUpto</p>
-                <p class="text-gray-700">Location: @Model.BikeLocation</p>
-                <p class="text-gray-700">Address: @Model.BikeAddress</p>
+                
+                <h3 class="text-xl font-bold text-gray-800">@bike.BikeModel</h3>
+                <p class="text-gray-700">Available upto: @bike.AvailableUpto</p>
+                <p class="text-gray-700">Location: @bike.BikeLocation</p>
+                <p class="text-gray-700">Address: @bike.BikeAddress</p>
                 <button class="w-full bg-orange-500 text-white p-2 rounded mt-2">Remove</button>
             </div>
-            <div class="bg-gray-100 p-4 rounded shadow-md">
-                <img alt="Yamaha MT 15" class="w-full h-auto mb-4" src="~/Images/Fascino 125 FI.webp" />
-                <h3 class="text-xl font-bold text-gray-800">Yamaha MT 15</h3>
-                <p class="text-gray-700">Available upto: 15/11/2024</p>
-                <p class="text-gray-700">Location: Hyderabad</p>
-                <p class="text-gray-700">Address: Madhapur</p>
-                <button class="w-full bg-orange-500 text-white p-2 rounded mt-2">Remove</button>
-            </div>
-        </div> *@
+         </div>
+         }
+        </div>
+           
     </div> 
 </body>
 </html>
