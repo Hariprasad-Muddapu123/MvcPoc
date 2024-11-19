@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using BikeBuddy.ViewModels;
 using Microsoft.AspNetCore.Identity;
 
 
@@ -18,5 +19,7 @@ namespace BikeBuddy.Models
         public bool IsAadhaarUploaded { get; set; }
         public bool IsDrivingLicenseUploaded { get; set; }
         public String? Address {  get; set; }
+
+        public ICollection<Bike> Bikes { get; set; }
     }
 }

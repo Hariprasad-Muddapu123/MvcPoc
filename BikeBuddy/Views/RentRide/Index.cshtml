@@ -1,4 +1,7 @@
-﻿<html>
+﻿@{
+    Layout = "_BikeBuddyLayout";
+}
+<html>
 <head>
     <title>
         Rent and Ride
@@ -8,76 +11,27 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
 </head>
 <body class="bg-gray-100">
-    <header class="flex justify-between items-center p-4">
-        <div class="flex items-center">
-            <img alt="Logo of a motorcycle" class="h-12 w-12" height="50" src="https://storage.googleapis.com/a1aa/image/CyKgwjiqc0pHINwgI2aGde8Ab0HLgfST7KI2UchTKnjkWpxTA.jpg" width="50" />
-            <h1 class="text-blue-600 text-xl ml-2">
-                Rent and Ride
-            </h1>
-        </div>
-        <div class="flex items-center">
-            <span class="mr-2">
-                Hari
-            </span>
-            <i class="fas fa-user-circle text-2xl">
-            </i>
-        </div>
-    </header>
-    <main class="flex justify-center items-center mt-10">
-        <div class="flex space-x-20">
+
+        <div class="flex space-x-20 justify-center items-center mt-10 mb-10">
             <div class="text-center">
-                <img alt="Ride" class="h-64 w-64" height="300" src="~/Images/Ride.png" width="300" />
-                <h2 class="text-orange-600 text-3xl mt-4">
-                    RIDE
-                </h2>
+                <Form asp-controller="RentRide" asp-action="Ride" method="get">
+                    <button>
+                    <img alt="Person holding a key standing next to a rental motorcycle" class="h-85 w-85" height="400" src="~/Images/bikeride.jpeg" width="400" />
+                    <h2 class="text-orange-600 text-5xl mt-4">RIDE </h2>
+                     </button>
+                </Form>
             </div>
             <div class="text-center">
-                <img alt="Rent" class="h-64 w-64" height="300" src="~/Images/Rent.png" width="300" />
-                <h2 class="text-orange-600 text-3xl mt-4">
-                    RENT
-                </h2>
-            </div>
-        </div>
-    </main>
-    <footer class="bg-black text-white mt-20 p-10">
-        <div class="flex justify-between">
-            <div>
-                <h3 class="text-lg font-bold">
-                    BIKE BUDDY
-                </h3>
-                <ul class="mt-4 space-y-2">
-                    <li>
-                        Home
-                    </li>
-                    <li>
-                        About Us
-                    </li>
-                    <li>
-                        Safety
-                    </li>
-                    <li>
-                        Contact Us
-                    </li>
-                </ul>
-            </div>
-            <div>
-                <h3 class="text-lg font-bold">
-                    FOLLOW US
-                </h3>
-                <div class="flex space-x-4 mt-4">
-                    <i class="fab fa-instagram text-2xl">
-                    </i>
-                    <i class="fab fa-facebook text-2xl">
-                    </i>
-                    <i class="fab fa-youtube text-2xl">
-                    </i>
-                    <i class="fab fa-linkedin text-2xl">
-                    </i>
-                </div>
+                <form asp-action="Rent" asp-controller="RentRide" method="get">
+                    <button>
+                        <img alt="Person handing over money to rent a motorcycle" class="h-85 w-85" height="400" src="~/Images/bikerent.jpeg" width="400" />
+                        <h2 class="text-orange-600 text-5xl mt-4">RENT</h2>
+                    </button>
+                </form>
             </div>
         </div>
 
-    </footer>
+
 </body>
 </html>
 
