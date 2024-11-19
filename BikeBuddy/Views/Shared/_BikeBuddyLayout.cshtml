@@ -1,0 +1,110 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<User> SignInManager
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - BikeBuddy</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/bike.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/BikeBuddy.styles.css" asp-append-version="true" />
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Jy6zJxWR2YB94k3hg1y5LbVZ/tg6kb4vPly4M9G/TmZb/0JdliuvRW+o2Ve0oI5K" crossorigin="anonymous">
+
+    <!-- Bootstrap JavaScript Bundle (Includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-9ndCyUa8Z5QgGd6FeYmvQz7eMWz8wixj8w0vRoE6FFtxAVxZp8qymWgW/04niAJp" crossorigin="anonymous"></script>
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+    
+    <header class="fixed-header">
+        <nav class="nav-Container">
+            <div class="nav-left">
+                <div>
+                    <img src="~/Images/nav_logo.png" />
+                </div>
+            </div>
+            <div class="nav-right">
+                <ul>
+                    <li><a>Home</a></li>
+                    
+                    
+                    <ul class="navbar-nav ml-auto">
+                        @*If the user is signed-in display Logout link*@
+                        @if (SignInManager.IsSignedIn(User))
+                        {
+                            <li><a asp-action="Index" asp-controller="RentRide">Rent/Ride</a></li>
+                            <form>
+                                <button asp-controller="User" asp-action="Profile" id="profileDropdown">Profile</button>
+                            </form>
+                            <form>
+                                <button asp-controller="Account" asp-action="Logout">Logout</button>
+                            </form>
+                            @* <div class="dropdown">
+                                <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Dropdown button
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Edit">My Profile</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Logout">Logout</a></li>
+                                </ul>
+                            </div> *@
+                        }
+                        else
+                        {
+                            <li><a>About us</a></li>
+                            <li><a>Contact Us </a></li>
+                            <li><a>Safety</a></li>
+                            <form>
+                                <button asp-controller="Account" asp-action="login">Login</button>
+                            </form>
+                        }
+                    </ul>
+
+                </ul>
+            </div>
+        </nav>
+
+    </header>
+   
+    <div class="">
+        
+            @RenderBody()
+        
+    </div>
+
+
+    <footer>
+        <div class="footer-left">
+            <h1>Bike Buddy</h1>
+            <ul>
+                <li><a>Home</a></li>
+                <li><a>About us</a></li>
+                <li><a>Contact Us </a></li>
+                <li><a>Safety</a></li>
+
+            </ul>
+        </div>
+        <div class="footer-right">
+            <h1>Follow Us</h1>
+            <ul>
+                <li><i class="fa-brands fa-x-twitter"></i></li>
+                <li><i class="fa-brands fa-instagram"></i></li>
+                <li><i class="fa-brands fa-youtube"></i></li>
+                <li><i class="fa-brands fa-linkedin"></i></li>
+
+            </ul>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+

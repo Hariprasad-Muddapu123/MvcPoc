@@ -1,0 +1,36 @@
+﻿@model BikeBuddy.Models.ForgotViewModel;
+@{
+
+    Layout = "_BikeBuddyLayout";
+}
+<html>
+<head>
+    <title>Forgot Password</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body >
+    <div class="container d-flex justify-content-center align-items-center main-content mt-6 mb-3">
+    <div class="bg-white p-8 rounded-lg shadow-md w-96 mx-auto">
+        <h2 class="text-black text-2xl font-bold mb-4 text-center">Forgot Password</h2>
+        <p class="text-gray-700 mb-4 text-center">Enter Your Registered Email Id</p>
+
+        <form class="w-full" asp-action="ForgotPassword" method="post">
+            <label class="block text-gray-700 mb-2" for="Email">Email Id</label>
+            <div class="flex items-center mb-6">
+                <input asp-for="Email" type="email" placeholder="Enter your Email ID" class="w-full focus:outline-none">    
+            </div>
+            <span asp-validation-for="Email" class="text-danger"></span>
+            <button type="submit" class="bg-orange-500 text-white font-bold py-2 px-4 rounded-full w-full">Send</button>
+            
+        </form>
+        @if (TempData["Message"] != null)
+
+        {
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mt-4">
+                <strong>@TempData["Message"]</strong>
+            </div>
+        }
+    </div>
+    </div>
+</body>
+</html>
