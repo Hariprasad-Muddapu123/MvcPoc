@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BikeBuddy.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241120061649_new")]
-    partial class @new
+    [Migration("20241120154750_l")]
+    partial class l
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

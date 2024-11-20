@@ -49,8 +49,7 @@
                 ×
             </button>
         </div>
-        <div class="mt-4">
-            
+        <div class="mt-4">  
             <div class="relative">
                 <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 p-2"></i>
                 <input id="searchBar" class="w-full  p-6 pl-12 pr-20 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 " placeholder="Search or type city to select" type="text" onkeyup="filterCities()" />
@@ -59,13 +58,13 @@
             </div>
         </div>
         
-        <div id="cityGrid" class="grid grid-cols-4 gap-4 mt-4">
+        <div id="cityGrid" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
             @foreach (var city in Model)
             {
-                <a asp-controller="RentRide" asp-action="DisplayBikes" asp-route-SearchAddres="@city.Name">
-                    <div class="city-card">
-                        <img alt="@city.Name" src="~/Cities/@city.ImageUrl" />
-                        <span>@city.Name</span>
+                <a asp-controller="RentRide" asp-action="DisplayBikes" asp-route-SearchLocation="@city.Name" class="city-card">
+                    <div class="p-4 border rounded-lg shadow cursor-pointer hover:shadow-md transition">
+                        <img alt="@city.Name" src="~/Cities/@city.ImageUrl" class="w-full h-32 object-cover rounded-md mb-2" />
+                        <span class="text-lg font-semibold">@city.Name</span>
                     </div>
                 </a>
             }
@@ -80,20 +79,16 @@
             cityCards.forEach((card) => {
                 const cityName = card.querySelector("span").textContent.toLowerCase();
                 if (cityName.includes(searchInput)) {
-                    card.style.display = "block";
+                    card.style.display = "block"; // Show matching cards
                 } else {
-                    card.style.display = "none";
+                    card.style.display = "none"; // Hide non-matching cards
                 }
             });
         }
 
         function clearFilter() {
             document.getElementById("searchBar").value = '';
-            filterCities();
-        }
-
-        function selectCity(cityName) {
-            window.location.href = `/Home/CitySelected?cityName=${cityName}`;
+            filterCities(); // Reset the filter
         }
     </script>
 

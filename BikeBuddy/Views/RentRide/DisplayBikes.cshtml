@@ -1,5 +1,7 @@
 ﻿@model RegisteredBikeViewModel
-
+@{
+    Layout = "_BikeBuddyLayout";
+}
 <html>
 <head>
     <title>Bike Rental</title>
@@ -78,23 +80,25 @@
             <!-- Main Content -->
             <div class="w-3/4 p-4">
                 <h1 class="text-2xl font-bold mb-4">Available Bikes</h1>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-4 gap-4">
                     @if (Model?.Bikes != null && Model.Bikes.Any())
                     {
                         foreach (var bike in Model.Bikes)
                         {
-                            <div class="bg-white p-4 rounded-lg shadow-lg">
-                                <img alt="@bike.BikeModel"
-                                     class="w-full mb-2"
-                                     src="@(bike.BikeImageBytes != null ? $"data:image/png;base64,{Convert.ToBase64String(bike.BikeImageBytes)}" : "/images/default-profile.png")"
-                                     style="max-height: 200px; object-fit: cover;" />
-                                <h3 class="text-xl font-bold mb-1">@bike.BikeModel</h3>
-                                <p class="text-gray-600">Location: @bike.BikeLocation</p>
-                                <p class="text-gray-600">Address: @bike.BikeAddress</p>
-                                <p class="text-gray-600">Price/Hour: ₹100</p>
-                                <p class="text-gray-600">Available Upto: @bike.AvailableUpto.ToString("dd/MM/yyyy")</p>
-                                <button class="w-full bg-orange-500 text-white py-2 mt-2 rounded-lg">Book Now</button>
+                            <div class="flex card mb-5">
+                                <div class="bg-white p-4 rounded shadow-md">
+                                    <img alt="Bike Image"
+                                         src="@(bike.BikeImageBytes != null ? $"data:image/png;base64,{Convert.ToBase64String(bike.BikeImageBytes)}" : "/images/default-profile.png")"
+                                         class="w-full h mb-4" style="height:120px;" />
+                                    <h3 class="text-xl font-bold mb-1">@bike.BikeModel</h3>
+                                    <p class="text-gray-600">Location: @bike.BikeLocation</p>
+                                    <p class="text-gray-600">Address: @bike.BikeAddress</p>
+                                    <p class="text-gray-600">Price/Hour: ₹100</p>
+                                    <p class="text-gray-600">Available Upto: @bike.AvailableUpto.ToString("dd/MM/yyyy")</p>
+                                    <button class="w-full bg-orange-500 text-white py-2 mt-2 rounded-lg">Book Now</button>
+                                </div>
                             </div>
+
                         }
                     }
                     else

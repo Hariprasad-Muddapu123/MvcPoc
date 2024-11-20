@@ -14,7 +14,7 @@ namespace BikeBuddy.Controllers
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ApplicationDbContext _context;
 
-        public RentRideController(UserManager<User> userManager,IWebHostEnvironment webHostEnvironment,ApplicationDbContext context)
+        public RentRideController(UserManager<User> userManager, IWebHostEnvironment webHostEnvironment, ApplicationDbContext context)
         {
             this._userManager = userManager;
             this._webHostEnvironment = webHostEnvironment;
@@ -22,7 +22,7 @@ namespace BikeBuddy.Controllers
         }
         public IActionResult Index()
         {
-            
+
             return View();
         }
         [HttpGet]
@@ -30,7 +30,7 @@ namespace BikeBuddy.Controllers
         {
             //TempData["Message"] = "";
             var user = await _userManager.GetUserAsync(User);
-           // var model = new BikeViewModel();
+            // var model = new BikeViewModel();
             var userBikes = await _context.Bikes
                    .Where(b => b.UserId.Equals(user.Id))
                    .ToListAsync();
@@ -118,49 +118,87 @@ namespace BikeBuddy.Controllers
         }
 
 
-
-        public async Task<IActionResult> DisplayBikes(string SearchModel, string SearchAddress)
+        public async Task<IActionResult> DisplayByCity(String SearchAddress)
         {
-            if (_context.Bikes == null)
+            IQueryable<string> BikeLocation = from m in _context.Bikes orderby m.BikeLocation select m.BikeLocation;
+            return View();
+        }
+
+        //public async Task<IActionResult> DisplayBikes(string SearchModel, string SearchAddress)
+        //{
+        //    if (_context.Bikes == null)
+        //    {
+        //        return Problem("Entity set 'Bikes' is null.");
+        //    }
+
+        //    // Fetch bike addresses and models
+        //    IQueryable<string> BikesAddress = from m in _context.Bikes
+        //                                      orderby m.BikeAddress
+        //                                      select m.BikeAddress;
+
+        //    IQueryable<string> BikeModels = from m in _context.Bikes
+        //                                    orderby m.BikeModel
+        //                                    select m.BikeModel;
+
+        //    // Filter the list of bikes based on the search criteria
+        //    var bikesQuery = _context.Bikes.AsQueryable();
+
+        //    if (!string.IsNullOrEmpty(SearchModel))
+        //    {
+        //        bikesQuery = bikesQuery.Where(b => b.BikeModel.ToUpper().Contains(SearchModel.ToUpper()));
+        //    }
+
+        //    if (!string.IsNullOrEmpty(SearchAddress))
+        //    {
+        //        bikesQuery = bikesQuery.Where(b => b.BikeAddress.ToUpper().Contains(SearchAddress.ToUpper()));
+        //    }
+
+        //    var bikes = await bikesQuery.ToListAsync();
+
+        //    // Create a view model with filtered results
+        //    var RegisteredBikeviewModel = new RegisteredBikeViewModel
+        //    {
+        //        BikeModels = await BikeModels.Distinct().ToListAsync(),
+        //        BikesAddress = await BikesAddress.Distinct().ToListAsync(),
+        //        Bikes = bikes // Add the filtered list of bikes
+        //    };
+
+        //    // Return the view with the filtered data
+        //    return View(RegisteredBikeviewModel);
+        //}
+        public IActionResult DisplayBikes(string SearchAddress, string SearchModel, string SearchLocation)
+        {
+            var bikes = _context.Bikes.ToList();
+
+            // Filter by City
+            if (!string.IsNullOrEmpty(SearchLocation))
             {
-                return Problem("Entity set 'Bikes' is null.");
+                bikes = bikes.Where(b => b.BikeLocation == SearchLocation).ToList();
             }
 
-            // Fetch bike addresses and models
-            IQueryable<string> BikesAddress = from m in _context.Bikes
-                                              orderby m.BikeAddress
-                                              select m.BikeAddress;
-
-            IQueryable<string> BikeModels = from m in _context.Bikes
-                                            orderby m.BikeModel
-                                            select m.BikeModel;
-
-            // Filter the list of bikes based on the search criteria
-            var bikesQuery = _context.Bikes.AsQueryable();
-
-            if (!string.IsNullOrEmpty(SearchModel))
-            {
-                bikesQuery = bikesQuery.Where(b => b.BikeModel.ToUpper().Contains(SearchModel.ToUpper()));
-            }
-
+            // Filter by Address
             if (!string.IsNullOrEmpty(SearchAddress))
             {
-                bikesQuery = bikesQuery.Where(b => b.BikeAddress.ToUpper().Contains(SearchAddress.ToUpper()));
+                bikes = bikes.Where(b => b.BikeAddress.Contains(SearchAddress, StringComparison.OrdinalIgnoreCase)).ToList();
             }
 
-            var bikes = await bikesQuery.ToListAsync();
-
-            // Create a view model with filtered results
-            var RegisteredBikeviewModel = new RegisteredBikeViewModel
+            // Filter by Bike Model
+            if (!string.IsNullOrEmpty(SearchModel))
             {
-                BikeModels = await BikeModels.Distinct().ToListAsync(),
-                BikesAddress = await BikesAddress.Distinct().ToListAsync(),
-                Bikes = bikes // Add the filtered list of bikes
+                bikes = bikes.Where(b => b.BikeModel.Contains(SearchModel, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
+
+            var viewModel = new RegisteredBikeViewModel
+            {
+                Bikes = bikes,
+                BikesAddress = bikes.Select(b => b.BikeAddress).Distinct().ToList(),
+                BikeModels = bikes.Select(b => b.BikeModel).Distinct().ToList()
             };
 
-            // Return the view with the filtered data
-            return View(RegisteredBikeviewModel);
+            return View(viewModel);
         }
+
 
 
 

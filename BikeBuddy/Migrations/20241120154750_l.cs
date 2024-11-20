@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BikeBuddy.Migrations
 {
     /// <inheritdoc />
-    public partial class @new : Migration
+    public partial class l : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

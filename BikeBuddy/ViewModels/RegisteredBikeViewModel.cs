@@ -8,5 +8,7 @@ namespace BikeBuddy.ViewModels
         public List<string> BikesAddress { get; set; }
 
         public List<Bike> Bikes {  get; set; }
+
+        public List<String> BikeLocation { get; set; }
     }
 }
