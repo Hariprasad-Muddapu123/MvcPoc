@@ -1,0 +1,23 @@
+﻿@model RegisteredBikeViewModel
+<form method="get" asp-action="Display">
+    <input type="text" name="SearchModel" placeholder="Search by Bike Model" value="@Context.Request.Query["SearchModel"]" />
+    <input type="text" name="SearchAddress" placeholder="Search by Address" value="@Context.Request.Query["SearchAddress"]" />
+    <button type="submit">Search</button>
+</form>
+
+<h3>Bike Models</h3>
+<ul>
+    @foreach (var m in Model.BikeModels)
+    {
+        <li>@m</li>
+    }
+</ul>
+
+<h3>Bike Addresses</h3>
+<ul>
+    @foreach (var address in Model.BikesAddress)
+    {
+        <li>@address</li>
+    }
+</ul>
+

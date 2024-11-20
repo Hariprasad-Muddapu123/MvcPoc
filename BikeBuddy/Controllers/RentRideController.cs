@@ -1,9 +1,10 @@
 ﻿using BikeBuddy.Data;
 using BikeBuddy.Models;
 using BikeBuddy.ViewModels;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace BikeBuddy.Controllers
 {
@@ -30,9 +31,9 @@ namespace BikeBuddy.Controllers
             //TempData["Message"] = "";
             var user = await _userManager.GetUserAsync(User);
            // var model = new BikeViewModel();
-            var userBikes = _context.Bikes
+            var userBikes = await _context.Bikes
                    .Where(b => b.UserId.Equals(user.Id))
-                   .ToList();
+                   .ToListAsync();
             var viewModel = new RegisterBikeViewModel
             {
                 NewBike = new BikeViewModel(),
@@ -87,6 +88,7 @@ namespace BikeBuddy.Controllers
                     KycStatus = model.KycStatus,
                     UserId = user.Id,
                     RegistrationDate = DateTime.UtcNow,
+                    AvailableUpto = model.AvailableUpto,
                     // Save the byte arrays for images and documents
                     BikeImageBytes = model.BikeImageBytes,
                     BikeDocumentsBytes = model.BikeDocumentsBytes
@@ -107,6 +109,60 @@ namespace BikeBuddy.Controllers
             TempData["ErrorMessage"] = "Failed to register the bike. Please check the inputs.";
             return View(viewModel);  // Return the RegisterBikeViewModel back to the view
         }
+
+        [HttpGet]
+        public IActionResult Ride()
+        {
+            var cities = _context.Cities.ToList();
+            return View(cities);
+        }
+
+
+
+        public async Task<IActionResult> DisplayBikes(string SearchModel, string SearchAddress)
+        {
+            if (_context.Bikes == null)
+            {
+                return Problem("Entity set 'Bikes' is null.");
+            }
+
+            // Fetch bike addresses and models
+            IQueryable<string> BikesAddress = from m in _context.Bikes
+                                              orderby m.BikeAddress
+                                              select m.BikeAddress;
+
+            IQueryable<string> BikeModels = from m in _context.Bikes
+                                            orderby m.BikeModel
+                                            select m.BikeModel;
+
+            // Filter the list of bikes based on the search criteria
+            var bikesQuery = _context.Bikes.AsQueryable();
+
+            if (!string.IsNullOrEmpty(SearchModel))
+            {
+                bikesQuery = bikesQuery.Where(b => b.BikeModel.ToUpper().Contains(SearchModel.ToUpper()));
+            }
+
+            if (!string.IsNullOrEmpty(SearchAddress))
+            {
+                bikesQuery = bikesQuery.Where(b => b.BikeAddress.ToUpper().Contains(SearchAddress.ToUpper()));
+            }
+
+            var bikes = await bikesQuery.ToListAsync();
+
+            // Create a view model with filtered results
+            var RegisteredBikeviewModel = new RegisteredBikeViewModel
+            {
+                BikeModels = await BikeModels.Distinct().ToListAsync(),
+                BikesAddress = await BikesAddress.Distinct().ToListAsync(),
+                Bikes = bikes // Add the filtered list of bikes
+            };
+
+            // Return the view with the filtered data
+            return View(RegisteredBikeviewModel);
+        }
+
+
 
     }
 }

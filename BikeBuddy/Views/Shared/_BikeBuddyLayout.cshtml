@@ -36,7 +36,7 @@
                         @*If the user is signed-in display Logout link*@
                         @if (SignInManager.IsSignedIn(User))
                         {
-                            <li><a asp-action="Index" asp-controller="RentRide">Rent/Ride</a></li>
+                            <li class="hover:text-orange-500"><a asp-controller="RentRide" asp-action="Index">Rent/Ride</a></li>
                             <form>
                                 <button asp-controller="User" asp-action="Profile" id="profileDropdown">Profile</button>
                             </form>

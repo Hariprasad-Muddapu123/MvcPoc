@@ -1,0 +1,102 @@
+﻿@model IEnumerable<City>
+<html>
+<head>
+    <title>
+        City Selection
+    </title>
+    <script src="https://cdn.tailwindcss.com">
+    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <style>
+        .city-card {
+                 position: relative;
+                 width: 100%;
+                 padding-top: 100%;
+                 overflow: hidden;
+                 border-radius: 0.5rem;
+             }
+             .city-card img {
+                 position: absolute;
+                 top: 0;
+                 left: 0;
+                 width: 100%;
+                 height: 100%;
+                 object-fit: cover;
+             }
+             .city-card span {
+                 position: absolute;
+                 bottom: 0;
+                 left: 0;
+                 right: 0;
+                 padding: 0.5rem;
+                 background: rgba(0, 0, 0, 0.5);
+                 color: white;
+                 font-size: 1.25rem;
+                 text-align: center;
+             }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="max-w-4xl mx-auto p-4">
+        <div class="relative bg-gray-200 p-4 rounded-lg">
+            <div class="flex justify-content-center flex-row items-center">
+                <img alt="Bike Buddy Logo" class="w-24 h-24 mr-2" src="~/Images/nav_logo.png" />
+                <span class="text-xl  font-bold">
+                    Bike Buddy
+                </span> 
+            </div>
+            <button class="absolute top-2 right-2 text-5xl  font">
+                ×
+            </button>
+        </div>
+        <div class="mt-4">
+            
+            <div class="relative">
+                <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 p-2"></i>
+                <input id="searchBar" class="w-full  p-6 pl-12 pr-20 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 " placeholder="Search or type city to select" type="text" onkeyup="filterCities()" />
+                
+                <button class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400" onclick="clearFilter()"> Clear</button>
+            </div>
+        </div>
+        
+        <div id="cityGrid" class="grid grid-cols-4 gap-4 mt-4">
+            @foreach (var city in Model)
+            {
+                <a asp-controller="RentRide" asp-action="DisplayBikes" asp-route-SearchAddres="@city.Name">
+                    <div class="city-card">
+                        <img alt="@city.Name" src="~/Cities/@city.ImageUrl" />
+                        <span>@city.Name</span>
+                    </div>
+                </a>
+            }
+        </div>
+    </div>
+
+    <script>
+        function filterCities() {
+            const searchInput = document.getElementById("searchBar").value.toLowerCase();
+            const cityCards = document.querySelectorAll(".city-card");
+
+            cityCards.forEach((card) => {
+                const cityName = card.querySelector("span").textContent.toLowerCase();
+                if (cityName.includes(searchInput)) {
+                    card.style.display = "block";
+                } else {
+                    card.style.display = "none";
+                }
+            });
+        }
+
+        function clearFilter() {
+            document.getElementById("searchBar").value = '';
+            filterCities();
+        }
+
+        function selectCity(cityName) {
+            window.location.href = `/Home/CitySelected?cityName=${cityName}`;
+        }
+    </script>
+
+</body>
+</html>
+
