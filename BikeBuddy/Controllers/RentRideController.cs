@@ -281,6 +281,5 @@ namespace BikeBuddy.Controllers
         //    // Redirect to a confirmation page or another view
         //    return View(rideDetails);
         //}
-
     }
 }
