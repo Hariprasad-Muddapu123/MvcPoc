@@ -1,0 +1,47 @@
+﻿@model RideSearchViewModel;
+@{
+    Layout = "_BikeBuddyLayout";
+}
+<html>
+<head>
+    <title>Search Date</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body >
+    @* <div class="container d-flex justify-content-center align-items-center main-content mt-3 mb-3">
+        <div class="bg-gradient p-8 rounded-lg shadow-lg w-96"> *@
+    <div class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="bg-gradient p-8 rounded-lg shadow-lg w-200">
+        <form asp-action="SearchDate" asp-controller="RentRide" method="get">
+            <h1 class="text-2xl font-bold text-center mb-6">Search Date & Time</h1>
+            <div class="mb-4">
+                <h2 class="text-lg font-semibold mb-2">PickUp</h2>
+                <div class="flex justify-between  space-x-2 mb-4">
+                    <div class="flex items-center bg-gray-200 p-2 rounded-md w-40">
+                        <input asp-for="PickupDate" type="date" class="bg-gray-200"  />  
+                    </div>
+                    <div class="flex items-center bg-gray-200 p-2 rounded-md w-40">
+                         <input asp-for="PickupTime" type="Time" class="bg-gray-200" />
+                    </div>
+                </div>
+            </div>
+            <div class="mb-6">
+                <h2 class="text-lg font-semibold mb-2">Dropoff</h2>
+                <div class="flex justify-between space-x-2 mb-4">
+                        <div class="flex items-center bg-gray-200 p-2 rounded-md w-40">
+                            <input asp-for="DropoffDate" type="date" class="bg-gray-200" />
+                        </div>
+                        <div class="flex items-center bg-gray-200 p-2 rounded-md w-40">
+                            <input asp-for="DropoffTime" type="Time" class="bg-gray-200" />
+                        </div>
+                </div>
+            </div>
+            <div class="flex justify-center">
+                <button class="bg-orange-500 text-white py-2 px-6 rounded-md">Search</button>
+            </div>
+        </form>
+    </div>
+    </div>
+</body>
+</html>

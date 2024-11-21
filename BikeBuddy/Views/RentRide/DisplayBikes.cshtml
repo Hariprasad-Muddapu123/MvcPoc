@@ -33,7 +33,8 @@
                                 @foreach (var address in Model.BikesAddress)
                                 {
                                     <label class="block">
-                                        <input class="mr-2" type="checkbox" name="SelectedAddresses" value="@address" />
+                                        <input class="mr-2" type="checkbox" name="SelectedAddresses" value="@address" 
+                                            @(Context.Request.Query["SelectedAddresses"].Contains(address) ? "checked" : "")/>
                                         @address
                                     </label>
                                 }
@@ -61,7 +62,8 @@
                                 @foreach (var modelBike in Model.BikeModels)
                                 {
                                     <label class="block">
-                                        <input class="mr-2" type="checkbox" name="SelectedModels" value="@modelBike" />
+                                        <input class="mr-2" type="checkbox" name="SelectedModels" value="@modelBike"
+                                        @(Context.Request.Query["SelectedModels"].Contains(modelBike) ? "checked" : "") />
                                         @modelBike
                                     </label>
                                 }
@@ -85,6 +87,8 @@
                     {
                         foreach (var bike in Model.Bikes)
                         {
+                            <form asp-action="Date" asp-controller="RentRide" method="get"  >
+                                <input type="hidden" name="BikeId" value="@bike.BikeId" />
                             <div class="flex card mb-5">
                                 <div class="bg-white p-4 rounded shadow-md">
                                     <img alt="Bike Image"
@@ -95,9 +99,11 @@
                                     <p class="text-gray-600">Address: @bike.BikeAddress</p>
                                     <p class="text-gray-600">Price/Hour: ₹100</p>
                                     <p class="text-gray-600">Available Upto: @bike.AvailableUpto.ToString("dd/MM/yyyy")</p>
-                                    <button class="w-full bg-orange-500 text-white py-2 mt-2 rounded-lg">Book Now</button>
+                                    <button class="w-full bg-orange-500 text-white py-2 mt-2 rounded-lg" >Book Now</button>
                                 </div>
                             </div>
+                            </form>
+                            
 
                         }
                     }
@@ -111,3 +117,5 @@
     </div>
 </body>
 </html>
+
+

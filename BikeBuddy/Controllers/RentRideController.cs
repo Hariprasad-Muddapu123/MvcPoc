@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Numerics;
 
 namespace BikeBuddy.Controllers
 {
@@ -28,9 +29,7 @@ namespace BikeBuddy.Controllers
         [HttpGet]
         public async Task<IActionResult> Rent()
         {
-            //TempData["Message"] = "";
             var user = await _userManager.GetUserAsync(User);
-            // var model = new BikeViewModel();
             var userBikes = await _context.Bikes
                    .Where(b => b.UserId.Equals(user.Id))
                    .ToListAsync();
@@ -41,8 +40,6 @@ namespace BikeBuddy.Controllers
             };
 
             return View(viewModel);
-
-            //return View(model);
         }
 
         [HttpPost]
@@ -51,34 +48,30 @@ namespace BikeBuddy.Controllers
         {
             if (ModelState.IsValid)
             {
-                var model = viewModel.NewBike;  // Access the NewBike model
+                var model = viewModel.NewBike;  
 
-                // Handle BikeImage upload
                 if (model.BikeImage != null && model.BikeImage.Length > 0)
                 {
                     using (var memoryStream = new MemoryStream())
                     {
                         await model.BikeImage.CopyToAsync(memoryStream);
-                        // Assuming your Bike class has a BikeImageBytes property
+                        
                         model.BikeImageBytes = memoryStream.ToArray();
                     }
                 }
 
-                // Handle BikeDocuments upload
                 if (model.BikeDocuments != null && model.BikeDocuments.Length > 0)
                 {
                     using (var memoryStream = new MemoryStream())
                     {
                         await model.BikeDocuments.CopyToAsync(memoryStream);
-                        // Assuming your Bike class has a BikeDocumentsBytes property
+                     
                         model.BikeDocumentsBytes = memoryStream.ToArray();
                     }
                 }
 
-                // Retrieve the logged-in user
                 var user = await _userManager.GetUserAsync(User);
 
-                // Create the bike object from the model
                 var bike = new Bike
                 {
                     BikeModel = model.BikeModel,
@@ -89,39 +82,26 @@ namespace BikeBuddy.Controllers
                     UserId = user.Id,
                     RegistrationDate = DateTime.UtcNow,
                     AvailableUpto = model.AvailableUpto,
-                    // Save the byte arrays for images and documents
                     BikeImageBytes = model.BikeImageBytes,
                     BikeDocumentsBytes = model.BikeDocumentsBytes
                 };
 
-                // Save to the database
                 _context.Bikes.Add(bike);
                 var result = await _context.SaveChangesAsync();
 
-                // Set TempData message for success/failure
                 TempData["Message"] = result == 1 ? "Bike registered successfully!" : "Failed to upload bike details";
 
-                // Redirect to the Rent page
                 return RedirectToAction("Rent");
             }
-
-            // If model validation fails, show the form with errors
             TempData["ErrorMessage"] = "Failed to register the bike. Please check the inputs.";
-            return View(viewModel);  // Return the RegisterBikeViewModel back to the view
+            return View(viewModel);
         }
 
         [HttpGet]
-        public IActionResult Ride()
+        public async  Task<IActionResult> Ride()
         {
-            var cities = _context.Cities.ToList();
+            var cities = await _context.Cities.ToListAsync();
             return View(cities);
-        }
-
-
-        public async Task<IActionResult> DisplayByCity(String SearchAddress)
-        {
-            IQueryable<string> BikeLocation = from m in _context.Bikes orderby m.BikeLocation select m.BikeLocation;
-            return View();
         }
 
         //public async Task<IActionResult> DisplayBikes(string SearchModel, string SearchAddress)
@@ -166,28 +146,36 @@ namespace BikeBuddy.Controllers
         //    // Return the view with the filtered data
         //    return View(RegisteredBikeviewModel);
         //}
-        public IActionResult DisplayBikes(string SearchAddress, string SearchModel, string SearchLocation)
+        [HttpGet]
+        public async Task<IActionResult> DisplayBikes(string SearchAddress, string SearchModel, string SearchLocation, string[] SelectedAddresses,string SelectedModels)
         {
-            var bikes = _context.Bikes.ToList();
+            var bikes =await  _context.Bikes.ToListAsync();
 
             // Filter by City
             if (!string.IsNullOrEmpty(SearchLocation))
             {
-                bikes = bikes.Where(b => b.BikeLocation == SearchLocation).ToList();
+                bikes =  bikes.Where(b => b.BikeLocation == SearchLocation & b.KycStatus == KycStatus.Approved).ToList();
             }
 
-            // Filter by Address
             if (!string.IsNullOrEmpty(SearchAddress))
             {
                 bikes = bikes.Where(b => b.BikeAddress.Contains(SearchAddress, StringComparison.OrdinalIgnoreCase)).ToList();
             }
 
-            // Filter by Bike Model
             if (!string.IsNullOrEmpty(SearchModel))
             {
                 bikes = bikes.Where(b => b.BikeModel.Contains(SearchModel, StringComparison.OrdinalIgnoreCase)).ToList();
             }
 
+            if (SelectedAddresses != null && SelectedAddresses.Any())
+            {
+                bikes = bikes.Where(b => SelectedAddresses.Contains(b.BikeAddress)).ToList();
+            }
+
+            if (SelectedModels != null && SelectedModels.Any())
+            {
+                bikes = bikes.Where(b => SelectedModels.Contains(b.BikeModel)).ToList();
+            }
 
             var viewModel = new RegisteredBikeViewModel
             {
@@ -198,9 +186,101 @@ namespace BikeBuddy.Controllers
 
             return View(viewModel);
         }
+        [HttpGet]
+        public async Task<IActionResult> Date(int BikeId)
+        {
+            HttpContext.Session.SetString("BikeId",BikeId.ToString());
+            return View();
+        }
+
+        
+
+        [HttpGet]
+        public IActionResult SearchDate(RideSearchViewModel model)
+        {
+            // Combine Date and Time fields to create full DateTime objects
+            DateTime pickupDateTime = model.PickupDate.Add(TimeSpan.Parse(model.PickupTime));
+            DateTime dropoffDateTime = model.DropoffDate.Add(TimeSpan.Parse(model.DropoffTime));
+
+            // Calculate the time difference in hours
+            TimeSpan timeDifference = dropoffDateTime - pickupDateTime;
+
+            // Calculate the total price based on the time difference
+            double totalHours = CalculateHours(timeDifference);
+            decimal totalPrice = (decimal)totalHours * 100;
+            decimal gst = (totalPrice * 5 )/ 100;
+            decimal totalBill = totalPrice + gst;
+
+            // Store ride details and calculated price in session
+            HttpContext.Session.SetString("PickupDateTime", pickupDateTime.ToString("yyyy-MM-dd HH:mm"));
+            HttpContext.Session.SetString("DropoffDateTime", dropoffDateTime.ToString("yyyy-MM-dd HH:mm"));
+            HttpContext.Session.SetString("RentedHours", totalHours.ToString(""));
+            HttpContext.Session.SetString("TotalPrice", totalPrice.ToString("F2"));  // Store price as string
+            HttpContext.Session.SetString("Gst", gst.ToString(""));
+            HttpContext.Session.SetString("TotalBill", totalBill.ToString(""));
+
+            // Pass the total price to the view (optional, if you want to show it immediately)
+            ViewBag.TotalPrice = totalPrice;
+
+            // Redirect or return the same view with the calculated price
+            return RedirectToAction("BookBike");
+        }
+
+        private double CalculateHours(TimeSpan timeDifference)
+        {
+            double totalHours = timeDifference.TotalHours;
+            if (totalHours % 1 != 0)
+            {
+                totalHours = Math.Ceiling(totalHours);
+            }
+            return totalHours;
+        }
+        [HttpGet]
+        public async Task<IActionResult> BookBike()
+        {
+            var totalPrice = HttpContext.Session.GetString("TotalPrice");
+            var rentedHours = HttpContext.Session.GetString("RentedHours");
+            var gst = HttpContext.Session.GetString("Gst");
+            var totalBill = HttpContext.Session.GetString("TotalBill");
+            var bikeIdString = HttpContext.Session.GetString("BikeId");
+            if (!int.TryParse(bikeIdString, out int bikeId))
+            {
+                // Handle invalid BikeId format
+                return BadRequest("Invalid BikeId format.");
+            }
+            var bike = await _context.Bikes.FirstOrDefaultAsync(b => b.BikeId == bikeId);
+
+            var model = new BookingViewModel
+            {
+                BikeDetails = bike,
+                Amount = totalPrice,
+                Gst = gst,
+                RentedHours = rentedHours,
+                TotalBill = totalBill
+
+            };
+            return View(model);
+        }
 
 
 
+        //Handle payment success and clear session
+        //public IActionResult PaymentSucceeded()
+        //{
+        //    // Store ride details after successful payment (in DB or elsewhere)
+        //    var rideDetails = new RideDetails
+        //    {
+        //        PickupDateTime = HttpContext.Session.GetString("PickupDateTime"),
+        //        DropoffDateTime = HttpContext.Session.GetString("DropoffDateTime"),
+        //        TotalPrice = decimal.Parse(HttpContext.Session.GetString("TotalPrice"))
+        //    };
+
+        //    // Clear session data after successful payment
+        //    HttpContext.Session.Clear();
+
+        //    // Redirect to a confirmation page or another view
+        //    return View(rideDetails);
+        //}
 
     }
 }

@@ -9,10 +9,14 @@ namespace BikeBuddy.Models
 
         [Required]
         [DataType(DataType.Password)]
+        [StringLength(100, MinimumLength = 6, ErrorMessage = "Password must be at least 6 characters long.")]
         public string NewPassword { get; set; }
 
+        
+        [Required(ErrorMessage = "Confirm password is required.")]
         [DataType(DataType.Password)]
-        [Compare("NewPassword", ErrorMessage = "Passwords do not match.")]
+        [Display(Name = "Confirm Password")]
+        [Compare("NewPassword", ErrorMessage = "Password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
     }
 
