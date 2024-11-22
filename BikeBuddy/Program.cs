@@ -1,5 +1,6 @@
 using BikeBuddy.Data;
 using BikeBuddy.Models;
+using BikeBuddy.Repositories;
 using BikeBuddy.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -37,7 +38,13 @@ namespace BikeBuddy
                     .AddDefaultTokenProviders();
             // Add services to the container.
             builder.Services.AddControllersWithViews();
-            builder.Services.AddScoped<EmailSender> (); 
+            builder.Services.AddScoped<EmailSender> ();
+            // Register Repositories
+            builder.Services.AddScoped<IBikeRepository, BikeRepository>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+            // Register Services
+            builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

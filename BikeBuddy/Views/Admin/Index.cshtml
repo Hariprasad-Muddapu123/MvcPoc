@@ -1,0 +1,80 @@
+﻿@model BikeBuddy.ViewModels.AdminDashboardViewModel
+@{
+    Layout = "_AdminLayout";
+}
+
+<div class="flex  min-h-screen bg-gray-100" style="width:160% ">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-7xl w-full px-8 h-100 mt-5">
+        <!-- Total Bikes -->
+        <div class="bg-[#D9D9D9] p-10 rounded-lg shadow-lg transform transition-transform hover:scale-105">
+            <div class="flex items-center mb-6">
+                <img alt="Bike Icon" class="h-16 w-16" src="https://storage.googleapis.com/a1aa/image/wNDh3wWRzX5RD9WGfzHN5fKtMtR3yeSOUl77AYzv2seUubOPB.jpg" />
+                <h2 class="ml-6 text-3xl font-bold">
+                    Total Bikes
+                </h2>
+            </div>
+            <p class="text-5xl font-bold mb-6">
+                @Model.TotalBikes
+            </p>
+            <div class="flex justify-between">
+                <div>
+                    <p class="text-gray-700">
+                        Approved
+                    </p>
+                    <p class="text-2xl font-bold">
+                        @Model.ApprovedBikes
+                    </p>
+                </div>
+                <div>
+                    <p class="text-gray-700">
+                        Pending
+                    </p>
+                    <p class="text-2xl font-bold">
+                        @Model.PendingBikes
+                    </p>
+                </div>
+                <div>
+                    <p class="text-gray-700">
+                        Rejected
+                    </p>
+                    <p class="text-2xl font-bold">
+                        @Model.RejectedBikes
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- Total Users -->
+        <div class="bg-[#D9D9D9] p-10 rounded-lg shadow-lg transform transition-transform hover:scale-105 h=100">
+            <div class="flex items-center mb-6">
+                <img alt="User Icon" class="h-16 w-16" src="https://storage.googleapis.com/a1aa/image/f1LDo2esbvhJbUYl9eY3WYe39IUDW8nv9m1bpojytqdbubOPB.jpg" />
+                <h2 class="ml-6 text-3xl font-bold">
+                    Total Users
+                </h2>
+            </div>
+            <p class="text-5xl font-bold mb-6">
+                @Model.TotalUsers
+            </p>
+            <div class="flex justify-between">
+                <div>
+                    <p class="text-gray-700">
+                        Kyc Users
+                    </p>
+                    <p class="text-2xl font-bold">
+                        @Model.KycUsers
+                    </p>
+                </div>
+                <div>
+                    <p class="text-gray-700">
+                        Non Kyc Users
+                    </p>
+                    <p class="text-2xl font-bold">
+                        @Model.NonKycUsers
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
