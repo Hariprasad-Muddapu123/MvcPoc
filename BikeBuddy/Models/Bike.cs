@@ -12,6 +12,10 @@ namespace BikeBuddy.Models
 
         public string BikeLocation { get; set; }
 
+        public double BikeRentPrice { get; set; }
+
+        public bool Available { get; set; } 
+
         public string BikeAddress { get; set; }
 
         public KycStatus KycStatus { get; set; }
@@ -29,5 +33,11 @@ namespace BikeBuddy.Models
 
         // Navigation property to User (One-to-Many)
         public User User { get; set; }
+
+
+        public ICollection<Ride> Rides { get; set; }
+
+        public ICollection<Payment> Payments { get; set; } 
+
     }
 }

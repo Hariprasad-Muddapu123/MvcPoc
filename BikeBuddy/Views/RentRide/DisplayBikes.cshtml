@@ -97,9 +97,20 @@
                                     <h3 class="text-xl font-bold mb-1">@bike.BikeModel</h3>
                                     <p class="text-gray-600">Location: @bike.BikeLocation</p>
                                     <p class="text-gray-600">Address: @bike.BikeAddress</p>
-                                    <p class="text-gray-600">Price/Hour: ₹100</p>
+                                    <p class="text-gray-600">Price/Hour: @bike.BikeRentPrice</p>
                                     <p class="text-gray-600">Available Upto: @bike.AvailableUpto.ToString("dd/MM/yyyy")</p>
-                                    <button class="w-full bg-orange-500 text-white py-2 mt-2 rounded-lg" >Book Now</button>
+                                    @{
+                                        if(@bike.Available)
+                                        {
+                                            <p class="text-green-600 flex justify-content-center"> Available</p>
+                                                <button class="w-full bg-orange-500 text-white py-2 mt-2 rounded-lg">Book Now</button>
+                                        }
+                                        else
+                                        {
+                                            <p class="text-red-600 flex justify-content-center">Not available</p>
+                                                <button class="w-full bg-gray-400 text-white py-2 mt-2 rounded-lg" disabled>Book Now</button>
+                                        }
+                                }  
                                 </div>
                             </div>
                             </form>

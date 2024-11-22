@@ -118,7 +118,7 @@ namespace BikeBuddy.Controllers
                             }
                             else
                             {
-                                return RedirectToAction("Index", "Account");
+                                return RedirectToAction("Index", "Home");
                             }
                         }
                         else
@@ -140,7 +140,7 @@ namespace BikeBuddy.Controllers
         public async Task<IActionResult> Logout()
         {
             await signInManager.SignOutAsync();
-            return RedirectToAction("index", "Account");
+            return RedirectToAction("index", "Home");
         }
 
         public IActionResult Index()

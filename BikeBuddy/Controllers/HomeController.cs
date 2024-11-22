@@ -18,6 +18,20 @@ namespace BikeBuddy.Controllers
             return View();
         }
 
+        public IActionResult Safety()
+        {
+            return View();
+        }
+        public IActionResult Aboutus()
+        {
+            return View();
+        }
+
+        public IActionResult ContactUs()
+        {
+            return View();
+        }
+
         public IActionResult Privacy()
         {
             return View();

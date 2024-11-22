@@ -1,8 +1,107 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    Layout = "_BikeBuddyLayout";
 }
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>
+        Bike Buddy
+    </title>
+    <script src="https://cdn.tailwindcss.com">
+    </script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&amp;display=swap" rel="stylesheet" />
+</head>
+<body class="font-roboto">
+    <div class="container mx-auto p-4">
+        <div class="flex flex-col md:flex-row items-center justify-center md:justify-between p-8 max-w-6xl mx-auto">
+            <!-- Text Content -->
+            <div class="flex-1 p-4 text-center md:text-left">
+                <h1 class="text-5xl font-bold text-black">
+                    Bike
+                    <span class="text-orange-500">Buddy</span>
+                </h1>
+                <p class="text-2xl text-orange-500 mt-2">
+                    Rent-Ride
+                    <span class="text-black">Earn-Enjoy</span>
+                </p>
+                <p class="mt-4 text-lg">
+                    A platform to connect the "Bike-User" who has need of the bike and "Bike-Owner" rent to earn without any third-party rental shop.
+                </p>
+                <div class="mt-6">
+                    <button class="px-12 py-2 border border-orange-500 text-orange-500 rounded-full mr-4 text-xl">
+                        Rent
+                    </button>
+                    <button class="px-12 py-2 bg-orange-500 text-white rounded-full text-xl">
+                        Ride
+                    </button>
+                </div>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+            </div>
+
+            <!-- Image Content -->
+            <div class="flex-1 p-4 flex items-center justify-center">
+                <img alt="Illustration of two bikes with the text 'Bike Buddy' in the background"
+                     src="~/Images/MainPageLogo.png"
+                     class="w-80 h-auto max-w-full" />
+            </div>
+        </div>
+
+        <div class="mt-16">
+            <h2 class="text-4xl font-bold  ms-lg-6">
+                &nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; Services we providing
+            </h2>
+            <div class="flex  justify-content-center mt-4">
+                <button class="px-4 py-2 border border-orange-500 text-orange-500 rounded-full mr-2">
+                    Owner Services
+                </button>
+                <button class="px-4 py-2 bg-orange-500 text-white rounded-full">
+                    Rider Services
+                </button>
+            </div>
+            <h3 class=" flex justify-content-center text-3xl font-bold mt-8">
+                Rider Services
+            </h3>
+            <div class="flex justify-center">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8 max-w-4xl">
+                    <!-- Card 1 -->
+                    <div class="border border-orange-500 p-4 rounded-lg text-center max-w-xs mx-auto">
+                        <img alt="Icon representing finding bikes" class="mx-auto mb-4" height="80" src="~/Images/MainPageLogo.png" width="80" />
+                        <h4 class="text-lg font-bold">
+                            Find Bikes
+                        </h4>
+                        <p class="mt-2 text-sm">
+                            Easily find bikes available for rent in your area with our user-friendly search feature.
+                        </p>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="border border-orange-500 p-4 rounded-lg text-center max-w-xs mx-auto">
+                        <img alt="Icon representing lowest cost rentals" class="mx-auto mb-4" height="80" src="~/Images/MainPageLogo.png" width="80" />
+                        <h4 class="text-lg font-bold">
+                            Lowest Cost Rentals
+                        </h4>
+                        <p class="mt-2 text-sm">
+                            We offer the most competitive rental rates to ensure you get the best deal possible.
+                        </p>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="border border-orange-500 p-4 rounded-lg text-center max-w-xs mx-auto">
+                        <img alt="Icon representing ride anywhere" class="mx-auto mb-4" height="80" src="~/Images/MainPageLogo.png" width="80" />
+                        <h4 class="text-lg font-bold">
+                            Ride Anywhere
+                        </h4>
+                        <p class="mt-2 text-sm">
+                            Our bikes are available for rent in multiple locations, allowing you to ride wherever you need.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>
+

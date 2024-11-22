@@ -15,6 +15,10 @@ namespace BikeBuddy.ViewModels
 
         public String BikeAddress { get; set; }
 
+        public double BikeRentPrice { get; set; }
+
+        public bool Available { get; set; } = true;
+
         public KycStatus KycStatus { get; set; }
 
         public DateTime RegistrationDate { get; set; }

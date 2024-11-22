@@ -4,6 +4,7 @@ using BikeBuddy.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BikeBuddy.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241122042058_price")]
+    partial class price
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -29,9 +32,6 @@ namespace BikeBuddy.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BikeId"));
-
-                    b.Property<bool>("Available")
-                        .HasColumnType("bit");
 
                     b.Property<DateTime>("AvailableUpto")
                         .HasColumnType("datetime2");
@@ -99,109 +99,6 @@ namespace BikeBuddy.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Cities");
-                });
-
-            modelBuilder.Entity("BikeBuddy.Models.Payment", b =>
-                {
-                    b.Property<int>("PaymentId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PaymentId"));
-
-                    b.Property<int>("BikeId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Currency")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PaymentStatus")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("RideId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("TotalAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("TransactionDateTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("TransactionId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("PaymentId");
-
-                    b.HasIndex("BikeId");
-
-                    b.HasIndex("RideId")
-                        .IsUnique();
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Payments");
-                });
-
-            modelBuilder.Entity("BikeBuddy.Models.Ride", b =>
-                {
-                    b.Property<int>("RideId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RideId"));
-
-                    b.Property<string>("Amount")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("BikeId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("DropoffDateTime")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Gst")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PickupDateTime")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("RentalStatus")
-                        .HasMaxLength(50)
-                        .HasColumnType("int");
-
-                    b.Property<string>("RentedHours")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("RideRegisteredDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("TotalAmount")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("RideId");
-
-                    b.HasIndex("BikeId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Rides");
                 });
 
             modelBuilder.Entity("BikeBuddy.Models.User", b =>
@@ -438,52 +335,6 @@ namespace BikeBuddy.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("BikeBuddy.Models.Payment", b =>
-                {
-                    b.HasOne("BikeBuddy.Models.Bike", "Bike")
-                        .WithMany("Payments")
-                        .HasForeignKey("BikeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("BikeBuddy.Models.Ride", "Ride")
-                        .WithOne("Payment")
-                        .HasForeignKey("BikeBuddy.Models.Payment", "RideId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BikeBuddy.Models.User", "User")
-                        .WithMany("Payments")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Bike");
-
-                    b.Navigation("Ride");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("BikeBuddy.Models.Ride", b =>
-                {
-                    b.HasOne("BikeBuddy.Models.Bike", "Bike")
-                        .WithMany("Rides")
-                        .HasForeignKey("BikeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BikeBuddy.Models.User", "User")
-                        .WithMany("Rides")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Bike");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -535,26 +386,9 @@ namespace BikeBuddy.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("BikeBuddy.Models.Bike", b =>
-                {
-                    b.Navigation("Payments");
-
-                    b.Navigation("Rides");
-                });
-
-            modelBuilder.Entity("BikeBuddy.Models.Ride", b =>
-                {
-                    b.Navigation("Payment")
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("BikeBuddy.Models.User", b =>
                 {
                     b.Navigation("Bikes");
-
-                    b.Navigation("Payments");
-
-                    b.Navigation("Rides");
                 });
 #pragma warning restore 612, 618
         }

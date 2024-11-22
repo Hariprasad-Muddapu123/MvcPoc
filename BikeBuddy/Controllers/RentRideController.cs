@@ -79,7 +79,9 @@ namespace BikeBuddy.Controllers
                     BikeLocation = model.BikeLocation,
                     BikeAddress = model.BikeAddress,
                     KycStatus = model.KycStatus,
+                    BikeRentPrice = model.BikeRentPrice,
                     UserId = user.Id,
+                    Available=true,
                     RegistrationDate = DateTime.UtcNow,
                     AvailableUpto = model.AvailableUpto,
                     BikeImageBytes = model.BikeImageBytes,
@@ -196,33 +198,49 @@ namespace BikeBuddy.Controllers
         
 
         [HttpGet]
-        public IActionResult SearchDate(RideSearchViewModel model)
+        public async Task<IActionResult> SearchDate(RideSearchViewModel model)
         {
-            // Combine Date and Time fields to create full DateTime objects
+
+
+            var bikeIdString = HttpContext.Session.GetString("BikeId");
+            if (!int.TryParse(bikeIdString, out int bikeId))
+            {
+
+                return BadRequest("Invalid BikeId format.");
+            }
+            var bike = await _context.Bikes.FirstOrDefaultAsync(b => b.BikeId == bikeId);
+            if(bike.AvailableUpto<model.DropoffDate)
+            {
+                ViewData["Message"] = $"Not Available upto that time.Available upto {@bike.AvailableUpto}";
+                return View("Date");
+            }
             DateTime pickupDateTime = model.PickupDate.Add(TimeSpan.Parse(model.PickupTime));
             DateTime dropoffDateTime = model.DropoffDate.Add(TimeSpan.Parse(model.DropoffTime));
-
-            // Calculate the time difference in hours
             TimeSpan timeDifference = dropoffDateTime - pickupDateTime;
+            
+            double bikeRentPrice = await _context.Bikes
+                .Where(b => b.BikeId == bikeId)
+                .Select(b => b.BikeRentPrice)
+                .FirstOrDefaultAsync();
 
-            // Calculate the total price based on the time difference
+
             double totalHours = CalculateHours(timeDifference);
-            decimal totalPrice = (decimal)totalHours * 100;
+            decimal totalPrice = (decimal)totalHours * (decimal)bikeRentPrice;
             decimal gst = (totalPrice * 5 )/ 100;
             decimal totalBill = totalPrice + gst;
 
-            // Store ride details and calculated price in session
+
             HttpContext.Session.SetString("PickupDateTime", pickupDateTime.ToString("yyyy-MM-dd HH:mm"));
             HttpContext.Session.SetString("DropoffDateTime", dropoffDateTime.ToString("yyyy-MM-dd HH:mm"));
             HttpContext.Session.SetString("RentedHours", totalHours.ToString(""));
-            HttpContext.Session.SetString("TotalPrice", totalPrice.ToString("F2"));  // Store price as string
+            HttpContext.Session.SetString("TotalPrice", totalPrice.ToString("F2"));  
             HttpContext.Session.SetString("Gst", gst.ToString(""));
             HttpContext.Session.SetString("TotalBill", totalBill.ToString(""));
 
-            // Pass the total price to the view (optional, if you want to show it immediately)
+        
             ViewBag.TotalPrice = totalPrice;
 
-            // Redirect or return the same view with the calculated price
+           
             return RedirectToAction("BookBike");
         }
 
@@ -245,7 +263,6 @@ namespace BikeBuddy.Controllers
             var bikeIdString = HttpContext.Session.GetString("BikeId");
             if (!int.TryParse(bikeIdString, out int bikeId))
             {
-                // Handle invalid BikeId format
                 return BadRequest("Invalid BikeId format.");
             }
             var bike = await _context.Bikes.FirstOrDefaultAsync(b => b.BikeId == bikeId);
@@ -262,24 +279,77 @@ namespace BikeBuddy.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> PaymentSucess()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
 
+            var bikeIdString = HttpContext.Session.GetString("BikeId");
+            if (!int.TryParse(bikeIdString, out int bikeId))
+            {
+                return BadRequest("Invalid BikeId format.");
+            }
+            var pickupdatetime = HttpContext.Session.GetString("PickupDateTime");
+            var dropoffdatetime = HttpContext.Session.GetString("PickupDateTime");
+            var totalPrice = HttpContext.Session.GetString("TotalPrice");
+            var rentedHours = HttpContext.Session.GetString("RentedHours");
+            var gst = HttpContext.Session.GetString("Gst");
+            var totalBill = HttpContext.Session.GetString("TotalBill");
 
-        //Handle payment success and clear session
-        //public IActionResult PaymentSucceeded()
-        //{
-        //    // Store ride details after successful payment (in DB or elsewhere)
-        //    var rideDetails = new RideDetails
-        //    {
-        //        PickupDateTime = HttpContext.Session.GetString("PickupDateTime"),
-        //        DropoffDateTime = HttpContext.Session.GetString("DropoffDateTime"),
-        //        TotalPrice = decimal.Parse(HttpContext.Session.GetString("TotalPrice"))
-        //    };
+            var ride = new Ride
+            {
+                UserId = user.Id,
+                BikeId = bikeId,
+                PickupDateTime = pickupdatetime,
+                DropoffDateTime = dropoffdatetime,
+                RentalStatus = RentStatus.Ongoing, 
+                RideRegisteredDate = DateTime.UtcNow,
+                RentedHours=rentedHours,
+                Amount = totalPrice, 
+                Gst = gst, 
+                TotalAmount = totalBill, 
+            };
 
-        //    // Clear session data after successful payment
-        //    HttpContext.Session.Clear();
+            _context.Rides.Add(ride);
+            await _context.SaveChangesAsync();
 
-        //    // Redirect to a confirmation page or another view
-        //    return View(rideDetails);
-        //}
+            var payment = new Payment
+            {
+                UserId = user.Id,
+                RideId = ride.RideId,
+                BikeId = ride.BikeId, 
+                TransactionId = GenerateTransactionId(),
+                TransactionDateTime = DateTime.UtcNow,
+                TotalAmount = Convert.ToDecimal(ride.TotalAmount),
+                PaymentStatus = "Success", 
+                Currency = "INR" 
+            };
+            
+            _context.Payments.Add(payment);
+            await _context.SaveChangesAsync();
+
+            ride.RentalStatus = RentStatus.Completed; 
+            ride.TotalAmount = payment.TotalAmount.ToString();
+
+            _context.Rides.Update(ride);
+            await _context.SaveChangesAsync();
+
+            var bike = await _context.Bikes.FirstOrDefaultAsync(b => b.BikeId == bikeId);
+            bike.Available = false;
+            _context.Bikes.Update(bike);
+            await _context.SaveChangesAsync();
+            HttpContext.Session.Clear();
+            return View(bike); 
+        }
+
+        private string GenerateTransactionId()
+        {
+            return Guid.NewGuid().ToString("N");
+        }
+
     }
 }

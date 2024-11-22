@@ -21,5 +21,10 @@ namespace BikeBuddy.Models
         public String? Address {  get; set; }
 
         public ICollection<Bike> Bikes { get; set; }
+
+        public ICollection<Ride> Rides { get; set; }
+
+        public ICollection<Payment> Payments { get; set; } // Navigation property
+
     }
 }

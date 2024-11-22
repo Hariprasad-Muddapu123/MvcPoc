@@ -26,8 +26,10 @@
             </div>
             <div class="nav-right">
                 <ul>
-                    <li><a>Home</a></li>
-                    
+                    <li><a asp-action="Index" asp-controller="Home">Home</a></li>
+                    <li><a asp-action="AboutUs" asp-controller="Home">About us</a></li>
+                    <li><a asp-action="Contactus" asp-controller="Home">Contact Us </a></li>
+                    <li><a asp-action="Safety" asp-controller="Home">Safety</a></li>
                     
                     <ul class="navbar-nav ml-auto">
                         @*If the user is signed-in display Logout link*@
@@ -52,9 +54,7 @@
                         }
                         else
                         {
-                            <li><a>About us</a></li>
-                            <li><a>Contact Us </a></li>
-                            <li><a>Safety</a></li>
+                            
                             <form>
                                 <button asp-controller="Account" asp-action="login">Login</button>
                             </form>
