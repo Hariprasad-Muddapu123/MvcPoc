@@ -1,5 +1,6 @@
 ﻿using BikeBuddy.Data;
 using BikeBuddy.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace BikeBuddy.Repositories
 {
@@ -30,6 +31,21 @@ namespace BikeBuddy.Repositories
         public int GetPendingBikes()
         {
             return _context.Bikes.Count(b=>b.KycStatus == KycStatus.Pending);
+        }
+        public IEnumerable<Bike> GetAll()
+        {
+            return _context.Bikes.Include(b => b.User).ToList();
+        }
+
+        public Bike GetById(int bikeId)
+        {
+            return _context.Bikes.Include(b => b.User).FirstOrDefault(b => b.BikeId == bikeId);
+        }
+
+        public void Update(Bike bike)
+        {
+            _context.Bikes.Update(bike);
+            _context.SaveChanges();
         }
     }
 }

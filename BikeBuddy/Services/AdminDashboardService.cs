@@ -56,9 +56,26 @@ namespace BikeBuddy.Services
             if (user == null) return false;
 
             user.KycStatus = approve ? KycStatus.Approved : KycStatus.Rejected;
-            _userRepository.SaveChanges(); // Assuming SaveChanges is implemented in UserRepository
+            _userRepository.SaveChanges();
             return true;
         }
+
+        public IEnumerable<Bike> GetAllBikes()
+        {
+            return _bikeRepository.GetAll();
+        }
+
+        public bool UpdateBikeStatus(int bikeId, bool approve)
+        {
+            var bike = _bikeRepository.GetById(bikeId);
+            if (bike == null) return false;
+
+            // Update the status or approval status
+            bike.KycStatus = approve ? KycStatus.Approved : KycStatus.Rejected; // Assuming you want to set some approval flag
+            _bikeRepository.Update(bike); // Save changes to the database
+            return true;
+        }
+
 
 
     }

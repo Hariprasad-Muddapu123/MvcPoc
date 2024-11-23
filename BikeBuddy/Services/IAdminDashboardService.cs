@@ -12,5 +12,8 @@ namespace BikeBuddy.Services
         User GetUserById(Guid id);
 
         bool UpdateKycStatus(String userId, bool approve);
+
+        IEnumerable<Bike> GetAllBikes(); // Add this line
+        bool UpdateBikeStatus(int bikeId, bool isApproved);
     }
 }

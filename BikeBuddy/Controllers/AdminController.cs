@@ -1,16 +1,20 @@
 ﻿using BikeBuddy.Services;
+using BikeBuddy.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using BikeBuddy.ViewModels;
+using BikeBuddy.Models;
 
 namespace BikeBuddy.Controllers
 {
     public class AdminController : Controller
     {
         private readonly IAdminDashboardService _adminDashboardService;
+        private readonly IBikeRepository _bikeRepository;
 
-        public AdminController(IAdminDashboardService adminDashboardService)
+        public AdminController(IAdminDashboardService adminDashboardService, IBikeRepository bikeRepository)
         {
             _adminDashboardService = adminDashboardService;
+            _bikeRepository = bikeRepository;
         }
 
         public IActionResult Index()
@@ -112,8 +116,63 @@ namespace BikeBuddy.Controllers
             return RedirectToAction("KycDetails");
         }
 
+       
 
+        public IActionResult BikeDetails()
+        {
+            // Retrieve dashboard data (if needed)
+            var dashboardData = _adminDashboardService.GetDashboardData();
 
+            // Fetch all bikes (you can modify this to get bikes that are pending for approval if needed)
+            var bikes = _adminDashboardService.GetAllBikes();
+
+            // Store bikes in ViewBag to pass to the view
+            ViewBag.Bikes = bikes;
+
+            // Return dashboard data if you want to display some metrics like total bikes, etc.
+            return View(dashboardData); // You can return View(dashboardData) or View() depending on your requirements
+        }
+        [HttpGet]
+        public IActionResult ViewBikeDetails(int bikeId)
+        {
+            // Fetch the bike details using the bikeId
+            var bike = _bikeRepository.GetById(bikeId);
+
+            // If no bike is found, return to the bike list with an error message
+            if (bike == null)
+            {
+                TempData["Message"] = "Bike not found.";
+                TempData["MessageType"] = "error"; // Indicates an error
+                return RedirectToAction("BikeDetails"); // Or another action that lists bikes
+            }
+
+            // Return the bike details to the view
+            return View(bike); // This will pass the bike object to the view for display
+        }
+
+        public IActionResult ViewBikeDocument(int bikeId, string type)
+        {
+            // Get the bike using the bikeId
+            var bike = _bikeRepository.GetById(bikeId);
+
+            if (bike == null)
+            {
+                return NotFound();
+            }
+
+            byte[] fileData = type switch
+            {
+                "BikeDocument" => bike.BikeDocumentsBytes,
+                _ => null
+            };
+
+            if (fileData == null) return NotFound();
+
+            // Assuming the document is a PDF. You can change this depending on the actual type of the document.
+            string contentType = "application/pdf";
+
+            return File(fileData, contentType); // This will open the PDF document directly in the browser.
+        }
 
 
     }
