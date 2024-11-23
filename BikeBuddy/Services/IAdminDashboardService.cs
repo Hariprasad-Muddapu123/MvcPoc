@@ -8,5 +8,9 @@ namespace BikeBuddy.Services
         AdminDashboardViewModel GetDashboardData();
 
         IEnumerable<User> GetAllUsers();
+
+        User GetUserById(Guid id);
+
+        bool UpdateKycStatus(String userId, bool approve);
     }
 }

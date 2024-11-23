@@ -8,5 +8,6 @@ namespace BikeBuddy.Repositories
         int GetKycUsers();
 
         IEnumerable<User> GetAllUsers();
+        void SaveChanges();
     }
 }

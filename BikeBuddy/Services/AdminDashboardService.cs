@@ -1,6 +1,7 @@
 ﻿using BikeBuddy.Models;
 using BikeBuddy.Repositories;
 using BikeBuddy.ViewModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace BikeBuddy.Services
 {
@@ -42,6 +43,23 @@ namespace BikeBuddy.Services
             {
                 return _userRepository.GetAllUsers();
             }
+
+        public User GetUserById(Guid id)
+        {
+            return _userRepository.GetAllUsers().FirstOrDefault(u => Guid.Parse(u.Id )== id);
+        }
+
         
+        public bool UpdateKycStatus(String userId, bool approve)
+        {
+            var user = _userRepository.GetAllUsers().FirstOrDefault(u => u.Id == userId.ToString());
+            if (user == null) return false;
+
+            user.KycStatus = approve ? KycStatus.Approved : KycStatus.Rejected;
+            _userRepository.SaveChanges(); // Assuming SaveChanges is implemented in UserRepository
+            return true;
+        }
+
+
     }
 }
