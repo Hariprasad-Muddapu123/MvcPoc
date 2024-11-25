@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using BikeBuddy.Models;
+using BikeBuddy.ViewModels;
 
 namespace BikeBuddy.Controllers
 {

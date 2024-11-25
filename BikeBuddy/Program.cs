@@ -21,7 +21,11 @@ namespace BikeBuddy
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
             });
-
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AdminPolicy", policy =>
+                    policy.RequireRole("Admin"));
+            });
             builder.Services.AddIdentity<User, IdentityRole>(options =>
             {
                 options.Password.RequireDigit = true;
@@ -59,7 +63,7 @@ namespace BikeBuddy
             app.UseStaticFiles();
 
             app.UseRouting();
-
+            
             app.UseAuthorization();
 
             app.MapControllerRoute(

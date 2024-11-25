@@ -3,9 +3,8 @@ using BikeBuddy.Models;
 using BikeBuddy.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using System.Numerics;
+using System.Security.Claims;
 
 namespace BikeBuddy.Controllers
 {
@@ -105,55 +104,10 @@ namespace BikeBuddy.Controllers
             var cities = await _context.Cities.ToListAsync();
             return View(cities);
         }
-
-        //public async Task<IActionResult> DisplayBikes(string SearchModel, string SearchAddress)
-        //{
-        //    if (_context.Bikes == null)
-        //    {
-        //        return Problem("Entity set 'Bikes' is null.");
-        //    }
-
-        //    // Fetch bike addresses and models
-        //    IQueryable<string> BikesAddress = from m in _context.Bikes
-        //                                      orderby m.BikeAddress
-        //                                      select m.BikeAddress;
-
-        //    IQueryable<string> BikeModels = from m in _context.Bikes
-        //                                    orderby m.BikeModel
-        //                                    select m.BikeModel;
-
-        //    // Filter the list of bikes based on the search criteria
-        //    var bikesQuery = _context.Bikes.AsQueryable();
-
-        //    if (!string.IsNullOrEmpty(SearchModel))
-        //    {
-        //        bikesQuery = bikesQuery.Where(b => b.BikeModel.ToUpper().Contains(SearchModel.ToUpper()));
-        //    }
-
-        //    if (!string.IsNullOrEmpty(SearchAddress))
-        //    {
-        //        bikesQuery = bikesQuery.Where(b => b.BikeAddress.ToUpper().Contains(SearchAddress.ToUpper()));
-        //    }
-
-        //    var bikes = await bikesQuery.ToListAsync();
-
-        //    // Create a view model with filtered results
-        //    var RegisteredBikeviewModel = new RegisteredBikeViewModel
-        //    {
-        //        BikeModels = await BikeModels.Distinct().ToListAsync(),
-        //        BikesAddress = await BikesAddress.Distinct().ToListAsync(),
-        //        Bikes = bikes // Add the filtered list of bikes
-        //    };
-
-        //    // Return the view with the filtered data
-        //    return View(RegisteredBikeviewModel);
-        //}
         [HttpGet]
         public async Task<IActionResult> DisplayBikes(string SearchAddress, string SearchModel, string SearchLocation, string[] SelectedAddresses,string SelectedModels)
         {
             var bikes =await  _context.Bikes.ToListAsync();
-
-            // Filter by City
             if (!string.IsNullOrEmpty(SearchLocation))
             {
                 bikes =  bikes.Where(b => b.BikeLocation == SearchLocation & b.KycStatus == KycStatus.Approved).ToList();
@@ -223,7 +177,6 @@ namespace BikeBuddy.Controllers
                 .Select(b => b.BikeRentPrice)
                 .FirstOrDefaultAsync();
 
-
             double totalHours = CalculateHours(timeDifference);
             decimal totalPrice = (decimal)totalHours * (decimal)bikeRentPrice;
             decimal gst = (totalPrice * 5 )/ 100;
@@ -247,15 +200,27 @@ namespace BikeBuddy.Controllers
         private double CalculateHours(TimeSpan timeDifference)
         {
             double totalHours = timeDifference.TotalHours;
-            if (totalHours % 1 != 0)
-            {
-                totalHours = Math.Ceiling(totalHours);
-            }
+            //if (totalHours % 1 != 0)
+            //{
+            //    totalHours = Math.Ceiling(totalHours);
+            //}
             return totalHours;
         }
         [HttpGet]
         public async Task<IActionResult> BookBike()
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            if (user.KycStatus != KycStatus.Approved)
+            {
+                return BadRequest("Your KYC status is not approved. You cannot book a bike.");
+            }
+
             var totalPrice = HttpContext.Session.GetString("TotalPrice");
             var rentedHours = HttpContext.Session.GetString("RentedHours");
             var gst = HttpContext.Session.GetString("Gst");

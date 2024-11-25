@@ -2,10 +2,13 @@
 using BikeBuddy.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using BikeBuddy.ViewModels;
-using BikeBuddy.Models;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace BikeBuddy.Controllers
 {
+
+    [Authorize(Roles ="Admin")]
     public class AdminController : Controller
     {
         private readonly IAdminDashboardService _adminDashboardService;
@@ -27,13 +30,10 @@ namespace BikeBuddy.Controllers
         {
             var dashboardData = _adminDashboardService.GetDashboardData();
 
-            // Get list of all users
             var users = _adminDashboardService.GetAllUsers();
 
-            // Pass data to the view using ViewBag
             ViewBag.Users = users;
 
-            // Pass dashboard data as the model
             return View(dashboardData);
         }
 
@@ -46,6 +46,24 @@ namespace BikeBuddy.Controllers
 
             return View(dashboardData);
 
+        }
+
+        [HttpGet]
+        public IActionResult SearchByUsername(string Username)
+        {
+            var dashboardData = _adminDashboardService.GetDashboardData();
+
+            var users = _adminDashboardService.GetAllUsers();
+
+
+            if (!string.IsNullOrEmpty(Username))
+            {
+                users = users.Where(u => u.UserName.Contains(Username, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
+            ViewBag.Users = users;
+
+            return View("KycDetails", dashboardData);
         }
 
         public IActionResult ViewUserDetails(Guid id)
@@ -84,7 +102,6 @@ namespace BikeBuddy.Controllers
 
             if (fileData == null) return NotFound();
 
-            // Set MIME type to display the image in the browser
             string contentType = "image/jpeg";
 
             return File(fileData, contentType);
@@ -99,60 +116,50 @@ namespace BikeBuddy.Controllers
 
             if (!result)
             {
-                // Store failure message in TempData
                 TempData["Message"] = "User not found or operation failed.";
-                TempData["MessageType"] = "error"; // Indicates an error
+                TempData["MessageType"] = "error"; 
             }
             else
             {
-                // Store success message in TempData
                 TempData["Message"] = action == "approve"
                     ? "KYC successfully approved."
                     : "KYC successfully rejected.";
-                TempData["MessageType"] = "success"; // Indicates success
+                TempData["MessageType"] = "success";
             }
 
-            // Redirect to the same KYC details page
+
             return RedirectToAction("KycDetails");
         }
 
        
 
         public IActionResult BikeDetails()
-        {
-            // Retrieve dashboard data (if needed)
+        { 
             var dashboardData = _adminDashboardService.GetDashboardData();
 
-            // Fetch all bikes (you can modify this to get bikes that are pending for approval if needed)
             var bikes = _adminDashboardService.GetAllBikes();
 
-            // Store bikes in ViewBag to pass to the view
             ViewBag.Bikes = bikes;
 
-            // Return dashboard data if you want to display some metrics like total bikes, etc.
-            return View(dashboardData); // You can return View(dashboardData) or View() depending on your requirements
+            return View(dashboardData); 
         }
         [HttpGet]
         public IActionResult ViewBikeDetails(int bikeId)
         {
-            // Fetch the bike details using the bikeId
             var bike = _bikeRepository.GetById(bikeId);
 
-            // If no bike is found, return to the bike list with an error message
             if (bike == null)
             {
                 TempData["Message"] = "Bike not found.";
-                TempData["MessageType"] = "error"; // Indicates an error
-                return RedirectToAction("BikeDetails"); // Or another action that lists bikes
+                TempData["MessageType"] = "error";
+                return RedirectToAction("BikeDetails");
             }
 
-            // Return the bike details to the view
-            return View(bike); // This will pass the bike object to the view for display
+            return View(bike);
         }
 
         public IActionResult ViewBikeDocument(int bikeId, string type)
         {
-            // Get the bike using the bikeId
             var bike = _bikeRepository.GetById(bikeId);
 
             if (bike == null)
@@ -168,12 +175,31 @@ namespace BikeBuddy.Controllers
 
             if (fileData == null) return NotFound();
 
-            // Assuming the document is a PDF. You can change this depending on the actual type of the document.
             string contentType = "application/pdf";
 
-            return File(fileData, contentType); // This will open the PDF document directly in the browser.
+            return File(fileData, contentType);
         }
+        [HttpPost]
+        public IActionResult ApproveOrRejectBike(int bikeId, string action)
+        {
+            var result = _adminDashboardService.UpdateBikeStatus(bikeId, action == "approve");
 
+            if (!result)
+            {
+                TempData["Message"] = "Bike documnets are not valid upload valid documnets.";
+                TempData["MessageType"] = "error";
+            }
+            else
+            {
+                TempData["Message"] = action == "approve"
+                    ? "KYC successfully approved."
+                    : "KYC successfully rejected.";
+                TempData["MessageType"] = "success";
+            }
+
+
+            return RedirectToAction("BikeDetails");
+        }
 
     }
 }

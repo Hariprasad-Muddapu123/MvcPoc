@@ -1,5 +1,6 @@
 ﻿using BikeBuddy.Models;
 using BikeBuddy.Services;
+using BikeBuddy.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -10,13 +11,15 @@ namespace BikeBuddy.Controllers
     {
         private readonly UserManager<User> userManager;
         private readonly SignInManager<User> signInManager;
+        private readonly RoleManager<IdentityRole> roleManager;
         public readonly EmailSender emailSender;
         public AccountController(UserManager<User> userManager,
-            SignInManager<User> signInManager,EmailSender emailSender)
+            SignInManager<User> signInManager,EmailSender emailSender,RoleManager<IdentityRole> roleManager)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.emailSender = emailSender;
+            this.roleManager = roleManager;
         }
         [HttpGet]
         public IActionResult Signup()
@@ -56,6 +59,19 @@ namespace BikeBuddy.Controllers
 
                 if (result.Succeeded)
                 {
+                    if (!await roleManager.RoleExistsAsync("User"))
+                    {
+                        await roleManager.CreateAsync(new IdentityRole("User"));
+                    }
+                    var roleResult = await userManager.AddToRoleAsync(user, "User");
+                    if (!roleResult.Succeeded)
+                    {
+                        foreach (var error in roleResult.Errors)
+                        {
+                            ModelState.AddModelError(string.Empty, error.Description);
+                        }
+                        return View(model);
+                    }
                     await signInManager.SignInAsync(user, isPersistent: false);
                     var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
                     var callbackUrl = Url.Action(
@@ -103,14 +119,24 @@ namespace BikeBuddy.Controllers
                         await emailSender.SendEmailAsync(
                             user.Email,
                             "Confirm Email",
-                            $"Please Confirm Email by clicking here: <a href='{callbackUrl}'>link</a>");
+                            $"Please confirm your email by clicking here: <a href='{callbackUrl}'>link</a>");
 
-                        TempData["Message"] = "Confirm  link has been sent to your email.";
+                        TempData["Message"] = "A confirmation link has been sent to your email.";
                         return View("Login");
                     }
-                        var result = await signInManager.PasswordSignInAsync(model.UserName, model.Password, true, lockoutOnFailure: false);
 
-                        if (result.Succeeded)
+                    var result = await signInManager.PasswordSignInAsync(model.UserName, model.Password, true, lockoutOnFailure: false);
+
+                    if (result.Succeeded)
+                    {
+
+                        var roles = await userManager.GetRolesAsync(user);
+
+                        if (roles.Contains("Admin")) 
+                        {
+                            return RedirectToAction("Index", "Admin");
+                        }
+                        else if (roles.Contains("User"))
                         {
                             if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
                             {
@@ -123,19 +149,26 @@ namespace BikeBuddy.Controllers
                         }
                         else
                         {
-                            ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                            return View(model);
+                            TempData["Message"] = "Unauthorized role.";
+                            return View("Login");
                         }
-
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                        return View(model);
+                    }
                 }
                 else
                 {
                     ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                    TempData["Message"] = "User doesnt Exist";
+                    TempData["Message"] = "User does not exist.";
                 }
             }
+
             return View(model);
         }
+
         [HttpGet]
         public async Task<IActionResult> Logout()
         {

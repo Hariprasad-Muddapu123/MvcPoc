@@ -49,6 +49,7 @@
 
     .nav-right ul button:hover {
         background-color: orange;
+        color:white
     }
 
     .nav-right ul li:hover {

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BikeBuddy.Models
+namespace BikeBuddy.ViewModels
 {
     public class RegisterViewModel
     {
