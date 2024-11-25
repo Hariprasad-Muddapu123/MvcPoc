@@ -1,5 +1,6 @@
 ﻿using BikeBuddy.Data;
 using BikeBuddy.Models;
+using BikeBuddy.ViewModels;
 using Microsoft.AspNetCore.Identity;
 
 namespace BikeBuddy.Repositories
@@ -50,5 +51,8 @@ namespace BikeBuddy.Repositories
             var result = await _userManager.UpdateAsync(user);
             return result.Succeeded;
         }
+
+        
+
     }
 }

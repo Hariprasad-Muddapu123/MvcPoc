@@ -1,0 +1,29 @@
+﻿@model IEnumerable<BikeBuddy.Models.Ride>
+
+<h2>Bikes Ride by User</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>RideId</th>
+            <th>PickUpDateTime</th>
+            <th>DropoffDateTime</th>
+            <th>Status</th>
+            <th>Rental Hours</th>
+            <th>Bill Payed</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var ride in Model)
+        {
+            <tr>
+                <td>@ride.RideId</td>
+                <td>@ride.PickupDateTime</td>
+                <td>@ride.DropoffDateTime</td>
+                <td>@ride.RentalStatus</td>
+                <td>@ride.RentedHours</td>
+                <td>@ride.TotalAmount</td>
+            </tr>
+        }
+    </tbody>
+</table>

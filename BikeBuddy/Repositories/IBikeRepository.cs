@@ -13,6 +13,8 @@ namespace BikeBuddy.Repositories
         Bike GetById(int bikeId); 
         void Update(Bike bike);
 
-        
+        Task<IEnumerable<Bike>> GetAllByUserIdAsync(string userId);
+
+
     }   
 }

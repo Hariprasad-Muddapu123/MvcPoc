@@ -13,5 +13,7 @@ namespace BikeBuddy.Repositories
         Task<User> GetUserByIdAsync(string userId);
         Task<User> GetUserByNameAsync(string userName);
         Task<bool> UpdateUserAsync(User user);
+    
+
     }
 }

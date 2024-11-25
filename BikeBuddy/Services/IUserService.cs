@@ -8,5 +8,6 @@ namespace BikeBuddy.Services
         Task<User> GetCurrentUserAsync(string userName);
         Task<ProfileViewModel> GetUserProfileAsync(string userId);
         Task<bool> UpdateUserProfileAsync(string userId, ProfileViewModel model);
+
     }
 }

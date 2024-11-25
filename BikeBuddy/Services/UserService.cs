@@ -9,10 +9,12 @@ namespace BikeBuddy.Services
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
+        private readonly IBikeRepository _bikeRepository;
 
-        public UserService(IUserRepository userRepository)
+        public UserService(IUserRepository userRepository, IBikeRepository bikeRepository)
         {
             _userRepository = userRepository;
+            _bikeRepository = bikeRepository;
         }
 
         public async Task<User> GetCurrentUserAsync(string userName)
@@ -80,7 +82,6 @@ namespace BikeBuddy.Services
                     user.IsDrivingLicenseUploaded = true;
                 }
             }
-
             return await _userRepository.UpdateUserAsync(user);
         }
     }
