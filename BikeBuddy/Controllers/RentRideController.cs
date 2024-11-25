@@ -200,10 +200,7 @@ namespace BikeBuddy.Controllers
         private double CalculateHours(TimeSpan timeDifference)
         {
             double totalHours = timeDifference.TotalHours;
-            //if (totalHours % 1 != 0)
-            //{
-            //    totalHours = Math.Ceiling(totalHours);
-            //}
+            
             return totalHours;
         }
         [HttpGet]

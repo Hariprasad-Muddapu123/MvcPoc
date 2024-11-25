@@ -70,9 +70,8 @@ namespace BikeBuddy.Services
             var bike = _bikeRepository.GetById(bikeId);
             if (bike == null) return false;
 
-            // Update the status or approval status
-            bike.KycStatus = approve ? KycStatus.Approved : KycStatus.Rejected; // Assuming you want to set some approval flag
-            _bikeRepository.Update(bike); // Save changes to the database
+            bike.KycStatus = approve ? KycStatus.Approved : KycStatus.Rejected;
+            _bikeRepository.Update(bike);
             return true;
         }
 

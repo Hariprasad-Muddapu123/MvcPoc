@@ -46,8 +46,7 @@ namespace BikeBuddy
             // Register Repositories
             builder.Services.AddScoped<IBikeRepository, BikeRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
-
-            // Register Services
+            builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
             var app = builder.Build();
 
