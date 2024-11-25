@@ -3,6 +3,7 @@ using BikeBuddy.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using BikeBuddy.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 
 namespace BikeBuddy.Controllers
@@ -199,6 +200,14 @@ namespace BikeBuddy.Controllers
 
 
             return RedirectToAction("BikeDetails");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken] // Protects against CSRF
+        public async Task<IActionResult> Logout()
+        {
+            await _adminDashboardService.LogoutAdminAsync();
+            return RedirectToAction("Index", "Home");
         }
 
     }

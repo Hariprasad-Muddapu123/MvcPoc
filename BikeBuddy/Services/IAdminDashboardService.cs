@@ -15,5 +15,7 @@ namespace BikeBuddy.Services
 
         IEnumerable<Bike> GetAllBikes(); // Add this line
         bool UpdateBikeStatus(int bikeId, bool isApproved);
+
+        Task LogoutAdminAsync();
     }
 }

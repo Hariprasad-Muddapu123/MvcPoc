@@ -1,6 +1,7 @@
 ﻿using BikeBuddy.Models;
 using BikeBuddy.Repositories;
 using BikeBuddy.ViewModels;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace BikeBuddy.Services
@@ -9,11 +10,14 @@ namespace BikeBuddy.Services
     {
         private readonly IBikeRepository _bikeRepository;
         private readonly IUserRepository _userRepository;
+        private readonly SignInManager<User> _signInManager;
 
-        public AdminDashboardService(IBikeRepository bikeRepository, IUserRepository userRepository)
+        public AdminDashboardService(IBikeRepository bikeRepository, IUserRepository userRepository, SignInManager<User> signInManager)
         {
             _bikeRepository = bikeRepository;
             _userRepository = userRepository;
+            _signInManager = signInManager;
+
         }
 
         public AdminDashboardViewModel GetDashboardData()
@@ -39,10 +43,10 @@ namespace BikeBuddy.Services
             };
         }
 
-            public IEnumerable<User> GetAllUsers()
-            {
-                return _userRepository.GetAllUsers();
-            }
+        public IEnumerable<User> GetAllUsers()
+        {
+            return _userRepository.GetAllUsers();
+        }
 
         public User GetUserById(Guid id)
         {
@@ -74,7 +78,10 @@ namespace BikeBuddy.Services
             _bikeRepository.Update(bike);
             return true;
         }
-
+        public async Task LogoutAdminAsync()
+        {
+            await _signInManager.SignOutAsync();
+        }
 
 
     }

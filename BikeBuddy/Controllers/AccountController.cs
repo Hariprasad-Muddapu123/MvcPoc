@@ -197,7 +197,6 @@ namespace BikeBuddy.Controllers
                 var user = await userManager.FindByEmailAsync(model.Email);
                 if (user == null || !(await userManager.IsEmailConfirmedAsync(user)))
                 {
-                    // Don't reveal that the user does not exist or is not confirmed
                     TempData["Message"] = "If your email is registered, you'll receive a password reset link.";
                     return View("ForgotPasswordConfirmation");
                 }
@@ -272,7 +271,6 @@ namespace BikeBuddy.Controllers
             var user = await userManager.FindByEmailAsync(model.Email);
             if (user == null)
             {
-                // Don't reveal that the user does not exist
                 TempData["Message"] = "Password has been reset successfully. Please log in.";
                 return RedirectToAction("Login");
             }

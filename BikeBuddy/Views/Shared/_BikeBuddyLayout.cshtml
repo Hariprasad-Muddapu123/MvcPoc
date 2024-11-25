@@ -9,13 +9,15 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/bike.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/BikeBuddy.styles.css" asp-append-version="true" />
-    <!-- Bootstrap 5.3 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Jy6zJxWR2YB94k3hg1y5LbVZ/tg6kb4vPly4M9G/TmZb/0JdliuvRW+o2Ve0oI5K" crossorigin="anonymous">
-    <!-- Bootstrap JavaScript Bundle (Includes Popper) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-9ndCyUa8Z5QgGd6FeYmvQz7eMWz8wixj8w0vRoE6FFtxAVxZp8qymWgW/04niAJp" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&amp;display=swap" rel="stylesheet" />
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha2/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap JS (with Popper.js) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha2/js/bootstrap.min.js"></script>
+
+    
 </head>
 <body>
     
@@ -34,27 +36,19 @@
                     <li><a asp-action="Safety" asp-controller="Home">Safety</a></li>
                     
                     <li class="navbar-nav ml-auto">
-                        @*If the user is signed-in display Logout link*@
                         @if (SignInManager.IsSignedIn(User))
                         {
                             <li class="hover:text-orange-500"><a asp-controller="RentRide" asp-action="Index">Rent/Ride</a></li>
-                            <form>
-                                <button asp-controller="User" asp-action="Profile" id="profileDropdown">Profile</button>
-                            </form>
-                            <form>
-                                <button asp-controller="Account" asp-action="Logout">Logout</button>
-                            </form>
-                            
-                            @* <div class="dropdown">
-                                <a class="btn btn-secondary dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false"  >
+                            <div class="dropdown">
+                            <a class="btn btn-secondary dropdown-toggle  bg-orange-500" href="#" role="button" id="dropdownmenulink" data-bs-toggle="dropdown" aria-expanded="false" >
                                     @User.Identity.Name
                                 </a>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="History">My History</a></li>
-                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile">My Profile</a></li>
-                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Logout">Logout</a></li>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profiledropdown">
+                                <li ><a class="dropdown-item " asp-controller="User" asp-action="history">My history</a></li>
+                                <li ><a class="dropdown-item" asp-controller="User" asp-action="profile">My profile</a></li>
+                                <li ><a class="dropdown-item" asp-controller="account" asp-action="logout">Logout</a></li>
                                 </ul>
-                            </div> *@
+                            </div>
                         }
                         else
                         {

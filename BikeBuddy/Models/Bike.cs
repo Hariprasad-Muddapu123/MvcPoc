@@ -31,6 +31,9 @@ namespace BikeBuddy.Models
         // Foreign key to User (IdentityUser)
         public string UserId { get; set; }
 
+        public DateTime? RemovedDate { get; set; }
+        public bool IsRemoved { get; set; }
+
         // Navigation property to User (One-to-Many)
         public User User { get; set; }
 

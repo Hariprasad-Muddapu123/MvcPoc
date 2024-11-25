@@ -91,7 +91,12 @@
                     <p class="text-gray-700">Available upto: @bike.AvailableUpto</p>
                     <p class="text-gray-700">Location: @bike.BikeLocation</p>
                     <p class="text-gray-700">Address: @bike.BikeAddress</p>
-                    <button class="w-full bg-orange-500 text-white p-2 rounded mt-2">Remove</button>
+                        <form asp-action="RemoveBike" asp-controller="RentRide" method="post">
+                            <input type="hidden" name="bikeId" value="@bike.BikeId" />
+                            <button type="submit" class="w-full bg-orange-500 text-white p-2 rounded mt-2">
+                                Remove
+                            </button>
+                        </form>
                 </div>
              </div>
          }

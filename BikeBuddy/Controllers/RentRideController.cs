@@ -30,7 +30,7 @@ namespace BikeBuddy.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
             var userBikes = await _context.Bikes
-                   .Where(b => b.UserId.Equals(user.Id))
+                   .Where(b => b.UserId.Equals(user.Id) && !b.IsRemoved)
                    .ToListAsync();
             var viewModel = new RegisterBikeViewModel
             {
@@ -97,6 +97,37 @@ namespace BikeBuddy.Controllers
             TempData["ErrorMessage"] = "Failed to register the bike. Please check the inputs.";
             return View(viewModel);
         }
+        [HttpPost]
+        public async Task<IActionResult> RemoveBike(int bikeId)
+        {
+            var bike = await _context.Bikes.FindAsync(bikeId);
+            if (bike != null)
+            {
+                bike.RemovedDate = DateTime.UtcNow;
+                bike.IsRemoved = true;
+                _context.Bikes.Update(bike);
+                await _context.SaveChangesAsync();
+
+                TempData["Message"] = "Bike removed successfully and archived!";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Bike not found!";
+            }
+
+            return RedirectToAction("Rent");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> RemovedBikes()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var removedBikes = await _context.Bikes
+                .Where(b => b.UserId.Equals(user.Id) && b.IsRemoved)
+                .ToListAsync();
+
+            return View(removedBikes);
+        }
 
         [HttpGet]
         public async  Task<IActionResult> Ride()
@@ -142,6 +173,8 @@ namespace BikeBuddy.Controllers
 
             return View(viewModel);
         }
+        
+
         [HttpGet]
         public async Task<IActionResult> Date(int BikeId)
         {
