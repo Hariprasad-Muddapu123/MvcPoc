@@ -55,14 +55,17 @@
     .nav-right ul li:hover {
         color: orange;
     }
-
 footer {
-    display: flex;
-    justify-content: space-between;
-    padding: 3% 5% ;
+    padding: 3% 5%;
     color: white;
     background-color: black;
-    bottom:0;
+    bottom: 0;
+}
+
+footer .top-container{
+    display: flex;
+    justify-content: space-between;
+    
 }
 
 .footer-left ul {
@@ -84,6 +87,11 @@ footer {
 }
 .footer-right ul li {
     margin: 5px;
+}
+
+footer .bottom-container p {
+    text-align: center;
+    color: red;
 }
 
 .dropdown-menu {

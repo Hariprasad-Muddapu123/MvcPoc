@@ -40,8 +40,8 @@
                         {
                             <li class="hover:text-orange-500"><a asp-controller="RentRide" asp-action="Index">Rent/Ride</a></li>
                             <div class="dropdown">
-                            <a class="btn btn-secondary dropdown-toggle  bg-orange-500" href="#" role="button" id="dropdownmenulink" data-bs-toggle="dropdown" aria-expanded="false" >
-                                    @User.Identity.Name
+                                <a class="btn btn-secondary dropdown-toggle  bg-orange-500" href="#" role="button" id="dropdownmenulink" data-bs-toggle="dropdown" aria-expanded="false" >
+                                        @User.Identity.Name
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profiledropdown">
                                 <li ><a class="dropdown-item " asp-controller="User" asp-action="MyRents">My rents</a></li>
@@ -74,7 +74,7 @@
 
 
     <footer>
-        
+        <div class="top-container">
         <div class="footer-left">
             <h1>Bike Buddy</h1>
             <ul>
@@ -94,6 +94,11 @@
                 <li><i class="fa-brands fa-linkedin"></i></li>
 
             </ul>
+        </div>
+        </div>
+        <div class="bottom-container">
+            <hr class="m-3" />
+            <p >© 2024 Bike Buddy. All rights reserved.</p>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
