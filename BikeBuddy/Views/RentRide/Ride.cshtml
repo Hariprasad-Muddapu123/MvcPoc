@@ -70,12 +70,10 @@
             }
         </div>
     </div>
-
     <script>
         function filterCities() {
             const searchInput = document.getElementById("searchBar").value.toLowerCase();
             const cityCards = document.querySelectorAll(".city-card");
-
             cityCards.forEach((card) => {
                 const cityName = card.querySelector("span").textContent.toLowerCase();
                 if (cityName.includes(searchInput)) {
@@ -91,7 +89,6 @@
             filterCities(); // Reset the filter
         }
     </script>
-
 </body>
 </html>
 

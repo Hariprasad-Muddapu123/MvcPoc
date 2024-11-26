@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Authentication;
+using System.ComponentModel.DataAnnotations;
 
 namespace BikeBuddy.ViewModels
 {
@@ -16,5 +17,6 @@ namespace BikeBuddy.ViewModels
 
         //[Display(Name = "Remember Me")]
         //public bool RememberMe { get; set; }
+        public IEnumerable<AuthenticationScheme>? Schemes { get; set; }
     }
 }

@@ -13,8 +13,9 @@ namespace BikeBuddy.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(string type="owner")
         {
+            ViewData["ServiceType"]=type;
             return View();
         }
 
@@ -31,12 +32,18 @@ namespace BikeBuddy.Controllers
         {
             return View();
         }
-
         public IActionResult Privacy()
         {
             return View();
         }
-
+        public IActionResult HandleError(int statusCode)
+        {
+            if(statusCode == 404)
+            {
+                return View("Not Found");
+            }
+            return View("Error");
+        }
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

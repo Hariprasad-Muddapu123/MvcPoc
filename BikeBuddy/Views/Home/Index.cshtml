@@ -1,13 +1,11 @@
 ﻿@{
-    Layout = "_BikeBuddyLayout";
+    string serviceType =(string) @ViewData["ServiceType"];   
 }
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>
-        Bike Buddy
-    </title>
+    <title>Bike Buddy</title>
     <script src="https://cdn.tailwindcss.com">
     </script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
@@ -56,56 +54,30 @@
             <h2 class="text-4xl font-bold  ms-lg-6">
                 &nbsp; &nbsp;&nbsp; &nbsp;&nbsp; &nbsp; Services we providing
             </h2>
-            <div class="flex  justify-content-center mt-4">
-                <button class="px-4 py-2 border border-orange-500 text-orange-500 rounded-full mr-2">
+            <div class="flex justify-center mt-4 space-x-4">
+                <a href="@Url.Action("Index", "Home", new { type = "owner" })"
+                   class="px-6 py-2 border border-orange-500 text-orange-500 font-medium rounded-full transition-colors duration-200 hover:bg-orange-500 hover:text-white focus:outline-none focus:ring focus:ring-orange-300">
                     Owner Services
-                </button>
-                <button class="px-4 py-2 bg-orange-500 text-white rounded-full">
+                </a>
+                <a href="@Url.Action("Index", "Home", new { type = "rider" })"
+                   class="px-6 py-2 bg-orange-500 text-white font-medium rounded-full transition-colors duration-200 hover:bg-orange-600 focus:outline-none focus:ring focus:ring-orange-300">
                     Rider Services
-                </button>
-            </div>
-            <h3 class=" flex justify-content-center text-3xl font-bold mt-8">
-                Rider Services
-            </h3>
-            <div class="flex justify-center">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8 max-w-4xl">
-                    <!-- Card 1 -->
-                    <div class="border border-orange-500 p-4 rounded-lg text-center max-w-xs mx-auto">
-                        <img alt="Icon representing finding bikes" class="mx-auto mb-4" height="80" src="~/Images/MainPageLogo.png" width="80" />
-                        <h4 class="text-lg font-bold">
-                            Find Bikes
-                        </h4>
-                        <p class="mt-2 text-sm">
-                            Easily find bikes available for rent in your area with our user-friendly search feature.
-                        </p>
-                    </div>
-
-                    <!-- Card 2 -->
-                    <div class="border border-orange-500 p-4 rounded-lg text-center max-w-xs mx-auto">
-                        <img alt="Icon representing lowest cost rentals" class="mx-auto mb-4" height="80" src="~/Images/MainPageLogo.png" width="80" />
-                        <h4 class="text-lg font-bold">
-                            Lowest Cost Rentals
-                        </h4>
-                        <p class="mt-2 text-sm">
-                            We offer the most competitive rental rates to ensure you get the best deal possible.
-                        </p>
-                    </div>
-
-                    <!-- Card 3 -->
-                    <div class="border border-orange-500 p-4 rounded-lg text-center max-w-xs mx-auto">
-                        <img alt="Icon representing ride anywhere" class="mx-auto mb-4" height="80" src="~/Images/MainPageLogo.png" width="80" />
-                        <h4 class="text-lg font-bold">
-                            Ride Anywhere
-                        </h4>
-                        <p class="mt-2 text-sm">
-                            Our bikes are available for rent in multiple locations, allowing you to ride wherever you need.
-                        </p>
-                    </div>
-                </div>
+                </a>
             </div>
 
+            <div class="mt-8">
+                @if (serviceType == "owner")
+                {
+                    @await Html.PartialAsync("_OwnerServices");
+                }
+                else if (serviceType == "rider")
+                {
+                    @await Html.PartialAsync("_RiderService");
+                }
+            </div>
         </div>
     </div>
 </body>
 </html>
+
 

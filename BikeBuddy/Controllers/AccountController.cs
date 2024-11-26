@@ -4,6 +4,7 @@ using BikeBuddy.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace BikeBuddy.Controllers
 {
@@ -72,7 +73,7 @@ namespace BikeBuddy.Controllers
                         }
                         return View(model);
                     }
-                    await signInManager.SignInAsync(user, isPersistent: false);
+                   // await signInManager.SignInAsync(user, isPersistent: false);
                     var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
                     var callbackUrl = Url.Action(
                         "ConfirmEmail", "Account",
@@ -96,9 +97,13 @@ namespace BikeBuddy.Controllers
             return View(model);
         }
         [HttpGet]
-        public IActionResult Login()
+        public async Task<IActionResult> Login()
         {
-            return View();
+            var loginVM = new LoginViewModel()
+            {
+                Schemes = await signInManager.GetExternalAuthenticationSchemesAsync()
+            };
+            return View(loginVM);
         }
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model, string? ReturnUrl)
@@ -122,7 +127,11 @@ namespace BikeBuddy.Controllers
                             $"Please confirm your email by clicking here: <a href='{callbackUrl}'>link</a>");
 
                         TempData["Message"] = "A confirmation link has been sent to your email.";
-                        return View("Login");
+                        var loginVM = new LoginViewModel()
+                        {
+                            Schemes = await signInManager.GetExternalAuthenticationSchemesAsync()
+                        };
+                        return View(loginVM);
                     }
 
                     var result = await signInManager.PasswordSignInAsync(model.UserName, model.Password, true, lockoutOnFailure: false);
@@ -150,23 +159,76 @@ namespace BikeBuddy.Controllers
                         else
                         {
                             TempData["Message"] = "Unauthorized role.";
-                            return View("Login");
+                            var loginVM = new LoginViewModel()
+                            {
+                                Schemes = await signInManager.GetExternalAuthenticationSchemesAsync()
+                            };
+                            return View(loginVM);
                         }
                     }
                     else
                     {
-                        ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                        return View(model);
+                        ModelState.AddModelError(string.Empty, "Invalid Password.");
+                        var loginVM = new LoginViewModel()
+                        {
+                            Schemes = await signInManager.GetExternalAuthenticationSchemesAsync()
+                        };
+                        return View(loginVM);
                     }
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                    ModelState.AddModelError(string.Empty, "Invalid User Name.");
                     TempData["Message"] = "User does not exist.";
                 }
             }
-
+            model.Schemes = await signInManager.GetExternalAuthenticationSchemesAsync();
             return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult GoogleLogin(String provider, String returnUrl = "")
+        {
+            var redirectUrl = Url.Action("GoogleLoginCallBack", "Account", new { ReturnUrl = returnUrl });
+            var properties = signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+            properties.Items["prompt"] = "select_account";
+            return new ChallengeResult(provider, properties);
+        }
+
+        public async Task<IActionResult> GoogleLoginCallBack(string remoteError, String returnUrl = "")
+        {
+            var loginVM = new LoginViewModel()
+            {
+                Schemes = await signInManager.GetExternalAuthenticationSchemesAsync()
+            };
+            if (remoteError != null)
+            {
+                ModelState.AddModelError("", $"Error from google login provider : {remoteError}");
+                return View("Login", loginVM);
+            }
+            var info = await signInManager.GetExternalLoginInfoAsync();
+            if (info == null)
+            {
+                ModelState.AddModelError("", $"Error from google login provider : {remoteError}");
+                return View("Login", loginVM);
+            }
+            var user = await userManager.FindByEmailAsync(info.Principal?.FindFirst(ClaimTypes.Email)?.Value);
+            await signInManager.SignInAsync(user, isPersistent: false);
+            //return RedirectToAction("Index", "Home");
+            var roles = await userManager.GetRolesAsync(user);
+            if (roles.Contains("Admin"))
+            {
+                return RedirectToAction("Index", "Admin");
+            }
+            else if (roles.Contains("User"))
+            { 
+                    return RedirectToAction("Index", "Home");  
+            }
+            else
+            {
+                TempData["Message"] = "Unauthorized role.";
+                return View("Login");
+            }
         }
 
         [HttpGet]
