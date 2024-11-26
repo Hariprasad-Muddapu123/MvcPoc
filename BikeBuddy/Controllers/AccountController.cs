@@ -302,7 +302,11 @@ namespace BikeBuddy.Controllers
             var result = await userManager.ConfirmEmailAsync(user, token);
             if (result.Succeeded)
             {
-                return View("Login");
+                var loginVM = new LoginViewModel()
+                {
+                    Schemes = await signInManager.GetExternalAuthenticationSchemesAsync()
+                };
+                return View("Login",loginVM);
             }
             else
             {

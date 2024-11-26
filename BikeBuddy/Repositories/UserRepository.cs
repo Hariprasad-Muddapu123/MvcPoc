@@ -30,7 +30,7 @@ namespace BikeBuddy.Repositories
         {
             return _context.Users.ToList();
         }
-
+        
         public void SaveChanges()
         {
             _context.SaveChanges();

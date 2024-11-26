@@ -34,11 +34,10 @@
                     <li><a asp-action="AboutUs" asp-controller="Home">About us</a></li>
                     <li><a asp-action="Contactus" asp-controller="Home">Contact Us </a></li>
                     <li><a asp-action="Safety" asp-controller="Home">Safety</a></li>
-                    
+                    <li ><a asp-controller="RentRide" asp-action="Index">Rent/Ride</a></li>
                     <li class="navbar-nav ml-auto">
                         @if (SignInManager.IsSignedIn(User))
                         {
-                            <li class="hover:text-orange-500"><a asp-controller="RentRide" asp-action="Index">Rent/Ride</a></li>
                             <div class="dropdown">
                                 <a class="btn btn-secondary dropdown-toggle  bg-orange-500" href="#" role="button" id="dropdownmenulink" data-bs-toggle="dropdown" aria-expanded="false" >
                                         @User.Identity.Name

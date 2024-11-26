@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using BikeBuddy.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using BikeBuddy.Models;
 
 
 namespace BikeBuddy.Controllers
@@ -14,11 +16,12 @@ namespace BikeBuddy.Controllers
     {
         private readonly IAdminDashboardService _adminDashboardService;
         private readonly IBikeRepository _bikeRepository;
-
-        public AdminController(IAdminDashboardService adminDashboardService, IBikeRepository bikeRepository)
+        private readonly EmailSender _emailSender;
+        public AdminController(IAdminDashboardService adminDashboardService, IBikeRepository bikeRepository, EmailSender emailSender)
         {
             _adminDashboardService = adminDashboardService;
             _bikeRepository = bikeRepository;
+            _emailSender = emailSender;
         }
 
         public IActionResult Index()
@@ -111,7 +114,7 @@ namespace BikeBuddy.Controllers
 
 
         [HttpPost]
-        public IActionResult ApproveOrRejectKyc(String userId, string action)
+        public async  Task<IActionResult> ApproveOrRejectKyc(String userId, string action)
         {
             var result = _adminDashboardService.UpdateKycStatus(userId, action == "approve");
 
@@ -122,18 +125,21 @@ namespace BikeBuddy.Controllers
             }
             else
             {
+
                 TempData["Message"] = action == "approve"
                     ? "KYC successfully approved."
-                    : "KYC successfully rejected.";
+                    : "KYC rejected.";
                 TempData["MessageType"] = "success";
+
+                var userEmail = await _adminDashboardService.GetUserEmailAsync(userId);
+                string subject = action == "approve" ? "KYC Approved" : "KYC Rejected";
+                string body = action == "approve"
+                    ? "Congratulations! Your KYC has been approved. You can now access all features of our platform."
+                    : "Unfortunately, your KYC has been rejected. Please review your submission and try again.";
+                await _emailSender.SendEmailAsync(userEmail, subject, body);
             }
-
-
             return RedirectToAction("KycDetails");
         }
-
-       
-
         public IActionResult BikeDetails()
         { 
             var dashboardData = _adminDashboardService.GetDashboardData();
@@ -181,7 +187,7 @@ namespace BikeBuddy.Controllers
             return File(fileData, contentType);
         }
         [HttpPost]
-        public IActionResult ApproveOrRejectBike(int bikeId, string action)
+        public async Task<IActionResult> ApproveOrRejectBike(int bikeId, string action)
         {
             var result = _adminDashboardService.UpdateBikeStatus(bikeId, action == "approve");
 
@@ -193,17 +199,22 @@ namespace BikeBuddy.Controllers
             else
             {
                 TempData["Message"] = action == "approve"
-                    ? "KYC successfully approved."
-                    : "KYC successfully rejected.";
+                    ? "bike approved."
+                    : "bike rejected.";
                 TempData["MessageType"] = "success";
+                var bike =  _adminDashboardService.GetBikeByIdAsync(bikeId);
+                var userEmail = bike?.User?.Email;
+                string subject = action == "approve" ? "Bike Approved" : "Bike Rejected";
+                string body = action == "approve"
+                    ? "Congratulations! Your bike has been approved for renting. You can now list your bike and make it available for rental."
+                    : "Unfortunately, your bike has been rejected. Please upload valid documents for review.";
+                await _emailSender.SendEmailAsync(userEmail, subject, body);
             }
-
-
             return RedirectToAction("BikeDetails");
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken] // Protects against CSRF
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
             await _adminDashboardService.LogoutAdminAsync();

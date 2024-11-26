@@ -20,6 +20,12 @@ namespace BikeBuddy.Services
 
         }
 
+        public async Task<string> GetUserEmailAsync(string userId)
+        {
+            var user = await _userRepository.GetUserByIdAsync(userId);
+            return user?.Email;
+        }
+
         public AdminDashboardViewModel GetDashboardData()
         {
             var totalBikes = _bikeRepository.GetTotalBikes();
@@ -83,6 +89,9 @@ namespace BikeBuddy.Services
             await _signInManager.SignOutAsync();
         }
 
-
+        public Bike GetBikeByIdAsync(int bikeId)
+        {
+            return  _bikeRepository.GetById(bikeId);
+        }
     }
 }

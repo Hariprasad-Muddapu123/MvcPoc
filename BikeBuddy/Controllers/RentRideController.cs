@@ -29,6 +29,12 @@ namespace BikeBuddy.Controllers
         public async Task<IActionResult> Rent()
         {
             var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                TempData["Message"] = "Please log in to continue.";
+                return RedirectToAction("Login", "Account");
+            }
+
             var userBikes = await _context.Bikes
                    .Where(b => b.UserId.Equals(user.Id) && !b.IsRemoved)
                    .ToListAsync();
@@ -243,7 +249,8 @@ namespace BikeBuddy.Controllers
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                return NotFound("User not found.");
+                TempData["Message"] = "Please log in to continue.";
+                return RedirectToAction("Login", "Account");
             }
 
             if (user.KycStatus != KycStatus.Approved)
