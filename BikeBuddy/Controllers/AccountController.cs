@@ -133,47 +133,48 @@ namespace BikeBuddy.Controllers
                         };
                         return View(loginVM);
                     }
-
-                    var result = await signInManager.PasswordSignInAsync(model.UserName, model.Password, true, lockoutOnFailure: false);
-
-                    if (result.Succeeded)
+                    else
                     {
+                        var result = await signInManager.PasswordSignInAsync(model.UserName, model.Password, true, lockoutOnFailure: false);
 
-                        var roles = await userManager.GetRolesAsync(user);
+                        if (result.Succeeded)
+                        {
+                            var roles = await userManager.GetRolesAsync(user);
 
-                        if (roles.Contains("Admin")) 
-                        {
-                            return RedirectToAction("Index", "Admin");
-                        }
-                        else if (roles.Contains("User"))
-                        {
-                            if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
+                            if (roles.Contains("Admin"))
                             {
-                                return Redirect(ReturnUrl);
+                                return RedirectToAction("Index", "Admin");
+                            }
+                            else if (roles.Contains("User"))
+                            {
+                                if (!string.IsNullOrEmpty(ReturnUrl) && Url.IsLocalUrl(ReturnUrl))
+                                {
+                                    return Redirect(ReturnUrl);
+                                }
+                                else
+                                {
+                                    return RedirectToAction("Index", "Home");
+                                }
                             }
                             else
                             {
-                                return RedirectToAction("Index", "Home");
+                                TempData["Message"] = "Unauthorized role.";
+                                var loginVM = new LoginViewModel()
+                                {
+                                    Schemes = await signInManager.GetExternalAuthenticationSchemesAsync()
+                                };
+                                return View(loginVM);
                             }
                         }
                         else
                         {
-                            TempData["Message"] = "Unauthorized role.";
+                            ModelState.AddModelError(string.Empty, "Invalid Password.");
                             var loginVM = new LoginViewModel()
                             {
                                 Schemes = await signInManager.GetExternalAuthenticationSchemesAsync()
                             };
                             return View(loginVM);
                         }
-                    }
-                    else
-                    {
-                        ModelState.AddModelError(string.Empty, "Invalid Password.");
-                        var loginVM = new LoginViewModel()
-                        {
-                            Schemes = await signInManager.GetExternalAuthenticationSchemesAsync()
-                        };
-                        return View(loginVM);
                     }
                 }
                 else

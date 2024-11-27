@@ -6,7 +6,7 @@ namespace BikeBuddy.Services
     public class BikeAvailabilityService : BackgroundService
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly TimeSpan _interval = TimeSpan.FromMinutes(1);
+        private readonly TimeSpan _interval = TimeSpan.FromMinutes(100);
         public BikeAvailabilityService(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;

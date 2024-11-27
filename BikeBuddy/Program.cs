@@ -49,7 +49,7 @@ namespace BikeBuddy
             // Add services to the container.
             builder.Services.AddControllersWithViews();
             builder.Services.AddScoped<EmailSender> ();
-            builder.Services.AddHostedService<BikeAvailabilityService>();
+            //builder.Services.AddHostedService<BikeAvailabilityService>();
             // Register Repositories
             builder.Services.AddScoped<IBikeRepository, BikeRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
