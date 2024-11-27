@@ -19,5 +19,15 @@ namespace BikeBuddy.Repositories
                                  .Where(r => r.UserId == userId)
                                  .ToListAsync();
         }
+        public async Task<List<Ride>> GetAllRidesAsync()
+        {
+            return await _context.Rides.ToListAsync();
+        }
+
+        public async Task UpdateAsync(Ride ride)
+        {
+            _context.Rides.Update(ride);
+            await _context.SaveChangesAsync();
+        }
     }
 }

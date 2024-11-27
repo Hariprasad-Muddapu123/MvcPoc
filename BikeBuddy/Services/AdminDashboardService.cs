@@ -26,20 +26,20 @@ namespace BikeBuddy.Services
             return user?.Email;
         }
 
-        public AdminDashboardViewModel GetDashboardData()
+        public async Task<AdminDashboardViewModel> GetDashboardData()
         {
-            var totalBikes = _bikeRepository.GetTotalBikes();
-            var approvedBikes = _bikeRepository.GetApprovedBikes();
-            var pendingBikes = _bikeRepository.GetPendingBikes();
-            var rejectedBikes = _bikeRepository.GetRejectedBikes();
+            var totalBikes = await  _bikeRepository.GetTotalBikes();
+            var approvedBikes =await  _bikeRepository.GetApprovedBikes();
+            var pendingBikes = await  _bikeRepository.GetPendingBikes();
+            var rejectedBikes = await _bikeRepository.GetRejectedBikes();
 
-            var totalUsers = _userRepository.GetTotalUsers();
-            var kycUsers = _userRepository.GetKycUsers();
+            var totalUsers = await  _userRepository.GetTotalUsers();
+            var kycUsers = await _userRepository.GetKycUsers();
             var nonKycUsers = totalUsers - kycUsers;
 
             return new AdminDashboardViewModel
             {
-                TotalBikes = totalBikes,
+                TotalBikes =totalBikes,
                 ApprovedBikes = approvedBikes,
                 RejectedBikes = rejectedBikes,
                 PendingBikes = pendingBikes,
@@ -49,20 +49,22 @@ namespace BikeBuddy.Services
             };
         }
 
-        public IEnumerable<User> GetAllUsers()
+        public async  Task<IEnumerable<User>> GetAllUsers()
         {
-            return _userRepository.GetAllUsers();
+            return  await _userRepository.GetAllUsers();
         }
 
-        public User GetUserById(Guid id)
+        public async  Task<User> GetUserById(Guid id)
         {
-            return _userRepository.GetAllUsers().FirstOrDefault(u => Guid.Parse(u.Id )== id);
+            var user = await _userRepository.GetAllUsers();
+            return  user.FirstOrDefault(u => Guid.Parse(u.Id) == id);
         }
 
         
-        public bool UpdateKycStatus(String userId, bool approve)
+        public async  Task<bool> UpdateKycStatus(String userId, bool approve)
         {
-            var user = _userRepository.GetAllUsers().FirstOrDefault(u => u.Id == userId.ToString());
+            var users = await _userRepository.GetAllUsers();
+            var user = users.FirstOrDefault(u => u.Id == userId.ToString());
             if (user == null) return false;
 
             user.KycStatus = approve ? KycStatus.Approved : KycStatus.Rejected;
@@ -70,18 +72,18 @@ namespace BikeBuddy.Services
             return true;
         }
 
-        public IEnumerable<Bike> GetAllBikes()
+        public async  Task<IEnumerable<Bike>> GetAllBikes()
         {
-            return _bikeRepository.GetAll();
+            return await _bikeRepository.GetAll();
         }
 
-        public bool UpdateBikeStatus(int bikeId, bool approve)
+        public  async Task<bool> UpdateBikeStatus(int bikeId, bool approve)
         {
-            var bike = _bikeRepository.GetById(bikeId);
+            var bike =  await _bikeRepository.GetById(bikeId);
             if (bike == null) return false;
 
             bike.KycStatus = approve ? KycStatus.Approved : KycStatus.Rejected;
-            _bikeRepository.Update(bike);
+            await  _bikeRepository.Update(bike);
             return true;
         }
         public async Task LogoutAdminAsync()
@@ -89,9 +91,9 @@ namespace BikeBuddy.Services
             await _signInManager.SignOutAsync();
         }
 
-        public Bike GetBikeByIdAsync(int bikeId)
+        public async  Task<Bike> GetBikeByIdAsync(int bikeId)
         {
-            return  _bikeRepository.GetById(bikeId);
+            return await  _bikeRepository.GetById(bikeId);
         }
     }
 }

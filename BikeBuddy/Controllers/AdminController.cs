@@ -10,7 +10,6 @@ using BikeBuddy.Models;
 
 namespace BikeBuddy.Controllers
 {
-
     [Authorize(Roles ="Admin")]
     public class AdminController : Controller
     {
@@ -24,27 +23,27 @@ namespace BikeBuddy.Controllers
             _emailSender = emailSender;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var viewModel = _adminDashboardService.GetDashboardData();
+            var viewModel =await _adminDashboardService.GetDashboardData();
             return View(viewModel);
         }
 
-        public IActionResult UserDetails()
+        public async Task<IActionResult> UserDetails()
         {
-            var dashboardData = _adminDashboardService.GetDashboardData();
+            var dashboardData =await  _adminDashboardService.GetDashboardData();
 
-            var users = _adminDashboardService.GetAllUsers();
+            var users =await  _adminDashboardService.GetAllUsers();
 
             ViewBag.Users = users;
 
             return View(dashboardData);
         }
 
-        public IActionResult KycDetails()
+        public async Task<IActionResult> KycDetails()
         {
-            var dashboardData = _adminDashboardService.GetDashboardData();
-            var users = _adminDashboardService.GetAllUsers();
+            var dashboardData =await _adminDashboardService.GetDashboardData();
+            var users =await  _adminDashboardService.GetAllUsers();
 
             ViewBag.Users=users;
 
@@ -53,11 +52,11 @@ namespace BikeBuddy.Controllers
         }
 
         [HttpGet]
-        public IActionResult SearchByUsername(string Username)
+        public async Task<IActionResult> SearchByUsername(string Username)
         {
-            var dashboardData = _adminDashboardService.GetDashboardData();
+            var dashboardData =await _adminDashboardService.GetDashboardData();
 
-            var users = _adminDashboardService.GetAllUsers();
+            var users = await _adminDashboardService.GetAllUsers();
 
 
             if (!string.IsNullOrEmpty(Username))
@@ -70,9 +69,9 @@ namespace BikeBuddy.Controllers
             return View("KycDetails", dashboardData);
         }
 
-        public IActionResult ViewUserDetails(Guid id)
+        public async Task<IActionResult> ViewUserDetails(Guid id)
         {
-            var user = _adminDashboardService.GetUserById(id);
+            var user = await _adminDashboardService.GetUserById(id);
             if (user == null)
             {
                 return NotFound("User not found.");
@@ -92,9 +91,9 @@ namespace BikeBuddy.Controllers
             return View("ViewUserDetails",userViewModel);
         }
 
-        public IActionResult ViewDocument(Guid userId, string type)
+        public async Task<IActionResult> ViewDocument(Guid userId, string type)
         {
-            var user = _adminDashboardService.GetUserById(userId);
+            var user =await  _adminDashboardService.GetUserById(userId);
             if (user == null) return NotFound();
 
             byte[] fileData = type switch
@@ -116,7 +115,7 @@ namespace BikeBuddy.Controllers
         [HttpPost]
         public async  Task<IActionResult> ApproveOrRejectKyc(String userId, string action)
         {
-            var result = _adminDashboardService.UpdateKycStatus(userId, action == "approve");
+            var result =await  _adminDashboardService.UpdateKycStatus(userId, action == "approve");
 
             if (!result)
             {
@@ -140,20 +139,20 @@ namespace BikeBuddy.Controllers
             }
             return RedirectToAction("KycDetails");
         }
-        public IActionResult BikeDetails()
+        public async Task<IActionResult> BikeDetails()
         { 
-            var dashboardData = _adminDashboardService.GetDashboardData();
+            var dashboardData =await  _adminDashboardService.GetDashboardData();
 
-            var bikes = _adminDashboardService.GetAllBikes();
+            var bikes = await _adminDashboardService.GetAllBikes();
 
             ViewBag.Bikes = bikes;
 
             return View(dashboardData); 
         }
         [HttpGet]
-        public IActionResult ViewBikeDetails(int bikeId)
+        public async Task<IActionResult> ViewBikeDetails(int bikeId)
         {
-            var bike = _bikeRepository.GetById(bikeId);
+            var bike =await  _bikeRepository.GetById(bikeId);
 
             if (bike == null)
             {
@@ -165,9 +164,9 @@ namespace BikeBuddy.Controllers
             return View(bike);
         }
 
-        public IActionResult ViewBikeDocument(int bikeId, string type)
+        public async  Task<IActionResult> ViewBikeDocument(int bikeId, string type)
         {
-            var bike = _bikeRepository.GetById(bikeId);
+            var bike =await _bikeRepository.GetById(bikeId);
 
             if (bike == null)
             {
@@ -189,7 +188,7 @@ namespace BikeBuddy.Controllers
         [HttpPost]
         public async Task<IActionResult> ApproveOrRejectBike(int bikeId, string action)
         {
-            var result = _adminDashboardService.UpdateBikeStatus(bikeId, action == "approve");
+            var result = await _adminDashboardService.UpdateBikeStatus(bikeId, action == "approve");
 
             if (!result)
             {
@@ -202,7 +201,7 @@ namespace BikeBuddy.Controllers
                     ? "bike approved."
                     : "bike rejected.";
                 TempData["MessageType"] = "success";
-                var bike =  _adminDashboardService.GetBikeByIdAsync(bikeId);
+                var bike =await  _adminDashboardService.GetBikeByIdAsync(bikeId);
                 var userEmail = bike?.User?.Email;
                 string subject = action == "approve" ? "Bike Approved" : "Bike Rejected";
                 string body = action == "approve"

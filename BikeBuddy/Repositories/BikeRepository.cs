@@ -13,39 +13,39 @@ namespace BikeBuddy.Repositories
             _context = context;
         }
 
-        public int GetTotalBikes()
+        public async Task<int> GetTotalBikes()
         {
-            return _context.Bikes.Count();
+            return await _context.Bikes.CountAsync();
         }
 
-        public int GetApprovedBikes()
+        public async Task<int> GetApprovedBikes()
         {
-            return _context.Bikes.Count(b => b.KycStatus == KycStatus.Approved);
+            return await _context.Bikes.CountAsync(b => b.KycStatus == KycStatus.Approved);
         }
 
-        public int GetRejectedBikes()
+        public async Task<int> GetRejectedBikes()
         {
-            return _context.Bikes.Count(b => b.KycStatus == KycStatus.Rejected);
+            return await _context.Bikes.CountAsync(b => b.KycStatus == KycStatus.Rejected);
         }
 
-        public int GetPendingBikes()
+        public async Task<int> GetPendingBikes()
         {
-            return _context.Bikes.Count(b=>b.KycStatus == KycStatus.Pending);
+            return await _context.Bikes.CountAsync(b=>b.KycStatus == KycStatus.Pending);
         }
-        public IEnumerable<Bike> GetAll()
+        public async  Task<IEnumerable<Bike>> GetAll()
         {
-            return _context.Bikes.Include(b => b.User).ToList();
-        }
-
-        public Bike GetById(int bikeId)
-        {
-            return _context.Bikes.Include(b => b.User).FirstOrDefault(b => b.BikeId == bikeId);
+            return await  _context.Bikes.Include(b => b.User).ToListAsync();
         }
 
-        public void Update(Bike bike)
+        public async Task<Bike> GetById(int bikeId)
+        {
+            return await _context.Bikes.Include(b => b.User).FirstOrDefaultAsync(b => b.BikeId == bikeId);
+        }
+
+        public async Task Update(Bike bike)
         {
             _context.Bikes.Update(bike);
-            _context.SaveChanges();
+           await _context.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<Bike>> GetAllByUserIdAsync(string userId)

@@ -48,7 +48,6 @@ namespace BikeBuddy.Services
         {
             var user = await _userRepository.GetUserByIdAsync(userId);
             if (user == null) return false;
-
             user.UserName = string.IsNullOrWhiteSpace(model.UserName) ? user.UserName : model.UserName;
             user.Email = string.IsNullOrWhiteSpace(model.Email) ? user.Email : model.Email;
             user.PhoneNumber = string.IsNullOrWhiteSpace(model.PhoneNumber) ? user.PhoneNumber : model.PhoneNumber;

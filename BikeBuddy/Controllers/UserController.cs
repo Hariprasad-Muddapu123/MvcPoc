@@ -63,8 +63,6 @@ namespace BikeBuddy.Controllers
         public async Task<IActionResult> MyRides()
         {
             var user = await _userService.GetCurrentUserAsync(User.Identity.Name);
-            var bikes = await _bikeService.GetAllBikesByUserIdAsync(user.Id);
-            ViewBag.BikeModel=bikes;
             var rides = await _rideService.GetRidesByUserIdAsync(user.Id);
             if (rides == null)
             {

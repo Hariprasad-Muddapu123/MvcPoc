@@ -4,10 +4,10 @@ namespace BikeBuddy.Repositories
 {
     public interface IUserRepository
     {
-        int GetTotalUsers();
-        int GetKycUsers();
+        Task<int> GetTotalUsers();
+        Task<int> GetKycUsers();
 
-        IEnumerable<User> GetAllUsers();
+        Task<IEnumerable<User>> GetAllUsers();
         void SaveChanges();
 
         Task<User> GetUserByIdAsync(string userId);

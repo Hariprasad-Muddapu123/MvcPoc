@@ -4,15 +4,14 @@ namespace BikeBuddy.Repositories
 {
     public interface IBikeRepository
     {
-        int GetTotalBikes();
-        int GetApprovedBikes();
-        int GetRejectedBikes();
-        int GetPendingBikes();
+        Task<int> GetTotalBikes();
+        Task<int> GetApprovedBikes();
+        Task<int> GetRejectedBikes();
+        Task<int> GetPendingBikes();
 
-        IEnumerable<Bike> GetAll();
-        Bike GetById(int bikeId); 
-        void Update(Bike bike);
-
+        Task<IEnumerable<Bike>> GetAll();
+        Task<Bike> GetById(int bikeId); 
+        Task Update(Bike bike);
         Task<IEnumerable<Bike>> GetAllByUserIdAsync(string userId);
 
 

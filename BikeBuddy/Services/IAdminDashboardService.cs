@@ -5,19 +5,19 @@ namespace BikeBuddy.Services
 {
     public interface IAdminDashboardService
     {
-        AdminDashboardViewModel GetDashboardData();
+        Task<AdminDashboardViewModel> GetDashboardData();
 
-        IEnumerable<User> GetAllUsers();
+        Task<IEnumerable<User>> GetAllUsers();
 
-        User GetUserById(Guid id);
+        Task<User> GetUserById(Guid id);
 
-        bool UpdateKycStatus(String userId, bool approve);
+        Task<bool> UpdateKycStatus(String userId, bool approve);
 
-        IEnumerable<Bike> GetAllBikes(); // Add this line
-        bool UpdateBikeStatus(int bikeId, bool isApproved);
+        Task<IEnumerable<Bike>> GetAllBikes(); // Add this line
+        Task<bool> UpdateBikeStatus(int bikeId, bool isApproved);
         Task<string> GetUserEmailAsync(string userId);
         Task LogoutAdminAsync();
 
-        Bike GetBikeByIdAsync(int bikeId);
+        Task<Bike> GetBikeByIdAsync(int bikeId);
     }
 }

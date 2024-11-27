@@ -1,5 +1,6 @@
 ﻿@model IEnumerable<BikeBuddy.Models.Ride>
-<h2>Bikes Ride by User</h2>
+<div class="min-vh-100">
+    <h2>Bikes Ride by User</h2>
 <table class="table">
     <thead>
         <tr>
@@ -19,9 +20,10 @@
                 <td>@ride.PickupDateTime</td>
                 <td>@ride.DropoffDateTime</td>
                 <td>@ride.RentalStatus</td>
-                <td>@ride.RentedHours</td>
-                <td>@ride.TotalAmount</td>
+                <td>@(decimal.Parse(ride.RentedHours).ToString("F2"))</td>
+                <td>@(decimal.Parse(ride.TotalAmount).ToString("F2"))</td>
             </tr>
         }
     </tbody>
 </table>
+</di>

@@ -2,6 +2,7 @@
 using BikeBuddy.Models;
 using BikeBuddy.ViewModels;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 namespace BikeBuddy.Repositories
 {
@@ -16,19 +17,19 @@ namespace BikeBuddy.Repositories
             _userManager = userManager;
         }
 
-        public int GetTotalUsers()
+        public async Task<int> GetTotalUsers()
         {
-            return _context.Users.Count();
+            return await  _context.Users.CountAsync();
         }
 
-        public int GetKycUsers()
+        public async Task<int> GetKycUsers()
         {
-            return _context.Users.Count(u => u.KycStatus == KycStatus.Approved);
+            return await  _context.Users.CountAsync(u => u.KycStatus == KycStatus.Approved);
         }
 
-        public IEnumerable<User> GetAllUsers()
+        public async Task<IEnumerable<User>> GetAllUsers()
         {
-            return _context.Users.ToList();
+            return await  _context.Users.ToListAsync();
         }
         
         public void SaveChanges()

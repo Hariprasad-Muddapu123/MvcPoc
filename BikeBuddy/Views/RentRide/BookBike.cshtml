@@ -9,13 +9,12 @@
         <div class="bg-white border border-blue-300 rounded-lg shadow-md w-[45%] h-100 p-5 flex flex-col">
             <h1 class="text-4xl font-bold mb-3 text-orange-500">Summary</h1>
             <div class="flex">
-
-                <div class="flex-shrink-0">
+                <div class="flex-shrink-0 w-60  overflow-hidden rounded-lg">
                     <img alt="Bike Image"
                          src="@(Model.BikeDetails.BikeImageBytes != null
                          ? $"data:image/png;base64,{Convert.ToBase64String(Model.BikeDetails.BikeImageBytes)}"
                          : "/images/default-profile.png")"
-                         class="w-60 h-60 rounded-lg object-cover" />
+                         class="w-full h-full rounded-lg object-cover" />
                 </div>
 
                 <div class="flex flex-col ml-6 justify-center">
@@ -43,7 +42,7 @@
 
             <div class="flex justify-between text-gray-700 text-lg mb-1">
                 <span class="font-semibold">Vehicle Rented Hours:</span>
-                <span class="font-semibold">@Model.RentedHours</span>
+                <span class="font-semibold">@(decimal.Parse(Model.RentedHours).ToString("F2"))</span>
             </div>
 
             <div class="flex justify-between text-gray-700 text-lg mb-1">
@@ -53,7 +52,7 @@
 
             <div class="flex justify-between text-gray-700 text-lg mb-1">
                 <span class="font-semibold">GST:</span>
-                <span>@Model.Gst</span>
+                <span> @(decimal.Parse(Model.Gst).ToString("F2"))</span>
             </div>
 
             <div class="flex justify-between text-gray-700 text-lg mb-1">
@@ -63,7 +62,7 @@
             <hr />
             <div class="flex justify-between text-gray-700 text-2xl mb-1">
                 <span class="font-bold">Total Due:</span>
-                <span class="font-bold">@Model.TotalBill</span>
+                <span class="font-bold">@(decimal.Parse(Model.TotalBill).ToString("F2"))</span>
             </div>
 
             <a asp-action="PaymentSucess" asp-controller="RentRide" method="get" class="w-50 bg-orange-500 text-white py-2 mt-2 rounded-lg mb-3 flex justify-content-center">Pay Now </a>

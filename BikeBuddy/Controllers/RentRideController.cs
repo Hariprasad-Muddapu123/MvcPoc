@@ -22,7 +22,6 @@ namespace BikeBuddy.Controllers
         }
         public IActionResult Index()
         {
-
             return View();
         }
         [HttpGet]
@@ -131,7 +130,6 @@ namespace BikeBuddy.Controllers
             var removedBikes = await _context.Bikes
                 .Where(b => b.UserId.Equals(user.Id) && b.IsRemoved)
                 .ToListAsync();
-
             return View(removedBikes);
         }
 
@@ -193,8 +191,6 @@ namespace BikeBuddy.Controllers
         [HttpGet]
         public async Task<IActionResult> SearchDate(RideSearchViewModel model)
         {
-
-
             var bikeIdString = HttpContext.Session.GetString("BikeId");
             if (!int.TryParse(bikeIdString, out int bikeId))
             {
@@ -207,32 +203,36 @@ namespace BikeBuddy.Controllers
                 ViewData["Message"] = $"Not Available upto that time.Available upto {@bike.AvailableUpto}";
                 return View("Date");
             }
+            
             DateTime pickupDateTime = model.PickupDate.Add(TimeSpan.Parse(model.PickupTime));
             DateTime dropoffDateTime = model.DropoffDate.Add(TimeSpan.Parse(model.DropoffTime));
-            TimeSpan timeDifference = dropoffDateTime - pickupDateTime;
-            
+
+            if (pickupDateTime <= DateTime.Now)
+            {
+                ViewData["Message"] = "Pickup date and time must be in the future.";
+                return View("Date");
+            }
+            if (dropoffDateTime <= pickupDateTime)
+            {
+                ViewData["Message"] = "Dropoff date and time must be later than pickup date and time.";
+                return View("Date");
+            }
+            TimeSpan timeDifference = dropoffDateTime - pickupDateTime;           
             double bikeRentPrice = await _context.Bikes
                 .Where(b => b.BikeId == bikeId)
                 .Select(b => b.BikeRentPrice)
                 .FirstOrDefaultAsync();
-
             double totalHours = CalculateHours(timeDifference);
             decimal totalPrice = (decimal)totalHours * (decimal)bikeRentPrice;
             decimal gst = (totalPrice * 5 )/ 100;
             decimal totalBill = totalPrice + gst;
-
-
             HttpContext.Session.SetString("PickupDateTime", pickupDateTime.ToString("yyyy-MM-dd HH:mm"));
             HttpContext.Session.SetString("DropoffDateTime", dropoffDateTime.ToString("yyyy-MM-dd HH:mm"));
             HttpContext.Session.SetString("RentedHours", totalHours.ToString(""));
             HttpContext.Session.SetString("TotalPrice", totalPrice.ToString("F2"));  
             HttpContext.Session.SetString("Gst", gst.ToString(""));
             HttpContext.Session.SetString("TotalBill", totalBill.ToString(""));
-
-        
             ViewBag.TotalPrice = totalPrice;
-
-           
             return RedirectToAction("BookBike");
         }
 
@@ -276,7 +276,6 @@ namespace BikeBuddy.Controllers
                 Gst = gst,
                 RentedHours = rentedHours,
                 TotalBill = totalBill
-
             };
             return View(model);
         }
@@ -334,7 +333,7 @@ namespace BikeBuddy.Controllers
             _context.Payments.Add(payment);
             await _context.SaveChangesAsync();
 
-            ride.RentalStatus = RentStatus.Completed; 
+            //ride.RentalStatus = RentStatus.Completed; 
             ride.TotalAmount = payment.TotalAmount.ToString();
 
             _context.Rides.Update(ride);
