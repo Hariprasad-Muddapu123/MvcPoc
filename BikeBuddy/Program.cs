@@ -1,4 +1,5 @@
 using BikeBuddy.Data;
+using BikeBuddy.Middleware;
 using BikeBuddy.Models;
 using BikeBuddy.Repositories;
 using BikeBuddy.Services;
@@ -15,6 +16,7 @@ namespace BikeBuddy
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
             builder.Services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromMinutes(30);
@@ -26,6 +28,7 @@ namespace BikeBuddy
             {
                 options.ClientId = builder.Configuration["Google:ClientId"];
                 options.ClientSecret = builder.Configuration["Google:ClientSecret"];
+                options.CallbackPath = new PathString("/signin-google");
             });
             builder.Services.AddAuthorization(options =>
             {
@@ -75,7 +78,7 @@ namespace BikeBuddy
             app.UseAuthorization();
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+                pattern: "{controller=Home}/{action=Route}/{id?}");
 
             app.Run();
         }

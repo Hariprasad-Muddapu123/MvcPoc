@@ -93,30 +93,32 @@
                 </ul>
 
                 <form method="post" enctype="multipart/form-data" asp-action="Profile" class="w-full">
-                    <div class="mb-4">
-                        <label class="block text-lg font-semibold mb-2">Upload Aadhaar</label>
-                        <input type="file" asp-for="AadhaarFile" class="form-control w-full" accept="image/*" />
-                        <span asp-validation-for="AadhaarFile" class="text-red-500"></span>
-                    </div>
+                <div class="mb-4">
+                    <label class="block text-lg font-semibold mb-2">Upload Aadhaar</label>
+                    <input type="file" asp-for="AadhaarFile" class="form-control w-full" accept="image/*" />
+                    <span asp-validation-for="AadhaarFile" class="text-red-500"></span>
+                </div>
 
-                    <div class="mb-4">
-                        <label class="block text-lg font-semibold mb-2">Upload Driving License</label>
-                        <input type="file" asp-for="DrivingLicenseFile" class="form-control w-full" accept="image/*" />
-                        <span asp-validation-for="DrivingLicenseFile" class="text-red-500"></span>
-                    </div>
+                <div class="mb-4">
+                    <label class="block text-lg font-semibold mb-2">Upload Driving License</label>
+                    <input type="file" asp-for="DrivingLicenseFile" class="form-control w-full" accept="image/*" />
+                    <span asp-validation-for="DrivingLicenseFile" class="text-red-500"></span>
+                </div>
+
                 <div class="flex flex-col items-center">
                     <button type="submit" class="bg-orange-500 text-white py-2 px-6 rounded-lg w-50">
                         Save Changes
                     </button>
-                    </div>  
+                </div>  
 
-                    @if (TempData["Message"] != null)
-                    {
-                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mt-4">
-                            <strong>@TempData["Message"]</strong>
-                        </div>
-                    }
-                </form>
+                @if (TempData["Message"] != null)
+                {
+                    <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mt-4">
+                        <strong>@TempData["Message"]</strong>
+                    </div>
+                }
+            </form>
+
             </div>
         </div>
 

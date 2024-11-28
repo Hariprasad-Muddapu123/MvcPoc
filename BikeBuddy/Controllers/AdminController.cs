@@ -3,11 +3,7 @@ using BikeBuddy.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using BikeBuddy.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using BikeBuddy.Models;
-
-
 namespace BikeBuddy.Controllers
 {
     [Authorize(Roles ="Admin")]
@@ -29,36 +25,30 @@ namespace BikeBuddy.Controllers
             return View(viewModel);
         }
 
+        private async Task<(object DashboardData, IEnumerable<User> Users)> GetSharedDataAsync()
+        {
+            var dashboardData = await _adminDashboardService.GetDashboardData();
+            var users = await _adminDashboardService.GetAllUsers();
+            return (dashboardData, users);
+        }
         public async Task<IActionResult> UserDetails()
         {
-            var dashboardData =await  _adminDashboardService.GetDashboardData();
-
-            var users =await  _adminDashboardService.GetAllUsers();
-
+            var (dashboardData, users) = await GetSharedDataAsync();
             ViewBag.Users = users;
-
             return View(dashboardData);
         }
 
         public async Task<IActionResult> KycDetails()
         {
-            var dashboardData =await _adminDashboardService.GetDashboardData();
-            var users =await  _adminDashboardService.GetAllUsers();
-
+            var (dashboardData, users) = await GetSharedDataAsync();
             ViewBag.Users=users;
-
             return View(dashboardData);
-
         }
 
         [HttpGet]
         public async Task<IActionResult> SearchByUsername(string Username)
         {
-            var dashboardData =await _adminDashboardService.GetDashboardData();
-
-            var users = await _adminDashboardService.GetAllUsers();
-
-
+            var (dashboardData, users) = await GetSharedDataAsync();
             if (!string.IsNullOrEmpty(Username))
             {
                 users = users.Where(u => u.UserName.Contains(Username, StringComparison.OrdinalIgnoreCase)).ToList();
@@ -142,11 +132,8 @@ namespace BikeBuddy.Controllers
         public async Task<IActionResult> BikeDetails()
         { 
             var dashboardData =await  _adminDashboardService.GetDashboardData();
-
             var bikes = await _adminDashboardService.GetAllBikes();
-
             ViewBag.Bikes = bikes;
-
             return View(dashboardData); 
         }
         [HttpGet]

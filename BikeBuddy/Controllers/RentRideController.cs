@@ -255,7 +255,8 @@ namespace BikeBuddy.Controllers
 
             if (user.KycStatus != KycStatus.Approved)
             {
-                return BadRequest("Your KYC status is not approved. You cannot book a bike.");
+                TempData["Message"] = "Your KYC status is pending approval. You cannot book a bike until all required documents are uploaded and verified.";
+                return RedirectToAction("Profile", "User");
             }
 
             var totalPrice = HttpContext.Session.GetString("TotalPrice");

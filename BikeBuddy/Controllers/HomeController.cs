@@ -1,6 +1,7 @@
 using BikeBuddy.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using System.Security.Claims;
 
 namespace BikeBuddy.Controllers
 {
@@ -13,6 +14,14 @@ namespace BikeBuddy.Controllers
             _logger = logger;
         }
 
+        public IActionResult Route()
+        {
+            var userRoles=User.FindAll(ClaimTypes.Role).Select(r=>r.Value).ToList();
+            if (userRoles.Contains("Admin"))
+                return RedirectToAction("Index", "Admin");
+            else
+                return RedirectToAction("Index", "Home");
+        }
         public IActionResult Index(string type="owner")
         {
             ViewData["ServiceType"]=type;

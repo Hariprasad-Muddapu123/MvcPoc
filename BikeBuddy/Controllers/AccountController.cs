@@ -40,7 +40,6 @@ namespace BikeBuddy.Controllers
                     ModelState.AddModelError("Email", "This email address is already taken.");
                     return View(model);  
                 }
-
                 var existingMobile = await userManager.Users
                     .FirstOrDefaultAsync(u => u.PhoneNumber == model.Mobile);
 
@@ -57,7 +56,6 @@ namespace BikeBuddy.Controllers
                 };
 
                 var result = await userManager.CreateAsync(user, model.Password);
-
                 if (result.Succeeded)
                 {
                     if (!await roleManager.RoleExistsAsync("User"))
@@ -73,22 +71,8 @@ namespace BikeBuddy.Controllers
                         }
                         return View(model);
                     }
-                   // await signInManager.SignInAsync(user, isPersistent: false);
-                    var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
-                    var callbackUrl = Url.Action(
-                        "ConfirmEmail", "Account",
-                        new { token, UserId=user.Id },
-                        protocol: HttpContext.Request.Scheme);
-
-                    await emailSender.SendEmailAsync(
-                        model.Email,
-                        "Confirm Email",
-                        $"Please Confirm Email by clicking here: <a href='{callbackUrl}'>link</a>");
-
-                    TempData["Message"] = "Confirm  link has been sent to your email.";
-                    return View("signup");
+                    return View("login");
                 }
-
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
@@ -115,23 +99,10 @@ namespace BikeBuddy.Controllers
                 {
                     if (!user.EmailConfirmed)
                     {
-                        var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
-                        var callbackUrl = Url.Action(
-                            "ConfirmEmail", "Account",
-                            new { token, UserId = user.Id },
-                            protocol: HttpContext.Request.Scheme);
-
-                        await emailSender.SendEmailAsync(
-                            user.Email,
-                            "Confirm Email",
-                            $"Please confirm your email by clicking here: <a href='{callbackUrl}'>link</a>");
-
+                        SendEmail(model, user);
                         TempData["Message"] = "A confirmation link has been sent to your email.";
-                        var loginVM = new LoginViewModel()
-                        {
-                            Schemes = await signInManager.GetExternalAuthenticationSchemesAsync()
-                        };
-                        return View(loginVM);
+                        model.Schemes = await signInManager.GetExternalAuthenticationSchemesAsync();
+                        return View(model);
                     }
                     else
                     {
@@ -159,21 +130,15 @@ namespace BikeBuddy.Controllers
                             else
                             {
                                 TempData["Message"] = "Unauthorized role.";
-                                var loginVM = new LoginViewModel()
-                                {
-                                    Schemes = await signInManager.GetExternalAuthenticationSchemesAsync()
-                                };
-                                return View(loginVM);
+                                model.Schemes = await signInManager.GetExternalAuthenticationSchemesAsync();
+                                return View(model);
                             }
                         }
                         else
                         {
                             ModelState.AddModelError(string.Empty, "Invalid Password.");
-                            var loginVM = new LoginViewModel()
-                            {
-                                Schemes = await signInManager.GetExternalAuthenticationSchemesAsync()
-                            };
-                            return View(loginVM);
+                            model.Schemes = await signInManager.GetExternalAuthenticationSchemesAsync();
+                            return View(model);
                         }
                     }
                 }
@@ -186,6 +151,20 @@ namespace BikeBuddy.Controllers
             model.Schemes = await signInManager.GetExternalAuthenticationSchemesAsync();
             return View(model);
         }
+        private async void SendEmail(LoginViewModel model, User user)
+        {
+            var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
+            var callbackUrl = Url.Action(
+                "ConfirmEmail", "Account",
+                new { token, UserId = user.Id },
+                protocol: HttpContext.Request.Scheme);
+
+            await emailSender.SendEmailAsync(
+                user.Email,
+                "Confirm Email",
+                $"Please confirm your email by clicking here: <a href='{callbackUrl}'>link</a>");
+        }
+
 
         [HttpGet]
         public IActionResult GoogleLogin(String provider, String returnUrl = "")
@@ -214,28 +193,30 @@ namespace BikeBuddy.Controllers
                 return View("Login", loginVM);
             }
             var user = await userManager.FindByEmailAsync(info.Principal?.FindFirst(ClaimTypes.Email)?.Value);
-            await signInManager.SignInAsync(user, isPersistent: false);
-            //return RedirectToAction("Index", "Home");
             var roles = await userManager.GetRolesAsync(user);
             if (roles.Contains("Admin"))
             {
+                await signInManager.SignInAsync(user, isPersistent: false);
                 return RedirectToAction("Index", "Admin");
             }
             else if (roles.Contains("User"))
-            { 
-                    return RedirectToAction("Index", "Home");  
+            {
+                await signInManager.SignInAsync(user, isPersistent: false);
+                return RedirectToAction("Index", "Home");
             }
             else
             {
                 TempData["Message"] = "Unauthorized role.";
-                return View("Login");
-            }
+
+                return View("Login", loginVM);
+            }   
         }
 
         [HttpGet]
         public async Task<IActionResult> Logout()
         {
             await signInManager.SignOutAsync();
+            
             return RedirectToAction("index", "Home");
         }
 
@@ -355,7 +336,5 @@ namespace BikeBuddy.Controllers
             TempData["Message"] = "Password has been reset successfully. Please log in.";
             return RedirectToAction("Login");
         }
-
-
     }
 }
