@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using BikeBuddy.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using BikeBuddy.Models;
+using System.Text.Json;
+using Newtonsoft.Json;
 namespace BikeBuddy.Controllers
 {
     [Authorize(Roles ="Admin")]
@@ -21,26 +23,28 @@ namespace BikeBuddy.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var viewModel =await _adminDashboardService.GetDashboardData();
-            return View(viewModel);
-        }
-
-        private async Task<(object DashboardData, IEnumerable<User> Users)> GetSharedDataAsync()
-        {
             var dashboardData = await _adminDashboardService.GetDashboardData();
-            var users = await _adminDashboardService.GetAllUsers();
-            return (dashboardData, users);
+            TempData["DashBoardData"] = JsonConvert.SerializeObject(dashboardData, new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            });
+            return View(dashboardData);
         }
         public async Task<IActionResult> UserDetails()
         {
-            var (dashboardData, users) = await GetSharedDataAsync();
-            ViewBag.Users = users;
+            AdminDashboardViewModel? dashboardData = null;
+            if (TempData.ContainsKey("DashBoardData"))
+            {
+                dashboardData = JsonConvert.DeserializeObject<AdminDashboardViewModel>(TempData["DashBoardData"]?.ToString());
+            }
+            TempData.Keep("DashBoardData");
             return View(dashboardData);
         }
 
         public async Task<IActionResult> KycDetails()
         {
-            var (dashboardData, users) = await GetSharedDataAsync();
+            var dashboardData = await _adminDashboardService.GetDashboardData();
+            var users = await _adminDashboardService.GetAllUsers();
             ViewBag.Users=users;
             return View(dashboardData);
         }
@@ -48,7 +52,8 @@ namespace BikeBuddy.Controllers
         [HttpGet]
         public async Task<IActionResult> SearchByUsername(string Username)
         {
-            var (dashboardData, users) = await GetSharedDataAsync();
+            var dashboardData = await _adminDashboardService.GetDashboardData();
+            var users = await _adminDashboardService.GetAllUsers();
             if (!string.IsNullOrEmpty(Username))
             {
                 users = users.Where(u => u.UserName.Contains(Username, StringComparison.OrdinalIgnoreCase)).ToList();

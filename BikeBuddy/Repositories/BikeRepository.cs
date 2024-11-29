@@ -32,7 +32,7 @@ namespace BikeBuddy.Repositories
         {
             return await _context.Bikes.CountAsync(b=>b.KycStatus == KycStatus.Pending);
         }
-        public async  Task<IEnumerable<Bike>> GetAll()
+        public async  Task<IEnumerable<Bike>> GetAllBikes()
         {
             return await  _context.Bikes.Include(b => b.User).ToListAsync();
         }

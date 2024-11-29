@@ -50,10 +50,10 @@
             </tr>
         </thead>
         <tbody>
-            @if (ViewBag.Users != null)
+            @if (Model.Users != null)
             {
                 int count = 1;
-                foreach (var user in ViewBag.Users)
+                foreach (var user in Model.Users)
                 {
                     <tr>
                         <td class="border p-2">@count</td>

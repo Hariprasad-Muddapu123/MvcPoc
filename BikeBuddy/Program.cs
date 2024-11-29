@@ -50,7 +50,7 @@ namespace BikeBuddy
                     .AddEntityFrameworkStores<ApplicationDbContext>()
                     .AddDefaultTokenProviders();
             // Add services to the container.
-            builder.Services.AddControllersWithViews();
+            builder.Services.AddControllersWithViews().AddSessionStateTempDataProvider(); 
             builder.Services.AddScoped<EmailSender> ();
             builder.Services.AddHostedService<BikeAvailabilityService>();
             // Register Repositories

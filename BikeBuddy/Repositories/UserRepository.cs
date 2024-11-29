@@ -52,9 +52,5 @@ namespace BikeBuddy.Repositories
             var result = await _userManager.UpdateAsync(user);
             return result.Succeeded;
         }
-
-        
-
-
     }
 }

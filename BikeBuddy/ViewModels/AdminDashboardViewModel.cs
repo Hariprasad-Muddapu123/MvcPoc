@@ -1,4 +1,7 @@
-﻿namespace BikeBuddy.ViewModels
+﻿using BikeBuddy.Models;
+using System.Text.Json.Serialization;
+
+namespace BikeBuddy.ViewModels
 {
     public class AdminDashboardViewModel
     {
@@ -12,5 +15,8 @@
         public int TotalUsers { get; set; }
         public int KycUsers { get; set; }
         public int NonKycUsers { get; set; }
+        public IEnumerable<User> Users { get; set; }
+        public IEnumerable<Bike> Bikes { get; set; } 
+
     }
 }

@@ -25,7 +25,7 @@ namespace BikeBuddy.Services
             using (var scope = _serviceProvider.CreateScope())
             {
                 var bikeRepository = scope.ServiceProvider.GetRequiredService<IBikeRepository>();
-                var bikes = await bikeRepository.GetAll(); // Get all bikes
+                var bikes = await bikeRepository.GetAllBikes(); // Get all bikes
 
                 foreach (var bike in bikes)
                 {

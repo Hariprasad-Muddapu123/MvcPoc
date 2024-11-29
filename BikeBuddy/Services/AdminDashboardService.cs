@@ -28,24 +28,19 @@ namespace BikeBuddy.Services
 
         public async Task<AdminDashboardViewModel> GetDashboardData()
         {
-            var totalBikes = await  _bikeRepository.GetTotalBikes();
-            var approvedBikes =await  _bikeRepository.GetApprovedBikes();
-            var pendingBikes = await  _bikeRepository.GetPendingBikes();
-            var rejectedBikes = await _bikeRepository.GetRejectedBikes();
-
-            var totalUsers = await  _userRepository.GetTotalUsers();
-            var kycUsers = await _userRepository.GetKycUsers();
-            var nonKycUsers = totalUsers - kycUsers;
-
+            var Bikes = await _bikeRepository.GetAllBikes();
+            var Users=await _userRepository.GetAllUsers();
             return new AdminDashboardViewModel
             {
-                TotalBikes =totalBikes,
-                ApprovedBikes = approvedBikes,
-                RejectedBikes = rejectedBikes,
-                PendingBikes = pendingBikes,
-                TotalUsers = totalUsers,
-                KycUsers = kycUsers,
-                NonKycUsers = nonKycUsers
+                Bikes = Bikes.ToList(),
+                Users = Users.ToList(),
+                TotalBikes = Bikes.Count(),
+                ApprovedBikes = Bikes.Where(b => b.KycStatus == KycStatus.Approved).Count(),
+                RejectedBikes = Bikes.Where(b => b.KycStatus == KycStatus.Rejected).Count(),
+                PendingBikes = Bikes.Where(b => b.KycStatus == KycStatus.Pending).Count(),
+                TotalUsers = Users.Count(),
+                KycUsers = Users.Where(b => b.KycStatus == KycStatus.Approved).Count(),
+                NonKycUsers = Users.Where(b => b.KycStatus == KycStatus.Rejected).Count()
             };
         }
 
@@ -74,7 +69,7 @@ namespace BikeBuddy.Services
 
         public async  Task<IEnumerable<Bike>> GetAllBikes()
         {
-            return await _bikeRepository.GetAll();
+            return await _bikeRepository.GetAllBikes();
         }
 
         public  async Task<bool> UpdateBikeStatus(int bikeId, bool approve)
