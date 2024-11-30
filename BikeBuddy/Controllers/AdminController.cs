@@ -4,16 +4,17 @@ using Microsoft.AspNetCore.Mvc;
 using BikeBuddy.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using BikeBuddy.Models;
-using System.Text.Json;
 using Newtonsoft.Json;
+
 namespace BikeBuddy.Controllers
 {
-    [Authorize(Roles ="Admin")]
+    [Authorize(Roles = "Admin")]
     public class AdminController : Controller
     {
         private readonly IAdminDashboardService _adminDashboardService;
         private readonly IBikeRepository _bikeRepository;
         private readonly EmailSender _emailSender;
+
         public AdminController(IAdminDashboardService adminDashboardService, IBikeRepository bikeRepository, EmailSender emailSender)
         {
             _adminDashboardService = adminDashboardService;
@@ -21,56 +22,72 @@ namespace BikeBuddy.Controllers
             _emailSender = emailSender;
         }
 
-        public async Task<IActionResult> Index()
+        // Fetch and cache dashboard data
+        private async Task<AdminDashboardViewModel> GetDashboardDataAsync()
         {
+            // Fetch data from service
             var dashboardData = await _adminDashboardService.GetDashboardData();
+
+            // Serialize and store in TempData (if required)
             TempData["DashBoardData"] = JsonConvert.SerializeObject(dashboardData, new JsonSerializerSettings
             {
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             });
-            return View(dashboardData);
+
+            TempData.Keep("DashBoardData");
+            return dashboardData;
         }
-        public async Task<IActionResult> UserDetails()
+
+        // Reusable method to deserialize dashboard data from TempData
+        private AdminDashboardViewModel GetDashboardDataFromTempData()
         {
-            AdminDashboardViewModel? dashboardData = null;
             if (TempData.ContainsKey("DashBoardData"))
             {
-                dashboardData = JsonConvert.DeserializeObject<AdminDashboardViewModel>(TempData["DashBoardData"]?.ToString());
+                var jsonData = TempData["DashBoardData"]?.ToString();
+                TempData.Keep("DashBoardData");
+                return JsonConvert.DeserializeObject<AdminDashboardViewModel>(jsonData);
             }
-            TempData.Keep("DashBoardData");
+            return null;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            var dashboardData = await GetDashboardDataAsync();
+            return View(dashboardData);
+        }
+
+        public async Task<IActionResult> UserDetails()
+        {
+            var dashboardData = GetDashboardDataFromTempData() ?? await GetDashboardDataAsync();
             return View(dashboardData);
         }
 
         public async Task<IActionResult> KycDetails()
         {
-            var dashboardData = await _adminDashboardService.GetDashboardData();
-            var users = await _adminDashboardService.GetAllUsers();
-            ViewBag.Users=users;
+            var dashboardData = GetDashboardDataFromTempData() ?? await GetDashboardDataAsync();
+
             return View(dashboardData);
         }
 
         [HttpGet]
-        public async Task<IActionResult> SearchByUsername(string Username)
+        public async Task<IActionResult> SearchByUsername(string username)
         {
-            var dashboardData = await _adminDashboardService.GetDashboardData();
-            var users = await _adminDashboardService.GetAllUsers();
-            if (!string.IsNullOrEmpty(Username))
+            var dashboardData = GetDashboardDataFromTempData() ?? await GetDashboardDataAsync();
+            var users = dashboardData.Users;
+
+            if (!string.IsNullOrEmpty(username))
             {
-                users = users.Where(u => u.UserName.Contains(Username, StringComparison.OrdinalIgnoreCase)).ToList();
+                users = users.Where(u => u.UserName.Contains(username, StringComparison.OrdinalIgnoreCase)).ToList();
             }
 
-            ViewBag.Users = users;
-
+            dashboardData.Users = users;
             return View("KycDetails", dashboardData);
         }
 
         public async Task<IActionResult> ViewUserDetails(Guid id)
         {
             var user = await _adminDashboardService.GetUserById(id);
-            if (user == null)
-            {
-                return NotFound("User not found.");
-            }
+            if (user == null) return NotFound("User not found.");
 
             var userViewModel = new UserDetailsViewModel
             {
@@ -83,12 +100,12 @@ namespace BikeBuddy.Controllers
                 KycStatus = user.KycStatus
             };
 
-            return View("ViewUserDetails",userViewModel);
+            return View(userViewModel);
         }
 
         public async Task<IActionResult> ViewDocument(Guid userId, string type)
         {
-            var user =await  _adminDashboardService.GetUserById(userId);
+            var user = await _adminDashboardService.GetUserById(userId);
             if (user == null) return NotFound();
 
             byte[] fileData = type switch
@@ -100,52 +117,45 @@ namespace BikeBuddy.Controllers
 
             if (fileData == null) return NotFound();
 
-            string contentType = "image/jpeg";
-
-            return File(fileData, contentType);
+            return File(fileData, "image/jpeg");
         }
-
-
 
         [HttpPost]
-        public async  Task<IActionResult> ApproveOrRejectKyc(String userId, string action)
+        public async Task<IActionResult> ApproveOrRejectKyc(string userId, string action)
         {
-            var result =await  _adminDashboardService.UpdateKycStatus(userId, action == "approve");
+            bool isApproved = action == "approve";
+            var result = await _adminDashboardService.UpdateKycStatus(userId, isApproved);
 
-            if (!result)
+            TempData["Message"] = result
+                ? isApproved ? "KYC successfully approved." : "KYC rejected."
+                : "User not found or operation failed.";
+            TempData["MessageType"] = result ? "success" : "error";
+
+            if (result)
             {
-                TempData["Message"] = "User not found or operation failed.";
-                TempData["MessageType"] = "error"; 
-            }
-            else
-            {
-
-                TempData["Message"] = action == "approve"
-                    ? "KYC successfully approved."
-                    : "KYC rejected.";
-                TempData["MessageType"] = "success";
-
+                GetDashboardDataAsync();
                 var userEmail = await _adminDashboardService.GetUserEmailAsync(userId);
-                string subject = action == "approve" ? "KYC Approved" : "KYC Rejected";
-                string body = action == "approve"
-                    ? "Congratulations! Your KYC has been approved. You can now access all features of our platform."
-                    : "Unfortunately, your KYC has been rejected. Please review your submission and try again.";
+                string subject = isApproved ? "KYC Approved" : "KYC Rejected";
+                string body = isApproved
+                    ? "Congratulations! Your KYC has been approved."
+                    : "Unfortunately, your KYC has been rejected.";
                 await _emailSender.SendEmailAsync(userEmail, subject, body);
             }
+
             return RedirectToAction("KycDetails");
         }
+
         public async Task<IActionResult> BikeDetails()
-        { 
-            var dashboardData =await  _adminDashboardService.GetDashboardData();
-            var bikes = await _adminDashboardService.GetAllBikes();
-            ViewBag.Bikes = bikes;
-            return View(dashboardData); 
+        {
+            var dashboardData = GetDashboardDataFromTempData() ?? await GetDashboardDataAsync();
+            ViewBag.Bikes = await _adminDashboardService.GetAllBikes();
+            return View(dashboardData);
         }
+
         [HttpGet]
         public async Task<IActionResult> ViewBikeDetails(int bikeId)
         {
-            var bike =await  _bikeRepository.GetById(bikeId);
-
+            var bike = await _bikeRepository.GetById(bikeId);
             if (bike == null)
             {
                 TempData["Message"] = "Bike not found.";
@@ -156,14 +166,10 @@ namespace BikeBuddy.Controllers
             return View(bike);
         }
 
-        public async  Task<IActionResult> ViewBikeDocument(int bikeId, string type)
+        public async Task<IActionResult> ViewBikeDocument(int bikeId, string type)
         {
-            var bike =await _bikeRepository.GetById(bikeId);
-
-            if (bike == null)
-            {
-                return NotFound();
-            }
+            var bike = await _bikeRepository.GetById(bikeId);
+            if (bike == null) return NotFound();
 
             byte[] fileData = type switch
             {
@@ -173,34 +179,31 @@ namespace BikeBuddy.Controllers
 
             if (fileData == null) return NotFound();
 
-            string contentType = "application/pdf";
-
-            return File(fileData, contentType);
+            return File(fileData, "application/pdf");
         }
+
         [HttpPost]
         public async Task<IActionResult> ApproveOrRejectBike(int bikeId, string action)
         {
-            var result = await _adminDashboardService.UpdateBikeStatus(bikeId, action == "approve");
+            bool isApproved = action == "approve";
+            var result = await _adminDashboardService.UpdateBikeStatus(bikeId, isApproved);
 
-            if (!result)
+            TempData["Message"] = result
+                ? isApproved ? "Bike approved." : "Bike rejected."
+                : "Bike documents are not valid.";
+            TempData["MessageType"] = result ? "success" : "error";
+
+            if (result)
             {
-                TempData["Message"] = "Bike documnets are not valid upload valid documnets.";
-                TempData["MessageType"] = "error";
-            }
-            else
-            {
-                TempData["Message"] = action == "approve"
-                    ? "bike approved."
-                    : "bike rejected.";
-                TempData["MessageType"] = "success";
-                var bike =await  _adminDashboardService.GetBikeByIdAsync(bikeId);
+                var bike = await _adminDashboardService.GetBikeByIdAsync(bikeId);
                 var userEmail = bike?.User?.Email;
-                string subject = action == "approve" ? "Bike Approved" : "Bike Rejected";
-                string body = action == "approve"
-                    ? "Congratulations! Your bike has been approved for renting. You can now list your bike and make it available for rental."
-                    : "Unfortunately, your bike has been rejected. Please upload valid documents for review.";
+                string subject = isApproved ? "Bike Approved" : "Bike Rejected";
+                string body = isApproved
+                    ? "Congratulations! Your bike has been approved for renting."
+                    : "Unfortunately, your bike has been rejected. Please upload valid documents.";
                 await _emailSender.SendEmailAsync(userEmail, subject, body);
             }
+
             return RedirectToAction("BikeDetails");
         }
 
@@ -211,6 +214,5 @@ namespace BikeBuddy.Controllers
             await _adminDashboardService.LogoutAdminAsync();
             return RedirectToAction("Index", "Home");
         }
-
     }
 }
