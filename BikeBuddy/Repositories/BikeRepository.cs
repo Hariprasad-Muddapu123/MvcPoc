@@ -1,8 +1,4 @@
-﻿using BikeBuddy.Data;
-using BikeBuddy.Models;
-using Microsoft.EntityFrameworkCore;
-
-namespace BikeBuddy.Repositories
+﻿namespace BikeBuddy.Repositories
 {
     public class BikeRepository : IBikeRepository
     {
@@ -11,26 +7,6 @@ namespace BikeBuddy.Repositories
         public BikeRepository(ApplicationDbContext context)
         {
             _context = context;
-        }
-
-        public async Task<int> GetTotalBikes()
-        {
-            return await _context.Bikes.CountAsync();
-        }
-
-        public async Task<int> GetApprovedBikes()
-        {
-            return await _context.Bikes.CountAsync(b => b.KycStatus == KycStatus.Approved);
-        }
-
-        public async Task<int> GetRejectedBikes()
-        {
-            return await _context.Bikes.CountAsync(b => b.KycStatus == KycStatus.Rejected);
-        }
-
-        public async Task<int> GetPendingBikes()
-        {
-            return await _context.Bikes.CountAsync(b=>b.KycStatus == KycStatus.Pending);
         }
         public async  Task<IEnumerable<Bike>> GetAllBikes()
         {

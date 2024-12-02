@@ -1,9 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using BikeBuddy.ViewModels;
-using Microsoft.AspNetCore.Identity;
-
-
-namespace BikeBuddy.Models
+﻿namespace BikeBuddy.Models
 {
     public class User : IdentityUser
     {

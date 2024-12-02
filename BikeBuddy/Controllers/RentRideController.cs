@@ -1,11 +1,4 @@
-﻿using BikeBuddy.Data;
-using BikeBuddy.Models;
-using BikeBuddy.ViewModels;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
-
+﻿using System.Security.Claims;
 namespace BikeBuddy.Controllers
 {
     public class RentRideController : Controller
@@ -13,11 +6,13 @@ namespace BikeBuddy.Controllers
         private readonly UserManager<User> _userManager;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ApplicationDbContext _context;
+        private readonly IBikeService _bikeService;
 
-        public RentRideController(UserManager<User> userManager, IWebHostEnvironment webHostEnvironment, ApplicationDbContext context)
+        public RentRideController(UserManager<User> userManager, IWebHostEnvironment webHostEnvironment,IBikeService bikeService, ApplicationDbContext context)
         {
             this._userManager = userManager;
             this._webHostEnvironment = webHostEnvironment;
+            this._bikeService = bikeService;
             this._context = context;
         }
         public IActionResult Index()
@@ -33,10 +28,10 @@ namespace BikeBuddy.Controllers
                 TempData["Message"] = "Please log in to continue.";
                 return RedirectToAction("Login", "Account");
             }
-
-            var userBikes = await _context.Bikes
+            List<Bike> bikes=(List<Bike>) await _bikeService.GetAllBikes();
+            var userBikes = bikes
                    .Where(b => b.UserId.Equals(user.Id) && !b.IsRemoved)
-                   .ToListAsync();
+                   .ToList();
             var viewModel = new RegisterBikeViewModel
             {
                 NewBike = new BikeViewModel(),
@@ -105,7 +100,8 @@ namespace BikeBuddy.Controllers
         [HttpPost]
         public async Task<IActionResult> RemoveBike(int bikeId)
         {
-            var bike = await _context.Bikes.FindAsync(bikeId);
+            IEnumerable<Bike> bikes = await _bikeService.GetAllBikes();
+            Bike bike = bikes.FirstOrDefault(b => b.BikeId == bikeId);
             if (bike != null)
             {
                 bike.RemovedDate = DateTime.UtcNow;
@@ -127,9 +123,10 @@ namespace BikeBuddy.Controllers
         public async Task<IActionResult> RemovedBikes()
         {
             var user = await _userManager.GetUserAsync(User);
-            var removedBikes = await _context.Bikes
+            List<Bike> bikes= (List<Bike>)await _bikeService.GetAllBikes(); 
+            var removedBikes = bikes
                 .Where(b => b.UserId.Equals(user.Id) && b.IsRemoved)
-                .ToListAsync();
+                .ToList();
             return View(removedBikes);
         }
 
@@ -142,7 +139,10 @@ namespace BikeBuddy.Controllers
         [HttpGet]
         public async Task<IActionResult> DisplayBikes(string SearchAddress, string SearchModel, string SearchLocation, string[] SelectedAddresses,string SelectedModels)
         {
-            var bikes =await  _context.Bikes.ToListAsync();
+            List<Bike> bikes = (List<Bike>) await _bikeService.GetAllBikes();
+            String currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            Console.WriteLine(currentUserId);
+            bikes=bikes.Where(bike=>bike.UserId != currentUserId).ToList();
             if (!string.IsNullOrEmpty(SearchLocation))
             {
                 bikes =  bikes.Where(b => b.BikeLocation == SearchLocation & b.KycStatus == KycStatus.Approved).ToList();
@@ -186,8 +186,6 @@ namespace BikeBuddy.Controllers
             return View();
         }
 
-        
-
         [HttpGet]
         public async Task<IActionResult> SearchDate(RideSearchViewModel model)
         {
@@ -197,7 +195,8 @@ namespace BikeBuddy.Controllers
 
                 return BadRequest("Invalid BikeId format.");
             }
-            var bike = await _context.Bikes.FirstOrDefaultAsync(b => b.BikeId == bikeId);
+            List<Bike> bikes = (List<Bike>)await _bikeService.GetAllBikes();
+            var bike = bikes.FirstOrDefault(b => b.BikeId == bikeId);
             if(bike.AvailableUpto<model.DropoffDate)
             {
                 ViewData["Message"] = $"Not Available upto that time.Available upto {@bike.AvailableUpto}";
@@ -217,11 +216,11 @@ namespace BikeBuddy.Controllers
                 ViewData["Message"] = "Dropoff date and time must be later than pickup date and time.";
                 return View("Date");
             }
-            TimeSpan timeDifference = dropoffDateTime - pickupDateTime;           
-            double bikeRentPrice = await _context.Bikes
+            TimeSpan timeDifference = dropoffDateTime - pickupDateTime;  
+            double bikeRentPrice = bikes
                 .Where(b => b.BikeId == bikeId)
                 .Select(b => b.BikeRentPrice)
-                .FirstOrDefaultAsync();
+                .FirstOrDefault();
             double totalHours = CalculateHours(timeDifference);
             decimal totalPrice = (decimal)totalHours * (decimal)bikeRentPrice;
             decimal gst = (totalPrice * 5 )/ 100;
@@ -290,8 +289,7 @@ namespace BikeBuddy.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            var bikeIdString = HttpContext.Session.GetString("BikeId");
-            if (!int.TryParse(bikeIdString, out int bikeId))
+            if (!int.TryParse(HttpContext.Session.GetString("BikeId"), out int bikeId))
             {
                 return BadRequest("Invalid BikeId format.");
             }
@@ -301,6 +299,13 @@ namespace BikeBuddy.Controllers
             var rentedHours = HttpContext.Session.GetString("RentedHours");
             var gst = HttpContext.Session.GetString("Gst");
             var totalBill = HttpContext.Session.GetString("TotalBill");
+            
+            if (string.IsNullOrEmpty(pickupdatetime) || string.IsNullOrEmpty(dropoffdatetime) ||
+        string.IsNullOrEmpty(totalPrice) || string.IsNullOrEmpty(rentedHours) ||
+        string.IsNullOrEmpty(gst) || string.IsNullOrEmpty(totalBill))
+            {
+                return BadRequest("Session data is incomplete.");
+            }
 
             var ride = new Ride
             {
@@ -332,20 +337,28 @@ namespace BikeBuddy.Controllers
             };
             
             _context.Payments.Add(payment);
-            await _context.SaveChangesAsync();
-
-            //ride.RentalStatus = RentStatus.Completed; 
+            await _context.SaveChangesAsync(); 
             ride.TotalAmount = payment.TotalAmount.ToString();
 
             _context.Rides.Update(ride);
             await _context.SaveChangesAsync();
+            var bikes = await _bikeService.GetAllBikes();
 
-            var bike = await _context.Bikes.FirstOrDefaultAsync(b => b.BikeId == bikeId);
-            bike.Available = false;
-            _context.Bikes.Update(bike);
-            await _context.SaveChangesAsync();
-            HttpContext.Session.Clear();
-            return View(bike); 
+            var bike =  bikes.FirstOrDefault(b => b.BikeId == bikeId);
+            if(bike!=null)
+            {
+                bike.Available = false;
+                _context.Bikes.Update(bike);
+                await _context.SaveChangesAsync();
+                HttpContext.Session.Clear();
+                return View(bike);
+            }
+            else
+            {
+                TempData["Message"] = "Bike not found.";
+                return View("DisplayBikes");
+            }
+            
         }
 
         private string GenerateTransactionId()

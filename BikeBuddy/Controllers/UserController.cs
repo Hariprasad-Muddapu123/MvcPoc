@@ -1,10 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using BikeBuddy.Models;
-using BikeBuddy.Services;
-using BikeBuddy.ViewModels;
-
-namespace BikeBuddy.Controllers
+﻿namespace BikeBuddy.Controllers
 {
     public class UserController : Controller
     {

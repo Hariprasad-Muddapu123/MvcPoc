@@ -1,6 +1,4 @@
-﻿using BikeBuddy.Models;
-
-namespace BikeBuddy.Services
+﻿namespace BikeBuddy.Services
 {
     public interface IRideService
     {

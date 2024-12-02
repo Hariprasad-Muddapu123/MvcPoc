@@ -1,7 +1,4 @@
-﻿using BikeBuddy.Models;
-using BikeBuddy.ViewModels;
-
-namespace BikeBuddy.Services
+﻿namespace BikeBuddy.Services
 {
     public interface IAdminDashboardService
     {

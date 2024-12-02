@@ -1,7 +1,4 @@
-﻿using BikeBuddy.Models;
-using System.Text.Json.Serialization;
-
-namespace BikeBuddy.ViewModels
+﻿namespace BikeBuddy.ViewModels
 {
     public class AdminDashboardViewModel
     {

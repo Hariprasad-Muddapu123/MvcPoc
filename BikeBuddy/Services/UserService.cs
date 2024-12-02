@@ -1,10 +1,4 @@
-﻿using BikeBuddy.Models;
-using BikeBuddy.Repositories;
-using BikeBuddy.ViewModels;
-using System.IO;
-using System.Threading.Tasks;
-
-namespace BikeBuddy.Services
+﻿namespace BikeBuddy.Services
 {
     public class UserService : IUserService
     {

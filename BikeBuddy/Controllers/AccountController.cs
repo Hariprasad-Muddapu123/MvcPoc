@@ -1,9 +1,11 @@
-﻿using BikeBuddy.Models;
-using BikeBuddy.Services;
-using BikeBuddy.ViewModels;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿global using global::BikeBuddy.Models;
+global using global::BikeBuddy.Services;
+global using global::BikeBuddy.ViewModels;
+global using global::Microsoft.AspNetCore.Mvc;
+global using global::Microsoft.AspNetCore.Identity;
+global using global::Microsoft.EntityFrameworkCore;
+global using global::BikeBuddy.Data;
+global using global::BikeBuddy.Repositories;
 using System.Security.Claims;
 
 namespace BikeBuddy.Controllers
@@ -69,9 +71,11 @@ namespace BikeBuddy.Controllers
                         {
                             ModelState.AddModelError(string.Empty, error.Description);
                         }
+
                         return View(model);
                     }
-                    return View("login");
+                    ViewBag.SuccessMessage = "Registration successful! Please log in to continue.";
+                    return View();
                 }
                 foreach (var error in result.Errors)
                 {

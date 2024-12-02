@@ -1,12 +1,7 @@
-﻿using BikeBuddy.Models;
-
-namespace BikeBuddy.Repositories
+﻿namespace BikeBuddy.Repositories
 {
     public interface IUserRepository
     {
-        Task<int> GetTotalUsers();
-        Task<int> GetKycUsers();
-
         Task<IEnumerable<User>> GetAllUsers();
         void SaveChanges();
 

@@ -1,7 +1,4 @@
-﻿using BikeBuddy.Models;
-using BikeBuddy.Repositories;
-
-namespace BikeBuddy.Services
+﻿namespace BikeBuddy.Services
 {
     public class BikeAvailabilityService : BackgroundService
     {

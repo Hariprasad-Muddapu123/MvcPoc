@@ -1,9 +1,4 @@
-﻿using BikeBuddy.Services;
-using BikeBuddy.Repositories;
-using Microsoft.AspNetCore.Mvc;
-using BikeBuddy.ViewModels;
-using Microsoft.AspNetCore.Authorization;
-using BikeBuddy.Models;
+﻿using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json;
 
 namespace BikeBuddy.Controllers
@@ -12,23 +7,17 @@ namespace BikeBuddy.Controllers
     public class AdminController : Controller
     {
         private readonly IAdminDashboardService _adminDashboardService;
-        private readonly IBikeRepository _bikeRepository;
         private readonly EmailSender _emailSender;
 
-        public AdminController(IAdminDashboardService adminDashboardService, IBikeRepository bikeRepository, EmailSender emailSender)
+        public AdminController(IAdminDashboardService adminDashboardService, EmailSender emailSender)
         {
             _adminDashboardService = adminDashboardService;
-            _bikeRepository = bikeRepository;
             _emailSender = emailSender;
         }
-
-        // Fetch and cache dashboard data
         private async Task<AdminDashboardViewModel> GetDashboardDataAsync()
         {
-            // Fetch data from service
             var dashboardData = await _adminDashboardService.GetDashboardData();
 
-            // Serialize and store in TempData (if required)
             TempData["DashBoardData"] = JsonConvert.SerializeObject(dashboardData, new JsonSerializerSettings
             {
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
@@ -38,7 +27,6 @@ namespace BikeBuddy.Controllers
             return dashboardData;
         }
 
-        // Reusable method to deserialize dashboard data from TempData
         private AdminDashboardViewModel GetDashboardDataFromTempData()
         {
             if (TempData.ContainsKey("DashBoardData"))
@@ -70,7 +58,7 @@ namespace BikeBuddy.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> SearchByUsername(string username)
+        public async Task<IActionResult> SearchByUsername(string username, string targetView)
         {
             var dashboardData = GetDashboardDataFromTempData() ?? await GetDashboardDataAsync();
             var users = dashboardData.Users;
@@ -81,7 +69,21 @@ namespace BikeBuddy.Controllers
             }
 
             dashboardData.Users = users;
-            return View("KycDetails", dashboardData);
+            switch (targetView?.ToLower())
+            {
+                case "kycdetails":
+                    return PartialView("KycDetails", dashboardData);
+
+                case "userdetails":
+                    return PartialView("UserDetails", dashboardData);
+
+                case "bikedetails":
+                    return PartialView("BikeDetails", dashboardData);
+
+                default:
+                    return BadRequest("Invalid target view.");
+            }
+            return View(dashboardData);
         }
 
         public async Task<IActionResult> ViewUserDetails(Guid id)
@@ -155,7 +157,7 @@ namespace BikeBuddy.Controllers
         [HttpGet]
         public async Task<IActionResult> ViewBikeDetails(int bikeId)
         {
-            var bike = await _bikeRepository.GetById(bikeId);
+            var bike = await _adminDashboardService.GetBikeByIdAsync(bikeId);
             if (bike == null)
             {
                 TempData["Message"] = "Bike not found.";
@@ -168,7 +170,7 @@ namespace BikeBuddy.Controllers
 
         public async Task<IActionResult> ViewBikeDocument(int bikeId, string type)
         {
-            var bike = await _bikeRepository.GetById(bikeId);
+            var bike=await _adminDashboardService.GetBikeByIdAsync(bikeId);
             if (bike == null) return NotFound();
 
             byte[] fileData = type switch

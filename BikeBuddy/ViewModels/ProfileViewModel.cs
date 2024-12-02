@@ -1,6 +1,4 @@
-﻿using BikeBuddy.Models;
-
-namespace BikeBuddy.ViewModels
+﻿namespace BikeBuddy.ViewModels
 {
     public class ProfileViewModel
     {

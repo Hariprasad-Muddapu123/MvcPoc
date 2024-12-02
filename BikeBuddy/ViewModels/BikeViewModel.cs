@@ -1,7 +1,4 @@
-﻿using BikeBuddy.Models;
-using Microsoft.AspNetCore.Identity;
-
-namespace BikeBuddy.ViewModels
+﻿namespace BikeBuddy.ViewModels
 {
     public class BikeViewModel
     {

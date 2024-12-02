@@ -1,8 +1,4 @@
-﻿using BikeBuddy.Data;
-using BikeBuddy.Models;
-using Microsoft.EntityFrameworkCore;
-
-namespace BikeBuddy.Repositories
+﻿namespace BikeBuddy.Repositories
 {
     public class RideRepository : IRideRepository
     {
