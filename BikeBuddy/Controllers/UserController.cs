@@ -5,7 +5,6 @@
         private readonly IUserService _userService;
         private readonly IBikeService _bikeService;
         private readonly IRideService _rideService;
-
         public UserController(IUserService userService,IBikeService bikeService,IRideService rideService)
         {
             _userService = userService;

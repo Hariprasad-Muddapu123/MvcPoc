@@ -6,6 +6,7 @@
 <head>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script src="~/js/profileimagepreview.js"></script>
 </head>
 <body>
         <div class="flex justify-center space-x-8 py-8">
@@ -39,8 +40,6 @@
                                                 @Model.KYCStatus
                                             </span>
                         </div>
-
-
                         </div>
                         <div class="mb-4">
                             <label class="block text-lg font-semibold mb-2">UserName</label>
@@ -121,18 +120,5 @@
 
             </div>
         </div>
-
-    <script>
-        function previewImage(event) {
-            const reader = new FileReader();
-            reader.onload = function () {
-                const output = document.getElementById('profileImagePreview');
-                output.src = reader.result;
-            };
-            if (event.target.files && event.target.files[0]) {
-                reader.readAsDataURL(event.target.files[0]);
-            }
-        }
-    </script>
 </body>
 </html>

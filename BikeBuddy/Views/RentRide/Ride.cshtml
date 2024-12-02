@@ -2,37 +2,10 @@
 <html>
 <head>
     <title>City Selection</title>
-    <script src="https://cdn.tailwindcss.com">
-    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
-    <style>
-        .city-card {
-                 position: relative;
-                 width: 100%;
-                 padding-top: 100%;
-                 overflow: hidden;
-                 border-radius: 0.5rem;
-             }
-             .city-card img {
-                 position: absolute;
-                 top: 0;
-                 left: 0;
-                 width: 100%;
-                 height: 100%;
-                 object-fit: cover;
-             }
-             .city-card span {
-                 position: absolute;
-                 bottom: 0;
-                 left: 0;
-                 right: 0;
-                 padding: 0.5rem;
-                 background: rgba(0, 0, 0, 0.5);
-                 color: white;
-                 font-size: 1.25rem;
-                 text-align: center;
-             }
-    </style>
+    <link href="~/css/ride.css" rel="stylesheet" />
+    <script src="~/js/searchcity.js"></script>
 </head>
 <body class="bg-gray-100">
     <div class="max-w-4xl mx-auto p-4">
@@ -68,25 +41,6 @@
             }
         </div>
     </div>
-    <script>
-        function filterCities() {
-            const searchInput = document.getElementById("searchBar").value.toLowerCase();
-            const cityCards = document.querySelectorAll(".city-card");
-            cityCards.forEach((card) => {
-                const cityName = card.querySelector("span").textContent.toLowerCase();
-                if (cityName.includes(searchInput)) {
-                    card.style.display = "block"; // Show matching cards
-                } else {
-                    card.style.display = "none"; // Hide non-matching cards
-                }
-            });
-        }
-
-        function clearFilter() {
-            document.getElementById("searchBar").value = '';
-            filterCities(); // Reset the filter
-        }
-    </script>
 </body>
 </html>
 

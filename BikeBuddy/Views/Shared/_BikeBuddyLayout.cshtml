@@ -10,23 +10,15 @@
     <link rel="stylesheet" href="~/css/bike.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/BikeBuddy.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha2/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Bootstrap JS (with Popper.js) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha2/js/bootstrap.min.js"></script>
-
-    
 </head>
-<body class="d-flex flex-column min-vh-100">
-    
+<body class="d-flex flex-column min-vh-100"> 
     <header class="fixed-header">
         <nav class="nav-Container">
             <div class="nav-left">
-                <div>
-                    <img src="~/Images/nav_logo.png" />
-                </div>
+                <div><img src="~/Images/nav_logo.png" /></div>
             </div>
             <div class="nav-right">
                 <ul>
@@ -51,27 +43,18 @@
                             </div>
                         }
                         else
-                        {
-                            
-                            <form>
-                                <button asp-controller="Account" asp-action="login">Login</button>
-                            </form>
+                        { 
+                            <form><button asp-controller="Account" asp-action="login">Login</button></form>
                         }
                     </li>
 
                 </ul>
             </div>
         </nav>
-
     </header>
-   
     <div class="">
-        
-            @RenderBody()
-        
+            @RenderBody()   
     </div>
-
-
     <footer>
         <div class="top-container">
         <div class="footer-left">
