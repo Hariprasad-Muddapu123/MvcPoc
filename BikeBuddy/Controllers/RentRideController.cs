@@ -7,7 +7,6 @@ namespace BikeBuddy.Controllers
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ApplicationDbContext _context;
         private readonly IBikeService _bikeService;
-
         public RentRideController(UserManager<User> userManager, IWebHostEnvironment webHostEnvironment,IBikeService bikeService, ApplicationDbContext context)
         {
             this._userManager = userManager;
@@ -19,6 +18,7 @@ namespace BikeBuddy.Controllers
         {
             return View();
         }
+
         [HttpGet]
         public async Task<IActionResult> Rent()
         {
@@ -37,7 +37,6 @@ namespace BikeBuddy.Controllers
                 NewBike = new BikeViewModel(),
                 UserBikes = userBikes
             };
-
             return View(viewModel);
         }
 
@@ -69,23 +68,7 @@ namespace BikeBuddy.Controllers
                 }
 
                 var user = await _userManager.GetUserAsync(User);
-
-                var bike = new Bike
-                {
-                    BikeModel = model.BikeModel,
-                    BikeNumber = model.BikeNumber,
-                    BikeLocation = model.BikeLocation,
-                    BikeAddress = model.BikeAddress,
-                    KycStatus = model.KycStatus,
-                    BikeRentPrice = model.BikeRentPrice,
-                    UserId = user.Id,
-                    Available=true,
-                    RegistrationDate = DateTime.UtcNow,
-                    AvailableUpto = model.AvailableUpto,
-                    BikeImageBytes = model.BikeImageBytes,
-                    BikeDocumentsBytes = model.BikeDocumentsBytes
-                };
-
+                var bike = CreateBike(model, user);
                 _context.Bikes.Add(bike);
                 var result = await _context.SaveChangesAsync();
 
@@ -96,11 +79,30 @@ namespace BikeBuddy.Controllers
             TempData["ErrorMessage"] = "Failed to register the bike. Please check the inputs.";
             return View(viewModel);
         }
+        private Bike CreateBike(BikeViewModel model, User user)
+        {
+            return new Bike
+            {
+                BikeModel = model.BikeModel,
+                BikeNumber = model.BikeNumber,
+                BikeLocation = model.BikeLocation,
+                BikeAddress = model.BikeAddress,
+                KycStatus = model.KycStatus,
+                BikeRentPrice = model.BikeRentPrice,
+                UserId = user.Id,
+                Available = true,
+                RegistrationDate = DateTime.UtcNow,
+                AvailableUpto = model.AvailableUpto,
+                BikeImageBytes = model.BikeImageBytes,
+                BikeDocumentsBytes = model.BikeDocumentsBytes
+            };
+        }
+
         [HttpPost]
         public async Task<IActionResult> RemoveBike(int bikeId)
         {
             IEnumerable<Bike> bikes = await _bikeService.GetAllBikes();
-            Bike bike = bikes.FirstOrDefault(b => b.BikeId == bikeId);
+            Bike? bike = bikes.FirstOrDefault(b => b.BikeId == bikeId);
             if (bike != null)
             {
                 bike.RemovedDate = DateTime.UtcNow;
@@ -222,7 +224,6 @@ namespace BikeBuddy.Controllers
         private double CalculateHours(TimeSpan timeDifference)
         {
             double totalHours = timeDifference.TotalHours;
-            
             return totalHours;
         }
         [HttpGet]
@@ -273,81 +274,109 @@ namespace BikeBuddy.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            if (!int.TryParse(HttpContext.Session.GetString("BikeId"), out int bikeId))
+            var sessionData = GetSessionData();
+            if (sessionData == null || !int.TryParse(HttpContext.Session.GetString("BikeId"), out int bikeId))
             {
-                return BadRequest("Invalid BikeId format.");
+                return BadRequest("Session data is incomplete or BikeId is invalid.");
             }
-            var pickupdatetime = HttpContext.Session.GetString("PickupDateTime");
-            var dropoffdatetime = HttpContext.Session.GetString("PickupDateTime");
+
+            var bikes = await _bikeService.GetAllBikes();
+            var bike = bikes.FirstOrDefault(b => b.BikeId == bikeId);
+            if (bike == null)
+            {
+                TempData["Message"] = "Bike not found.";
+                return RedirectToAction("DisplayBikes");
+            }
+
+            // Begin transaction for consistency
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                // Create and save the ride
+                var ride = new Ride
+                {
+                    UserId = user.Id,
+                    BikeId = bikeId,
+                    PickupDateTime = sessionData.PickupDateTime,
+                    DropoffDateTime = sessionData.DropoffDateTime,
+                    RentalStatus = RentStatus.Ongoing,
+                    RideRegisteredDate = DateTime.UtcNow,
+                    RentedHours = sessionData.RentedHours,
+                    Amount = sessionData.TotalPrice,
+                    Gst = sessionData.Gst,
+                    TotalAmount = sessionData.TotalBill
+                };
+
+                _context.Rides.Add(ride);
+                await _context.SaveChangesAsync();
+
+                var payment = new Payment
+                {
+                    UserId = user.Id,
+                    RideId = ride.RideId,
+                    BikeId = ride.BikeId,
+                    TransactionId = GenerateTransactionId(),
+                    TransactionDateTime = DateTime.UtcNow,
+                    TotalAmount = Convert.ToDecimal(ride.TotalAmount),
+                    PaymentStatus = "Success",
+                    Currency = "INR"
+                };
+
+                _context.Payments.Add(payment);
+                await _context.SaveChangesAsync();
+
+                bike.Available = false;
+                _context.Bikes.Update(bike);
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+
+                HttpContext.Session.Clear();
+                return View(bike);
+            }
+            catch (Exception ex)
+            {
+                // Rollback transaction on error
+                await transaction.RollbackAsync();
+                TempData["ErrorMessage"] = "An error occurred while processing the payment. Please try again.";
+                return RedirectToAction("DisplayBikes");
+            }
+        }
+
+        private SessionData GetSessionData()
+        {
+            var bikeId = HttpContext.Session.GetString("BikeId");
+            var pickupDateTime = HttpContext.Session.GetString("PickupDateTime");
+            var dropoffDateTime = HttpContext.Session.GetString("DropoffDateTime");
             var totalPrice = HttpContext.Session.GetString("TotalPrice");
             var rentedHours = HttpContext.Session.GetString("RentedHours");
             var gst = HttpContext.Session.GetString("Gst");
             var totalBill = HttpContext.Session.GetString("TotalBill");
-            
-            if (string.IsNullOrEmpty(pickupdatetime) || string.IsNullOrEmpty(dropoffdatetime) ||
-        string.IsNullOrEmpty(totalPrice) || string.IsNullOrEmpty(rentedHours) ||
-        string.IsNullOrEmpty(gst) || string.IsNullOrEmpty(totalBill))
+
+            // Ensure all required session data is present
+            if (string.IsNullOrEmpty(bikeId) || string.IsNullOrEmpty(pickupDateTime) ||
+                string.IsNullOrEmpty(dropoffDateTime) || string.IsNullOrEmpty(totalPrice) ||
+                string.IsNullOrEmpty(rentedHours) || string.IsNullOrEmpty(gst) ||
+                string.IsNullOrEmpty(totalBill))
             {
-                return BadRequest("Session data is incomplete.");
+                return null;
             }
 
-            var ride = new Ride
+            return new SessionData
             {
-                UserId = user.Id,
-                BikeId = bikeId,
-                PickupDateTime = pickupdatetime,
-                DropoffDateTime = dropoffdatetime,
-                RentalStatus = RentStatus.Ongoing, 
-                RideRegisteredDate = DateTime.UtcNow,
-                RentedHours=rentedHours,
-                Amount = totalPrice, 
-                Gst = gst, 
-                TotalAmount = totalBill, 
+                BikeId = int.Parse(bikeId), // Parse the BikeId string to an integer
+                PickupDateTime = pickupDateTime,
+                DropoffDateTime = dropoffDateTime,
+                TotalPrice = totalPrice,
+                RentedHours = rentedHours,
+                Gst = gst,
+                TotalBill = totalBill
             };
-
-            _context.Rides.Add(ride);
-            await _context.SaveChangesAsync();
-
-            var payment = new Payment
-            {
-                UserId = user.Id,
-                RideId = ride.RideId,
-                BikeId = ride.BikeId, 
-                TransactionId = GenerateTransactionId(),
-                TransactionDateTime = DateTime.UtcNow,
-                TotalAmount = Convert.ToDecimal(ride.TotalAmount),
-                PaymentStatus = "Success", 
-                Currency = "INR" 
-            };
-            
-            _context.Payments.Add(payment);
-            await _context.SaveChangesAsync(); 
-            ride.TotalAmount = payment.TotalAmount.ToString();
-
-            _context.Rides.Update(ride);
-            await _context.SaveChangesAsync();
-            var bikes = await _bikeService.GetAllBikes();
-
-            var bike =  bikes.FirstOrDefault(b => b.BikeId == bikeId);
-            if(bike!=null)
-            {
-                bike.Available = false;
-                _context.Bikes.Update(bike);
-                await _context.SaveChangesAsync();
-                HttpContext.Session.Clear();
-                return View(bike);
-            }
-            else
-            {
-                TempData["Message"] = "Bike not found.";
-                return View("DisplayBikes");
-            }
-            
         }
 
         private string GenerateTransactionId()
         {
-            return Guid.NewGuid().ToString("N");
+            return Guid.NewGuid().ToString("N").ToUpper();
         }
 
     }
