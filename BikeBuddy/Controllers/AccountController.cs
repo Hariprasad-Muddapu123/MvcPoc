@@ -1,13 +1,4 @@
-﻿global using global::BikeBuddy.Models;
-global using global::BikeBuddy.Services;
-global using global::BikeBuddy.ViewModels;
-global using global::Microsoft.AspNetCore.Mvc;
-global using global::Microsoft.AspNetCore.Identity;
-global using global::Microsoft.EntityFrameworkCore;
-global using global::BikeBuddy.Data;
-global using global::BikeBuddy.Repositories;
-using System.Security.Claims;
-
+﻿using System.Security.Claims;
 namespace BikeBuddy.Controllers
 {
     public class AccountController : Controller

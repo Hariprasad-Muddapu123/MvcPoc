@@ -42,7 +42,6 @@ namespace BikeBuddy.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Rent(RegisterBikeViewModel viewModel)
         {
             if (ModelState.IsValid)
@@ -139,34 +138,19 @@ namespace BikeBuddy.Controllers
         [HttpGet]
         public async Task<IActionResult> DisplayBikes(string SearchAddress, string SearchModel, string SearchLocation, string[] SelectedAddresses,string SelectedModels)
         {
-            List<Bike> bikes = (List<Bike>) await _bikeService.GetAllBikes();
-            String currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            Console.WriteLine(currentUserId);
-            bikes=bikes.Where(bike=>bike.UserId != currentUserId).ToList();
-            if (!string.IsNullOrEmpty(SearchLocation))
-            {
-                bikes =  bikes.Where(b => b.BikeLocation == SearchLocation & b.KycStatus == KycStatus.Approved).ToList();
-            }
+            List<Bike> bikes = (List<Bike>)await _bikeService.GetAllBikes();
+            string? currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            if (!string.IsNullOrEmpty(SearchAddress))
-            {
-                bikes = bikes.Where(b => b.BikeAddress.Contains(SearchAddress, StringComparison.OrdinalIgnoreCase)).ToList();
-            }
+            bikes = bikes.Where(bike => bike.UserId != currentUserId).ToList();
 
-            if (!string.IsNullOrEmpty(SearchModel))
-            {
-                bikes = bikes.Where(b => b.BikeModel.Contains(SearchModel, StringComparison.OrdinalIgnoreCase)).ToList();
-            }
+            bikes = bikes.Where(b =>
+                (string.IsNullOrEmpty(SearchLocation) || (b.BikeLocation == SearchLocation && b.KycStatus == KycStatus.Approved)) &&
+                (string.IsNullOrEmpty(SearchAddress) || b.BikeAddress.Contains(SearchAddress, StringComparison.OrdinalIgnoreCase)) &&
+                (string.IsNullOrEmpty(SearchModel) || b.BikeModel.Contains(SearchModel, StringComparison.OrdinalIgnoreCase)) &&
+                (SelectedAddresses == null || !SelectedAddresses.Any() || SelectedAddresses.Contains(b.BikeAddress)) &&
+                (SelectedModels == null || !SelectedModels.Any() || SelectedModels.Contains(b.BikeModel))
+            ).ToList();
 
-            if (SelectedAddresses != null && SelectedAddresses.Any())
-            {
-                bikes = bikes.Where(b => SelectedAddresses.Contains(b.BikeAddress)).ToList();
-            }
-
-            if (SelectedModels != null && SelectedModels.Any())
-            {
-                bikes = bikes.Where(b => SelectedModels.Contains(b.BikeModel)).ToList();
-            }
 
             var viewModel = new RegisteredBikeViewModel
             {
@@ -177,12 +161,11 @@ namespace BikeBuddy.Controllers
 
             return View(viewModel);
         }
-        
 
         [HttpGet]
-        public async Task<IActionResult> Date(int BikeId)
+        public async Task<IActionResult> Date(int bikeId)
         {
-            HttpContext.Session.SetString("BikeId",BikeId.ToString());
+            HttpContext.Session.SetString("BikeId",bikeId.ToString());
             return View();
         }
 
@@ -192,12 +175,13 @@ namespace BikeBuddy.Controllers
             var bikeIdString = HttpContext.Session.GetString("BikeId");
             if (!int.TryParse(bikeIdString, out int bikeId))
             {
-
                 return BadRequest("Invalid BikeId format.");
             }
             List<Bike> bikes = (List<Bike>)await _bikeService.GetAllBikes();
             var bike = bikes.FirstOrDefault(b => b.BikeId == bikeId);
-            if(bike.AvailableUpto<model.DropoffDate)
+            if (bike == null)
+                return NotFound("Bike not found.");
+            if (bike.AvailableUpto<model.DropoffDate)
             {
                 ViewData["Message"] = $"Not Available upto that time.Available upto {@bike.AvailableUpto}";
                 return View("Date");

@@ -1,0 +1,24 @@
+[
+  {
+    "outputFileName": "wwwroot/js/Bikebuddy.min.js",
+    "inputFiles": [
+      "wwwroot/js/*"
+    ],
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
+    },
+    "includeInProject": true
+  },
+  {
+    "outputFileName": "wwwroot/css/Bikebuddy.min.css",
+    "inputFiles": [
+      "wwwroot/css/*"
+    ],
+    "minify": {
+      "enabled": true,
+      "renameLocals": true
+    },
+    "includeInProject": false
+  }
+]
