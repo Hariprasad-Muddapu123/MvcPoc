@@ -44,11 +44,15 @@ namespace BikeBuddy.Controllers
         }
         public IActionResult HandleError(int statusCode)
         {
-            if(statusCode == 404)
+            switch (statusCode)
             {
-                return View("Not Found");
+                case 404:
+                    return View("Not Found");
+                case 500:
+                    return View("ServerError");
+                default:
+                    return View("Error");
             }
-            return View("Error");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
