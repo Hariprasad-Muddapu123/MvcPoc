@@ -7,7 +7,6 @@
 <div class="bg-white p-6 rounded shadow-md">
     <h1 class="text-xl font-bold mb-4">Bike Details</h1>
 
-    <!-- Display the bike details -->
     <table class="table-auto w-full">
         <tr>
             <th class="text-left p-2">Bike ID</th>
@@ -39,7 +38,6 @@
         </tr>
     </table>
 
-    <!-- Display bike image -->
     <div class="mt-6">
         <h2 class="text-lg font-bold mb-2">Bike Image</h2>
         @if (Model.BikeImageBytes != null && Model.BikeImageBytes.Length > 0)
@@ -52,7 +50,6 @@
         }
     </div>
 
-    <!-- Display bike documents -->
     <div class="mt-6">
         <h2 class="text-lg font-bold mb-2">Bike Documents</h2>
         <p>
@@ -67,19 +64,7 @@
             }
         </p>
     </div>
-
-    <!-- Optionally, include a button to approve or reject the bike -->
     <div class="mt-6">
-        @if (TempData["Message"] != null)
-        {
-            var messageType = TempData["MessageType"] as string;
-            var messageClass = messageType == "success" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800";
-
-            <div class="@messageClass p-4 rounded mb-4">
-                @TempData["Message"]
-            </div>
-        }
-
         <form asp-action="ApproveOrRejectBike" method="post">
             <input type="hidden" name="bikeId" value="@Model.BikeId" />
             <button type="submit" name="action" value="approve" class="bg-green-500 text-white px-4 py-2 rounded">Approve</button>

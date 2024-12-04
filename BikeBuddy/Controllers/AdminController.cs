@@ -61,7 +61,6 @@ namespace BikeBuddy.Controllers
         public async Task<IActionResult> ByStatus(KycStatus? kycStatus = null)
         {
             var dashboardData = GetDashboardDataFromTempData() ?? await GetDashboardDataAsync();
-            // Filter bikes by KYC status
             if (kycStatus.HasValue)
             {
                 dashboardData.Users = dashboardData.Users
@@ -127,7 +126,7 @@ namespace BikeBuddy.Controllers
             var user = await _adminDashboardService.GetUserById(userId);
             if (user == null) return NotFound();
 
-            byte[] fileData = type switch
+            byte[]? fileData = type switch
             {
                 "DrivingLicense" => user.DrivingLicenseImage,
                 "Aadhaar" => user.AadhaarImage,
@@ -144,11 +143,6 @@ namespace BikeBuddy.Controllers
         {
             bool isApproved = action == "approve";
             var result = await _adminDashboardService.UpdateKycStatus(userId, isApproved);
-
-            TempData["Message"] = result
-                ? isApproved ? "KYC successfully approved." : "KYC rejected."
-                : "User not found or operation failed.";
-            TempData["MessageType"] = result ? "success" : "error";
 
             if (result)
             {
@@ -190,7 +184,7 @@ namespace BikeBuddy.Controllers
             var bike=await _adminDashboardService.GetBikeByIdAsync(bikeId);
             if (bike == null) return NotFound();
 
-            byte[] fileData = type switch
+            byte[]? fileData = type switch
             {
                 "BikeDocument" => bike.BikeDocumentsBytes,
                 _ => null
@@ -206,11 +200,6 @@ namespace BikeBuddy.Controllers
         {
             bool isApproved = action == "approve";
             var result = await _adminDashboardService.UpdateBikeStatus(bikeId, isApproved);
-
-            TempData["Message"] = result
-                ? isApproved ? "Bike approved." : "Bike rejected."
-                : "Bike documents are not valid.";
-            TempData["MessageType"] = result ? "success" : "error";
 
             if (result)
             {
