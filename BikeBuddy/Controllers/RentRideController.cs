@@ -288,11 +288,9 @@ namespace BikeBuddy.Controllers
                 return RedirectToAction("DisplayBikes");
             }
 
-            // Begin transaction for consistency
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                // Create and save the ride
                 var ride = new Ride
                 {
                     UserId = user.Id,

@@ -58,10 +58,10 @@
                     }
                 </div>
 
-            @if (TempData["Message"] != null)
+            @if (ViewBag.Message != null)
             {
-                <div class="alert alert-warning">
-                    @TempData["Message"]
+                <div class="alert alert-warning text-center">
+                    @ViewBag.Message
                 </div>
             }
     </div>

@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 namespace BikeBuddy.Controllers
 {
+
     public class AccountController : Controller
     {
         private readonly UserManager<User> userManager;
@@ -95,7 +96,7 @@ namespace BikeBuddy.Controllers
                     if (!user.EmailConfirmed)
                     {
                         SendEmail(model, user);
-                        TempData["Message"] = "A confirmation link has been sent to your email.";
+                        ViewBag.Message = "A confirmation link has been sent to your email.";
                         model.Schemes = await signInManager.GetExternalAuthenticationSchemesAsync();
                         return View(model);
                     }
@@ -124,7 +125,7 @@ namespace BikeBuddy.Controllers
                             }
                             else
                             {
-                                TempData["Message"] = "Unauthorized role.";
+                                ViewBag.Message = "Unauthorized role.";
                                 model.Schemes = await signInManager.GetExternalAuthenticationSchemesAsync();
                                 return View(model);
                             }
@@ -140,7 +141,7 @@ namespace BikeBuddy.Controllers
                 else
                 {
                     ModelState.AddModelError(string.Empty, "Invalid User Name.");
-                    TempData["Message"] = "User does not exist.";
+                    ViewBag.Message = "User does not exist.";
                 }
             }
             model.Schemes = await signInManager.GetExternalAuthenticationSchemesAsync();
@@ -236,8 +237,8 @@ namespace BikeBuddy.Controllers
                 var user = await userManager.FindByEmailAsync(model.Email);
                 if (user == null || !(await userManager.IsEmailConfirmedAsync(user)))
                 {
-                    TempData["Message"] = "If your email is registered, you'll receive a password reset link.";
-                    return View("ForgotPasswordConfirmation");
+                    ViewBag.Message = "The email you entered is not registered. Please enter a valid email to reset your password.";
+                    return View("Forgot");
                 }
 
                 var token = await userManager.GeneratePasswordResetTokenAsync(user);
@@ -251,51 +252,19 @@ namespace BikeBuddy.Controllers
                     "Reset Password",
                     $"Please reset your password by clicking here: <a href='{callbackUrl}'>link</a>");
 
-                TempData["Message"] = "Password reset link has been sent to your email.";
+                ViewBag.Message = "Password reset link has been sent to your email.";
                 return View("Forgot");
             }
 
             return View(model);
         }
-        [HttpGet]
-        public IActionResult ForgotPasswordConfirmation()
-        {
-            return View();  
-        }
-        [HttpGet]
-        public async Task<IActionResult> ConfirmEmail(string userId, string token)
-        {
-            if (userId == null || token == null)
-            {
-                return RedirectToAction("Index", "Account");
-            }
-
-            var user = await userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                return RedirectToAction("Index", "Account");
-            }
-
-            var result = await userManager.ConfirmEmailAsync(user, token);
-            if (result.Succeeded)
-            {
-                var loginVM = new LoginViewModel()
-                {
-                    Schemes = await signInManager.GetExternalAuthenticationSchemesAsync()
-                };
-                return View("Login",loginVM);
-            }
-            else
-            {
-                return RedirectToAction("Index", "Account");
-            }
-        }
+        
         [HttpGet]
         public IActionResult ResetPassword(string token, string email)
         {
             if (token == null || email == null)
             {
-                TempData["Message"] = "Invalid password reset token.";
+                ViewBag.Message = "Invalid password reset token.";
                 return RedirectToAction("ForgotPassword");
             }
 
@@ -314,7 +283,7 @@ namespace BikeBuddy.Controllers
             var user = await userManager.FindByEmailAsync(model.Email);
             if (user == null)
             {
-                TempData["Message"] = "Password has been reset successfully. Please log in.";
+                ViewBag.Message = "Password has been reset successfully. Please log in.";
                 return RedirectToAction("Login");
             }
 
@@ -328,7 +297,7 @@ namespace BikeBuddy.Controllers
                 return View(model);
             }
 
-            TempData["Message"] = "Password has been reset successfully. Please log in.";
+            ViewBag.Message = "Password has been reset successfully. Please log in.";
             return RedirectToAction("Login");
         }
     }

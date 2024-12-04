@@ -1,4 +1,4 @@
-namespace BikeBuddy.Models
+﻿namespace BikeBuddy.Models
 {
     public class ErrorViewModel
     {
