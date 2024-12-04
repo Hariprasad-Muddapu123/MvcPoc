@@ -9,6 +9,12 @@
             _context = context;
         }
 
+        public async Task AddRideAsync(Ride ride)
+        {
+            _context.Rides.Add(ride);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<IEnumerable<Ride>> GetRidesByUserIdAsync(string userId)
         {
             return await _context.Rides

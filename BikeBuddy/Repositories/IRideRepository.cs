@@ -5,5 +5,6 @@
         Task<IEnumerable<Ride>> GetRidesByUserIdAsync(string userId);
         Task<List<Ride>> GetAllRidesAsync();
         Task UpdateAsync(Ride ride);
+        Task AddRideAsync(Ride ride);
     }
 }

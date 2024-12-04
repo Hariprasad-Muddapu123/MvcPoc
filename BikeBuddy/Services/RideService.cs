@@ -12,5 +12,10 @@
         {
             return await _rideRepository.GetRidesByUserIdAsync(userId);
         }
+
+        public async Task AddRideAsync(Ride ride)
+        {
+            await _rideRepository.AddRideAsync(ride);
+        }
     }
 }

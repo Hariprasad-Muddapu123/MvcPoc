@@ -2,11 +2,11 @@
 {
     public interface IBikeRepository
     {
-        Task<IEnumerable<Bike>> GetAllBikes();
-        Task<Bike> GetById(int bikeId); 
-        Task Update(Bike bike);
+        Task<IEnumerable<Bike>> GetAllBikesAsync();
+        Task<Bike> GetBikeByIdAsync(int bikeId); 
+        Task UpdateBikeAsync(Bike bike);
         Task<IEnumerable<Bike>> GetAllByUserIdAsync(string userId);
-
+        Task AddBikeAsync(Bike bike);
 
     }   
 }

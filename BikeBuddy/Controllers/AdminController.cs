@@ -52,9 +52,26 @@ namespace BikeBuddy.Controllers
 
         public async Task<IActionResult> KycDetails()
         {
-            var dashboardData = GetDashboardDataFromTempData() ?? await GetDashboardDataAsync();
-
+            var dashboardData = TempData["FilteredData"] != null
+       ? JsonConvert.DeserializeObject<AdminDashboardViewModel>((string)TempData["FilteredData"])
+       : await GetDashboardDataAsync();
             return View(dashboardData);
+        }
+        [HttpGet]
+        public async Task<IActionResult> ByStatus(KycStatus? kycStatus = null)
+        {
+            var dashboardData = GetDashboardDataFromTempData() ?? await GetDashboardDataAsync();
+            // Filter bikes by KYC status
+            if (kycStatus.HasValue)
+            {
+                dashboardData.Users = dashboardData.Users
+                    .Where(b => b.KycStatus == kycStatus.Value);
+            }
+            TempData["FilteredData"] = JsonConvert.SerializeObject(dashboardData,new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            });
+            return RedirectToAction("KycDetails");
         }
 
         [HttpGet]

@@ -8,17 +8,23 @@
         {
             _context = context;
         }
-        public async  Task<IEnumerable<Bike>> GetAllBikes()
+        public async  Task<IEnumerable<Bike>> GetAllBikesAsync()
         {
             return await  _context.Bikes.Include(b => b.User).ToListAsync();
         }
 
-        public async Task<Bike> GetById(int bikeId)
+        public async Task<Bike> GetBikeByIdAsync(int bikeId)
         {
             return await _context.Bikes.Include(b => b.User).FirstOrDefaultAsync(b => b.BikeId == bikeId);
         }
 
-        public async Task Update(Bike bike)
+        public async Task AddBikeAsync(Bike bike)
+        {
+            _context.Bikes.Add(bike);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateBikeAsync(Bike bike)
         {
             _context.Bikes.Update(bike);
            await _context.SaveChangesAsync();

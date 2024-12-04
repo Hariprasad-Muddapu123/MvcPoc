@@ -22,14 +22,14 @@
             using (var scope = _serviceProvider.CreateScope())
             {
                 var bikeRepository = scope.ServiceProvider.GetRequiredService<IBikeRepository>();
-                var bikes = await bikeRepository.GetAllBikes(); // Get all bikes
+                var bikes = await bikeRepository.GetAllBikesAsync(); // Get all bikes
 
                 foreach (var bike in bikes)
                 {
                     if (bike.AvailableUpto <= DateTime.Now && bike.Available == true)
                     {
                         bike.Available = false;
-                        await bikeRepository.Update(bike);
+                        await bikeRepository.UpdateBikeAsync(bike);
                     }
                 }
             }

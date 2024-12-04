@@ -1,18 +1,23 @@
-﻿using System.Security.Claims;
+﻿using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 namespace BikeBuddy.Controllers
 {
     public class RentRideController : Controller
     {
         private readonly UserManager<User> _userManager;
         private readonly IWebHostEnvironment _webHostEnvironment;
-        private readonly ApplicationDbContext _context;
         private readonly IBikeService _bikeService;
-        public RentRideController(UserManager<User> userManager, IWebHostEnvironment webHostEnvironment,IBikeService bikeService, ApplicationDbContext context)
+        private readonly IRideService _rideService;
+        private readonly IPaymentService _paymentService;
+        private readonly ICityService _cityService;
+        public RentRideController(UserManager<User> userManager, IWebHostEnvironment webHostEnvironment,IBikeService bikeService, IRideService rideService, IPaymentService paymentService, ICityService cityService)
         {
             this._userManager = userManager;
             this._webHostEnvironment = webHostEnvironment;
             this._bikeService = bikeService;
-            this._context = context;
+            this._rideService = rideService;
+            this._paymentService = paymentService;
+            this._cityService = cityService;
         }
         public IActionResult Index()
         {
@@ -68,12 +73,15 @@ namespace BikeBuddy.Controllers
                 }
 
                 var user = await _userManager.GetUserAsync(User);
+                if (user == null)
+                {
+                    TempData["Message"] = "Please log in to continue.";
+                    return RedirectToAction("Login", "Account");
+                }
                 var bike = CreateBike(model, user);
-                _context.Bikes.Add(bike);
-                var result = await _context.SaveChangesAsync();
 
-                TempData["Message"] = result == 1 ? "Bike registered successfully!" : "Failed to upload bike details";
-
+                await _bikeService.RegisterBikeAsync(bike);
+                TempData["Message"] = "Bike registered successfully!";
                 return RedirectToAction("Rent");
             }
             TempData["ErrorMessage"] = "Failed to register the bike. Please check the inputs.";
@@ -107,10 +115,8 @@ namespace BikeBuddy.Controllers
             {
                 bike.RemovedDate = DateTime.UtcNow;
                 bike.IsRemoved = true;
-                _context.Bikes.Update(bike);
-                await _context.SaveChangesAsync();
-
-                TempData["Message"] = "Bike removed successfully and archived!";
+                await _bikeService.RemoveBikeAsync(bikeId);
+                TempData["Message"] = "Bike removed successfully.";
             }
             else
             {
@@ -121,6 +127,7 @@ namespace BikeBuddy.Controllers
         }
 
         [HttpGet]
+        
         public async Task<IActionResult> RemovedBikes()
         {
             var user = await _userManager.GetUserAsync(User);
@@ -134,9 +141,10 @@ namespace BikeBuddy.Controllers
         [HttpGet]
         public async  Task<IActionResult> Ride()
         {
-            var cities = await _context.Cities.ToListAsync();
+            var cities = await _cityService.GetAllCitiesAsync();
             return View(cities);
         }
+
         [HttpGet]
         public async Task<IActionResult> DisplayBikes(string SearchAddress, string SearchModel, string SearchLocation, string[] SelectedAddresses,string SelectedModels)
         {
@@ -150,10 +158,9 @@ namespace BikeBuddy.Controllers
                 (string.IsNullOrEmpty(SearchAddress) || b.BikeAddress.Contains(SearchAddress, StringComparison.OrdinalIgnoreCase)) &&
                 (string.IsNullOrEmpty(SearchModel) || b.BikeModel.Contains(SearchModel, StringComparison.OrdinalIgnoreCase)) &&
                 (SelectedAddresses == null || !SelectedAddresses.Any() || SelectedAddresses.Contains(b.BikeAddress)) &&
-                (SelectedModels == null || !SelectedModels.Any() || SelectedModels.Contains(b.BikeModel))
+                (SelectedModels == null || !SelectedModels.Any() || SelectedModels.Contains(b.BikeModel)) &&
+                (b.AvailableUpto>=DateTime.Now)
             ).ToList();
-
-
             var viewModel = new RegisteredBikeViewModel
             {
                 Bikes = bikes,
@@ -252,8 +259,7 @@ namespace BikeBuddy.Controllers
             {
                 return BadRequest("Invalid BikeId format.");
             }
-            var bike = await _context.Bikes.FirstOrDefaultAsync(b => b.BikeId == bikeId);
-
+            var bike = await _bikeService.GetBikeByIdAsync(bikeId);
             var model = new BookingViewModel
             {
                 BikeDetails = bike,
@@ -288,7 +294,6 @@ namespace BikeBuddy.Controllers
                 return RedirectToAction("DisplayBikes");
             }
 
-            using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
                 var ride = new Ride
@@ -305,8 +310,7 @@ namespace BikeBuddy.Controllers
                     TotalAmount = sessionData.TotalBill
                 };
 
-                _context.Rides.Add(ride);
-                await _context.SaveChangesAsync();
+                await _rideService.AddRideAsync(ride);
 
                 var payment = new Payment
                 {
@@ -320,22 +324,17 @@ namespace BikeBuddy.Controllers
                     Currency = "INR"
                 };
 
-                _context.Payments.Add(payment);
-                await _context.SaveChangesAsync();
+
+                await _paymentService.AddPaymentAsync(payment);
 
                 bike.Available = false;
-                _context.Bikes.Update(bike);
-                await _context.SaveChangesAsync();
-
-                await transaction.CommitAsync();
+                await _bikeService.UpdateBikeAsync(bike);
 
                 HttpContext.Session.Clear();
                 return View(bike);
             }
             catch (Exception ex)
             {
-                // Rollback transaction on error
-                await transaction.RollbackAsync();
                 TempData["ErrorMessage"] = "An error occurred while processing the payment. Please try again.";
                 return RedirectToAction("DisplayBikes");
             }
@@ -350,8 +349,6 @@ namespace BikeBuddy.Controllers
             var rentedHours = HttpContext.Session.GetString("RentedHours");
             var gst = HttpContext.Session.GetString("Gst");
             var totalBill = HttpContext.Session.GetString("TotalBill");
-
-            // Ensure all required session data is present
             if (string.IsNullOrEmpty(bikeId) || string.IsNullOrEmpty(pickupDateTime) ||
                 string.IsNullOrEmpty(dropoffDateTime) || string.IsNullOrEmpty(totalPrice) ||
                 string.IsNullOrEmpty(rentedHours) || string.IsNullOrEmpty(gst) ||
@@ -362,7 +359,7 @@ namespace BikeBuddy.Controllers
 
             return new SessionData
             {
-                BikeId = int.Parse(bikeId), // Parse the BikeId string to an integer
+                BikeId = int.Parse(bikeId),
                 PickupDateTime = pickupDateTime,
                 DropoffDateTime = dropoffDateTime,
                 TotalPrice = totalPrice,
