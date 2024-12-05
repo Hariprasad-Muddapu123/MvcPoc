@@ -11,7 +11,7 @@
         public async Task<IEnumerable<Bike>> GetAllByUserIdAsync(string userId)
         {
             return await _context.Bikes
-                                 .Where(b => b.UserId == userId) // Assuming Bike model has UserId property
+                                 .Where(b => b.UserId == userId)
                                  .ToListAsync();
         }
     }
