@@ -1,32 +1,42 @@
 ﻿@model IEnumerable<Bike>
-<div class="min-vh-100">
-<h2>Bikes Rented by User</h2>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Bike Model</th>
-            <th>Bike Number</th>
-            <th>Location</th>
-            <th>Status</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var bike in Model)
-        {
-            <tr>
-                <td>@bike.BikeModel</td>
-                <td>@bike.BikeNumber</td>
-                <td>@bike.BikeLocation</td>
-                <td>@if(bike.AvailableUpto<=DateTime.Now)
-                    {
-                        <span>your rented bike is Completed by @bike.AvailableUpto</span>
-                    }
-                    else
-                    {
-                        <span>Completed</span>
-                    }
-            </tr>
-        }
-    </tbody>
-</table>
-</div> 
+<html>
+<head>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <div class="container min-vh-100 py-5">
+        <h2 class="text-center mb-4">Bikes Rented by User</h2>
+        <table class="table table-bordered table-hover table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Bike Model</th>
+                    <th>Bike Number</th>
+                    <th>Location</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var bike in Model)
+                {
+                    <tr>
+                        <td>@bike.BikeModel</td>
+                        <td>@bike.BikeNumber</td>
+                        <td>@bike.BikeLocation</td>
+                        <td>
+                            @if (bike.AvailableUpto <= DateTime.Now)
+                            {
+                                <span >Completed - Your rented bike period ended on @bike.AvailableUpto</span>
+                            }
+                            else
+                            {
+                                <span class="text-success">Active - Available Until @bike.AvailableUpto</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

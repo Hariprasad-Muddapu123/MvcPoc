@@ -5,15 +5,14 @@ namespace BikeBuddy.Controllers
     public class RentRideController : Controller
     {
         private readonly UserManager<User> _userManager;
-        private readonly IWebHostEnvironment _webHostEnvironment;
+
         private readonly IBikeService _bikeService;
         private readonly IRideService _rideService;
         private readonly IPaymentService _paymentService;
         private readonly ICityService _cityService;
-        public RentRideController(UserManager<User> userManager, IWebHostEnvironment webHostEnvironment,IBikeService bikeService, IRideService rideService, IPaymentService paymentService, ICityService cityService)
+        public RentRideController(UserManager<User> userManager,IBikeService bikeService, IRideService rideService, IPaymentService paymentService, ICityService cityService)
         {
             this._userManager = userManager;
-            this._webHostEnvironment = webHostEnvironment;
             this._bikeService = bikeService;
             this._rideService = rideService;
             this._paymentService = paymentService;
@@ -95,6 +94,8 @@ namespace BikeBuddy.Controllers
                 BikeNumber = model.BikeNumber,
                 BikeLocation = model.BikeLocation,
                 BikeAddress = model.BikeAddress,
+                FullAddress =model.FullAddress,
+                ContactNo =model.ContactNo,
                 KycStatus = model.KycStatus,
                 BikeRentPrice = model.BikeRentPrice,
                 UserId = user.Id,
@@ -214,7 +215,7 @@ namespace BikeBuddy.Controllers
                 .Where(b => b.BikeId == bikeId)
                 .Select(b => b.BikeRentPrice)
                 .FirstOrDefault();
-            double totalHours = CalculateHours(timeDifference);
+            double totalHours = timeDifference.TotalHours;
             decimal totalPrice = (decimal)totalHours * (decimal)bikeRentPrice;
             decimal gst = (totalPrice * 5 )/ 100;
             decimal totalBill = totalPrice + gst;
@@ -228,11 +229,6 @@ namespace BikeBuddy.Controllers
             return RedirectToAction("BookBike");
         }
 
-        private double CalculateHours(TimeSpan timeDifference)
-        {
-            double totalHours = timeDifference.TotalHours;
-            return totalHours;
-        }
         [HttpGet]
         public async Task<IActionResult> BookBike()
         {

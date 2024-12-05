@@ -34,7 +34,7 @@
                 PendingBikes = Bikes.Where(b => b.KycStatus == KycStatus.Pending).Count(),
                 TotalUsers = Users.Count(),
                 KycUsers = Users.Where(b => b.KycStatus == KycStatus.Approved).Count(),
-                NonKycUsers = Users.Where(b => b.KycStatus == KycStatus.Rejected).Count()
+                NonKycUsers = Users.Where(b => b.KycStatus == KycStatus.Rejected || b.KycStatus == KycStatus.Pending).Count()
             };
         }
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.Connections;
+using System.ComponentModel.DataAnnotations;
 
 namespace BikeBuddy.Models
 {
@@ -12,11 +13,17 @@ namespace BikeBuddy.Models
 
         public string BikeLocation { get; set; }
 
+        public string BikeAddress { get; set; }
+
+        public string FullAddress {  get; set; }
+
+        public string ContactNo { get; set; }
+
         public double BikeRentPrice { get; set; }
 
         public bool Available { get; set; } 
 
-        public string BikeAddress { get; set; }
+        
 
         public KycStatus KycStatus { get; set; }
 

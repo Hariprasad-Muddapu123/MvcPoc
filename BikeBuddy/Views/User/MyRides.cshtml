@@ -1,29 +1,38 @@
 ﻿@model IEnumerable<BikeBuddy.Models.Ride>
-<div class="min-vh-100">
-    <h2>Bikes Ride by User</h2>
-<table class="table">
-    <thead>
-        <tr>
-            <th>RideId</th>
-            <th>PickUpDateTime</th>
-            <th>DropoffDateTime</th>
-            <th>Status</th>
-            <th>Rental Hours</th>
-            <th>Bill Payed</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var ride in Model)
-        {
-            <tr>
-                <td>@ride.RideId</td>
-                <td>@ride.PickupDateTime</td>
-                <td>@ride.DropoffDateTime</td>
-                <td>@ride.RentalStatus</td>
-                <td>@(decimal.Parse(ride.RentedHours).ToString("F2"))</td>
-                <td>@(decimal.Parse(ride.TotalAmount).ToString("F2"))</td>
-            </tr>
-        }
-    </tbody>
-</table>
-</di>
+<html>
+<head>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body>
+    <div class="container min-vh-100 py-5">
+                <h2 class="text-center mb-4">Bikes Ride by User</h2>
+        <table class="table table-bordered table-hover table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Ride ID</th>
+                    <th>Pick-Up Date & Time</th>
+                    <th>Drop-Off Date & Time</th>
+                    <th>Status</th>
+                    <th>Rental Hours</th>
+                    <th>Bill Paid</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var ride in Model)
+                {
+                    <tr>
+                        <td>@ride.RideId</td>
+                        <td>@ride.PickupDateTime</td>
+                        <td>@ride.DropoffDateTime</td>
+                        <td>@ride.RentalStatus</td>
+                        <td>@(decimal.Parse(ride.RentedHours).ToString("F2"))</td>
+                        <td>@(decimal.Parse(ride.TotalAmount).ToString("F2"))</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
+

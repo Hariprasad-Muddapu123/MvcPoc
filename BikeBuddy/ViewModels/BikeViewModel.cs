@@ -4,13 +4,17 @@
     {
         public int BikeId { get; set; }
 
-        public String BikeModel { get; set; }
+        public string BikeModel { get; set; }
 
-        public String BikeNumber { get; set; }
+        public string BikeNumber { get; set; }
 
-        public String BikeLocation { get; set; }
+        public string BikeLocation { get; set; }
 
-        public String BikeAddress { get; set; }
+        public string BikeAddress { get; set; }
+
+        public string FullAddress { get; set; }
+
+        public string ContactNo {  get; set; }
 
         public double BikeRentPrice { get; set; }
 
