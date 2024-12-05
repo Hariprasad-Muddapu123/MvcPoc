@@ -15,7 +15,7 @@
 
         public async Task AddRideAsync(Ride ride)
         {
-            await _rideRepository.AddRideAsync(ride);
+            await _rideRepository.AddAsync(ride);
         }
     }
 }

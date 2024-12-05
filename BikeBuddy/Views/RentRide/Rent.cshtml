@@ -52,11 +52,12 @@
                     
                     <div class="mb-4">
                         <label class="block text-gray-700">Bike Image<span class="text-danger">*</span></label>
-                        <input asp-for="NewBike.BikeImage" class="w-full p-2 border border-orange-500 rounded" type="file" />
+                        <input asp-for="NewBike.BikeImage" class="w-full p-2 border border-orange-500 rounded" type="file" accept="image/*" />
                     </div>
+
                     <div class="mb-6">
                         <label class="block text-gray-700">Bike Documents<span class="text-danger">*</span></label>
-                        <input asp-for="NewBike.BikeDocuments" class="w-full p-2 border border-orange-500 rounded" type="file" />
+                        <input asp-for="NewBike.BikeDocuments" class="w-full p-2 border border-orange-500 rounded" type="file" accept=".pdf" />
                     </div>
                     <button type="submit" class="w-full bg-orange-500 text-white p-2 rounded hover:bg-orange-600">
                         Register

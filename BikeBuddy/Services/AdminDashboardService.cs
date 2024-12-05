@@ -22,7 +22,7 @@
 
         public async Task<AdminDashboardViewModel> GetDashboardData()
         {
-            var Bikes = await _bikeRepository.GetAllBikesAsync();
+            var Bikes = await _bikeRepository.GetAllAsync();
             var Users=await _userRepository.GetAllUsers();
             return new AdminDashboardViewModel
             {
@@ -63,16 +63,16 @@
 
         public async  Task<IEnumerable<Bike>> GetAllBikes()
         {
-            return await _bikeRepository.GetAllBikesAsync();
+            return await _bikeRepository.GetAllAsync();
         }
 
         public  async Task<bool> UpdateBikeStatus(int bikeId, bool approve)
         {
-            var bike =  await _bikeRepository.GetBikeByIdAsync(bikeId);
+            var bike =  await _bikeRepository.GetByIdAsync(bikeId);
             if (bike == null) return false;
 
             bike.KycStatus = approve ? KycStatus.Approved : KycStatus.Rejected;
-            await  _bikeRepository.UpdateBikeAsync(bike);
+            await  _bikeRepository.UpdateAsync(bike);
             return true;
         }
         public async Task LogoutAdminAsync()
@@ -82,7 +82,7 @@
 
         public async  Task<Bike> GetBikeByIdAsync(int bikeId)
         {
-            return await  _bikeRepository.GetBikeByIdAsync(bikeId);
+            return await  _bikeRepository.GetByIdAsync(bikeId);
         }
     }
 }

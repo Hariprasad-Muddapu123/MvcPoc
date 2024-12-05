@@ -22,14 +22,14 @@
             using (var scope = _serviceProvider.CreateScope())
             {
                 var bikeRepository = scope.ServiceProvider.GetRequiredService<IBikeRepository>();
-                var bikes = await bikeRepository.GetAllBikesAsync(); // Get all bikes
+                var bikes = await bikeRepository.GetAllAsync(); // Get all bikes
 
                 foreach (var bike in bikes)
                 {
                     if (bike.AvailableUpto <= DateTime.Now && bike.Available == true)
                     {
                         bike.Available = false;
-                        await bikeRepository.UpdateBikeAsync(bike);
+                        await bikeRepository.UpdateAsync(bike);
                     }
                 }
             }
@@ -40,7 +40,7 @@
             using (var scope = _serviceProvider.CreateScope())
             {
                 var rideRepository = scope.ServiceProvider.GetRequiredService<IRideRepository>();
-                var rides = await rideRepository.GetAllRidesAsync();
+                var rides = await rideRepository.GetAllAsync();
 
                 foreach (var ride in rides)
                 {

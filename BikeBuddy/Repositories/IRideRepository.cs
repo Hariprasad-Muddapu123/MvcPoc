@@ -1,10 +1,7 @@
 ﻿namespace BikeBuddy.Repositories
 {
-    public interface IRideRepository
+    public interface IRideRepository : IRepository<Ride>
     {
         Task<IEnumerable<Ride>> GetRidesByUserIdAsync(string userId);
-        Task<List<Ride>> GetAllRidesAsync();
-        Task UpdateAsync(Ride ride);
-        Task AddRideAsync(Ride ride);
     }
 }

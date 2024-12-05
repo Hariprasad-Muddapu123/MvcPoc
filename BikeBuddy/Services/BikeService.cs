@@ -10,7 +10,7 @@
         }
         public async Task<IEnumerable<Bike>> GetAllBikes()
         {
-            return await _bikeRepository.GetAllBikesAsync();
+            return await _bikeRepository.GetAllAsync();
         }
 
         public async Task<IEnumerable<Bike>> GetAllBikesByUserIdAsync(string userId)
@@ -20,21 +20,21 @@
 
         public async Task<Bike?> GetBikeByIdAsync(int bikeId)
         {
-            return await _bikeRepository.GetBikeByIdAsync(bikeId);
+            return await _bikeRepository.GetByIdAsync(bikeId);
         }
         public async Task RegisterBikeAsync(Bike bike)
         {
-            await _bikeRepository.AddBikeAsync(bike);
+            await _bikeRepository.AddAsync(bike);
         }
 
         public async Task RemoveBikeAsync(int bikeId)
         {
-            var bike = await _bikeRepository.GetBikeByIdAsync(bikeId);
+            var bike = await _bikeRepository.GetByIdAsync(bikeId);
             if (bike != null)
             {
                 bike.IsRemoved = true;
                 bike.RemovedDate = DateTime.UtcNow;
-                await _bikeRepository.UpdateBikeAsync(bike);
+                await _bikeRepository.UpdateAsync(bike);
             }
         }
         public async Task UpdateBikeAsync(Bike bike)
@@ -48,7 +48,7 @@
             {
                 throw new ArgumentException("Bike model and address must not be empty.");
             }
-            await _bikeRepository.UpdateBikeAsync(bike);
+            await _bikeRepository.UpdateAsync(bike);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using BikeBuddy.Models;
+using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json;
 
 namespace BikeBuddy.Controllers
@@ -158,10 +159,11 @@ namespace BikeBuddy.Controllers
 
         public async Task<IActionResult> BikeDetails()
         {
-            var dashboardData = GetDashboardDataFromTempData() ?? await GetDashboardDataAsync();
+            var dashboardData = TempData["BikeFilteredData"] != null
+               ? JsonConvert.DeserializeObject<AdminDashboardViewModel>((string)TempData["BikeFilteredData"])
+               : await GetDashboardDataAsync();
             return View(dashboardData);
         }
-
         [HttpGet]
         public async Task<IActionResult> BikeStatus(KycStatus? kycStatus = null)
         {
@@ -181,12 +183,12 @@ namespace BikeBuddy.Controllers
                     .ToList();
             }
 
-            TempData["FilteredData"] = JsonConvert.SerializeObject(dashboardData, new JsonSerializerSettings
+            TempData["BikeFilteredData"] = JsonConvert.SerializeObject(dashboardData, new JsonSerializerSettings
             {
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             });
 
-            return RedirectToAction("KycDetails");
+            return RedirectToAction("BikeDetails");
         }
 
 
@@ -230,7 +232,7 @@ namespace BikeBuddy.Controllers
             if (result)
             {
                 var bike = await _adminDashboardService.GetBikeByIdAsync(bikeId);
-                var userEmail = bike?.User?.Email;
+                var userEmail = await _adminDashboardService.GetUserEmailAsync(bike.UserId);
                 string subject = isApproved ? "Bike Approved" : "Bike Rejected";
                 string body = isApproved
                     ? "Congratulations! Your bike has been approved for renting."
