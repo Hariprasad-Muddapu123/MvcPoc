@@ -43,25 +43,25 @@
                         </div>
                         <div class="mb-4">
                             <label class="block text-lg font-semibold mb-2">UserName</label>
-                            <input type="text" asp-for="UserName" class="form-control w-full" required />
+                            <input style="border: 1.5px solid #f97316" type="text" asp-for="UserName" class="form-control w-full" required />
                             <span asp-validation-for="UserName" class="text-red-500"></span>
                         </div>
 
                         <div class="mb-4">
                             <label class="block text-lg font-semibold mb-2">Email</label>
-                            <input type="email" asp-for="Email" class="form-control w-full" required />
+                        <input type="email" asp-for="Email" class="form-control w-full" required style="border: 1.5px solid #f97316" />
                             <span asp-validation-for="Email" class="text-red-500"></span>
                         </div>
 
                         <div class="mb-4">
                             <label class="block text-lg font-semibold mb-2">Phone Number</label>
-                            <input type="tel" asp-for="PhoneNumber" class="form-control w-full" required />
+                        <input type="tel" asp-for="PhoneNumber" class="form-control w-full" required style="border: 1.5px solid #f97316" />
                             <span asp-validation-for="PhoneNumber" class="text-red-500"></span>
                         </div>
 
                         <div class="mb-4">
                             <label class="block text-lg font-semibold mb-2">Address</label>
-                            <input type="text" asp-for="Address" class="form-control w-full" required />
+                        <input type="text" asp-for="Address" class="form-control w-full" required style="border: 1.5px solid #f97316" />
                             <span asp-validation-for="Address" class="text-red-500"></span>
                         </div>
                         <div class=" flex flex-col items-center">
@@ -94,13 +94,13 @@
                 <form method="post" enctype="multipart/form-data" asp-action="Profile" class="w-full">
                 <div class="mb-4">
                     <label class="block text-lg font-semibold mb-2">Upload Aadhaar</label>
-                    <input type="file" asp-for="AadhaarFile" class="form-control w-full" accept="image/*" />
+                    <input type="file" asp-for="AadhaarFile" class="form-control w-full" accept="image/*" style="border: 1.5px solid #f97316" />
                     <span asp-validation-for="AadhaarFile" class="text-red-500"></span>
                 </div>
 
                 <div class="mb-4">
                     <label class="block text-lg font-semibold mb-2">Upload Driving License</label>
-                    <input type="file" asp-for="DrivingLicenseFile" class="form-control w-full" accept="image/*" />
+                    <input type="file" asp-for="DrivingLicenseFile" class="form-control w-full" accept="image/*" style="border: 1.5px solid #f97316" />
                     <span asp-validation-for="DrivingLicenseFile" class="text-red-500"></span>
                 </div>
 

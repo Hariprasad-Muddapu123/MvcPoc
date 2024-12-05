@@ -76,10 +76,10 @@
                                 <td class="border p-2">@bike.BikeModel</td>
                                 <td class="border p-2">@bike.BikeLocation</td>
                                 <td class="border p-2">@bike.KycStatus</td>
-                                <td class="border p-2">
-                                    <form asp-action="ApproveOrRejectBike" method="post">
+                                <td class="border p-2 ">
+                                    <form class="text-center" asp-action="ApproveOrRejectBike" method="post">
                                         <input type="hidden" name="bikeId" value="@bike.BikeId" />
-                                        <a href="@Url.Action("ViewBikeDetails", "Admin", new { bikeId = bike.BikeId })" class="bg-blue-500 text-white px-4 py-2 rounded">View</a>
+                                        <a href="@Url.Action("ViewBikeDetails", "Admin", new { bikeId = bike.BikeId })" class="btn btn-primary mt-2">View</a>
                                     </form>
                                 </td>
                             </tr>

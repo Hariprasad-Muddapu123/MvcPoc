@@ -1,4 +1,6 @@
-﻿namespace BikeBuddy.ViewModels
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace BikeBuddy.ViewModels
 {
     public class BikeViewModel
     {
@@ -14,6 +16,8 @@
 
         public string FullAddress { get; set; }
 
+        [Required(ErrorMessage = "Contact number is required.")]
+        [RegularExpression("^[6-9][0-9]{9}$", ErrorMessage = "Contact number must be 10 digits and start with 6, 7, 8, or 9.")]
         public string ContactNo {  get; set; }
 
         public double BikeRentPrice { get; set; }

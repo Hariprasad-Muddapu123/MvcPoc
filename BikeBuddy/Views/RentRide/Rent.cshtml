@@ -40,6 +40,7 @@
                     <div class="mb-4">
                         <label class="block text-gray-700">Contact No<span class="text-danger">*</span></label>
                         <input asp-for="NewBike.ContactNo" class="w-full p-2 border border-orange-500 rounded" placeholder="Enter Your Mobile No" type="text" />
+                        <span asp-validation-for="NewBike.ContactNo" class="text-danger"></span>
                     </div>
                     <div class="mb-4">
                         <label class="block text-gray-700">Price Per Hour<span class="text-danger">*</span></label>
