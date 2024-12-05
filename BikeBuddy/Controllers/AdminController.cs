@@ -49,13 +49,12 @@ namespace BikeBuddy.Controllers
             var dashboardData = GetDashboardDataFromTempData() ?? await GetDashboardDataAsync();
             return View(dashboardData);
         }
-
         public async Task<IActionResult> KycDetails()
         {
             var dashboardData = TempData["FilteredData"] != null
-       ? JsonConvert.DeserializeObject<AdminDashboardViewModel>((string)TempData["FilteredData"])
-       : await GetDashboardDataAsync();
-            return View(dashboardData);
+               ? JsonConvert.DeserializeObject<AdminDashboardViewModel>((string)TempData["FilteredData"])
+               : await GetDashboardDataAsync();
+                    return View(dashboardData);
         }
         [HttpGet]
         public async Task<IActionResult> ByStatus(KycStatus? kycStatus = null)
@@ -72,7 +71,6 @@ namespace BikeBuddy.Controllers
             });
             return RedirectToAction("KycDetails");
         }
-
         [HttpGet]
         public async Task<IActionResult> SearchByUsername(string username, string targetView)
         {
@@ -161,9 +159,37 @@ namespace BikeBuddy.Controllers
         public async Task<IActionResult> BikeDetails()
         {
             var dashboardData = GetDashboardDataFromTempData() ?? await GetDashboardDataAsync();
-            ViewBag.Bikes = await _adminDashboardService.GetAllBikes();
             return View(dashboardData);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> BikeStatus(KycStatus? kycStatus = null)
+        {
+
+            var dashboardData = GetDashboardDataFromTempData() ?? await GetDashboardDataAsync();
+
+            if (kycStatus.HasValue)
+            {
+                dashboardData.Users = dashboardData.Users
+                    .Where(user => user.Bikes != null && user.Bikes.Any(bike => bike.KycStatus == kycStatus.Value))
+                    .Select(user => new User
+                    {
+                        Id = user.Id,
+                        UserName = user.UserName,
+                        Bikes = user.Bikes.Where(bike => bike.KycStatus == kycStatus.Value).ToList()
+                    })
+                    .ToList();
+            }
+
+            TempData["FilteredData"] = JsonConvert.SerializeObject(dashboardData, new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            });
+
+            return RedirectToAction("KycDetails");
+        }
+
+
 
         [HttpGet]
         public async Task<IActionResult> ViewBikeDetails(int bikeId)

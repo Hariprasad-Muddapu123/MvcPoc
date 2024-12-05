@@ -32,39 +32,37 @@
                 </ul>
             </div>
         </header>
-        <div class="flex flex-1">
+        <div class="flex h-screen">
+            <!-- Sidebar -->
             <aside class="w-1/5 bg-[#D9D9D9] border-r">
                 <nav class="flex flex-col p-4">
                     <a class="flex items-center p-2 mb-4 text-gray-700 hover:bg-gray-200 rounded" href="/Admin/Index">
-                        <i class="fas fa-home mr-2">
-                        </i>
+                        <i class="fas fa-home mr-2"></i>
                         Home
                     </a>
-                    <a asp-controller="Admin" asp-action="UserDetails" class="flex items-center p-2 mb-4 text-gray-700 hover:bg-gray-200 rounded" >
-                        <i class="fas fa-users mr-2">
-                        </i>
+                    <a asp-controller="Admin" asp-action="UserDetails" class="flex items-center p-2 mb-4 text-gray-700 hover:bg-gray-200 rounded">
+                        <i class="fas fa-users mr-2"></i>
                         Users
                     </a>
                     <a asp-controller="Admin" asp-action="KycDetails" class="flex items-center p-2 mb-4 text-gray-700 hover:bg-gray-200 rounded">
-                        <i class="fas fa-id-card mr-2">
-                        </i>
-                        Kyc approvals
+                        <i class="fas fa-id-card mr-2"></i>
+                        KYC Approvals
                     </a>
-                    <a asp-controller="Admin" asp-action="BikeDetails" class="flex items-center p-2 mb-4 text-gray-700 hover:bg-gray-200 rounded" >
-                        <i class="fas fa-motorcycle mr-2">
-                        </i>
+                    <a asp-controller="Admin" asp-action="BikeDetails" class="flex items-center p-2 mb-4 text-gray-700 hover:bg-gray-200 rounded">
+                        <i class="fas fa-motorcycle mr-2"></i>
                         Bike Approval
                     </a>
                 </nav>
             </aside>
-            <main>
-                <div class="">
 
+            <!-- Main Content -->
+            <main class="flex-1 p-6 bg-gray-100">
+                <div class="container mx-auto">
                     @RenderBody()
-
                 </div>
             </main>
         </div>
+
         <footer class="bg-black text-white p-6">
             <div class="flex justify-between">
                 <div>

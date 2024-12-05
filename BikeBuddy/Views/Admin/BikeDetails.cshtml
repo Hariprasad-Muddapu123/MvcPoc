@@ -35,7 +35,14 @@
 
 <div class="bg-white p-6 rounded shadow-md">
     <div class="flex justify-between items-center mb-4">
-        @await Html.PartialAsync("_SearchForm")
+        <div class="filters mb-4">
+            <a asp-action="BikeStatus" asp-controller="Admin" asp-route-kycStatus="Pending" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">Pending</a>
+            <a asp-action="BikeStatus" asp-route-kycStatus="Approved" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Approved</a>
+            <a asp-action="BikeStatus" asp-route-kycStatus="Rejected" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Rejected</a>
+        </div>
+        <div class="flex justify-between  space-x-1 items-center">
+            @await Html.PartialAsync("_SearchForm")
+        </div>
     </div>
 
     <table class="w-full border-collapse">
@@ -47,43 +54,47 @@
                 <th class="border p-2">Bike Id</th>
                 <th class="border p-2">Model</th>
                 <th class="border p-2">Location</th>
-                
                 <th class="border p-2">Status</th>
                 <th class="border p-2">Actions</th>
             </tr>
         </thead>
         <tbody>
-            @if (ViewBag.Bikes != null)
+            @if (Model.Users != null)
             {
                 int count = 1;
-                foreach (var bike in ViewBag.Bikes)
+                foreach (var user in Model.Users)
                 {
-                    <tr>
-                        <td class="border p-2">@count</td>
-                        <td class="border p-2">@bike.UserId</td>
-                        <td class="border p-2">@bike.User.UserName</td>
-                        <td class="border p-2">@bike.BikeId</td>
-                        <td class="border p-2">@bike.BikeModel</td>
-                        <td class="border p-2">@bike.BikeLocation</td>
-                        <td class="border p-2">
-                            @bike.KycStatus
-                        </td>
-                        <td class="border p-2">
-                            <form asp-action="ApproveOrRejectBike" method="post">
-                                <input type="hidden" name="bikeId" value="@bike.BikeId" />                                <a href="@Url.Action("ViewBikeDetails", "Admin", new { bikeId = bike.BikeId })" class="bg-blue-500 text-white px-4 py-2 rounded">View</a>
-                            </form>
-                        </td>
-
-                    </tr>
-                    count++;
+                    if (user.Bikes != null && user.Bikes.Any()) 
+                    {
+                        foreach (var bike in user.Bikes)
+                        {
+                            <tr>
+                                <td class="border p-2">@count</td>
+                                <td class="border p-2">@user.Id</td>
+                                <td class="border p-2">@user.UserName</td>
+                                <td class="border p-2">@bike.BikeId</td>
+                                <td class="border p-2">@bike.BikeModel</td>
+                                <td class="border p-2">@bike.BikeLocation</td>
+                                <td class="border p-2">@bike.KycStatus</td>
+                                <td class="border p-2">
+                                    <form asp-action="ApproveOrRejectBike" method="post">
+                                        <input type="hidden" name="bikeId" value="@bike.BikeId" />
+                                        <a href="@Url.Action("ViewBikeDetails", "Admin", new { bikeId = bike.BikeId })" class="bg-blue-500 text-white px-4 py-2 rounded">View</a>
+                                    </form>
+                                </td>
+                            </tr>
+                            count++; // Increment serial number
+                        }
+                    }
                 }
             }
             else
             {
                 <tr>
-                    <td colspan="5" class="text-center border p-2">No bike data available.</td>
+                    <td colspan="8" class="text-center border p-2">No bike data available.</td>
                 </tr>
             }
         </tbody>
     </table>
+
 </div>
