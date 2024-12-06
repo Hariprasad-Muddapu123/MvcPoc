@@ -50,7 +50,12 @@
         <form asp-action="ApproveOrRejectKyc" method="post">
             <input type="hidden" name="UserId" value="@Model.UserId" />
             <button type="submit" name="action" value="approve" class="bg-green-500 text-white px-4 py-2 rounded">Approve</button>
-            <button type="submit" name="action" value="reject" class="bg-red-500 text-white px-4 py-2 rounded">Reject</button>
+            <button type="button" id="rejectButton" class="bg-red-500 text-white px-4 py-2 rounded">Reject</button>
+            <div id="rejectionReasonContainer" class="hidden mt-4">
+                <textarea name="rejectionReason" rows="4" placeholder="Enter rejection reason..." class="border rounded w-full p-2"></textarea>
+                <button type="submit" name="action" value="reject" class="bg-red-500 text-white px-4 py-2 rounded mt-2">Submit Rejection</button>
+            </div>
         </form>
     </div>
 </div>
+<script src="~/js/rejection.js"></script>

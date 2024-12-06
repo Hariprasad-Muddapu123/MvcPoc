@@ -103,7 +103,7 @@ namespace BikeBuddy.Controllers
             {
                 case 404:
                     // Handle 404 Not Found errors.
-                    return View("NotFound");
+                    return View("Not Found");
                 case 500:
                     // Handle 500 Server Error.
                     return View("ServerError");

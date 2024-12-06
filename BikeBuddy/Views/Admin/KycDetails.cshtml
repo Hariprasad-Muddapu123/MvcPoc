@@ -50,8 +50,8 @@
         <thead>
             <tr class="bg-gray-200">
                 <th class="border p-2">SNO</th>
-                <th class="border p-2">User Id</th>
                 <th class="border p-2">UserName</th>
+                <th class="border p-2">Email</th>
                 <th class="border p-2">Status</th>
                 <th class="border p-2">Actions</th>
             </tr>
@@ -64,8 +64,8 @@
                 {
                     <tr>
                         <td class="border p-2">@count</td>
-                        <td class="border p-2">@user.Id</td>
                         <td class="border p-2">@user.UserName</td>
+                        <td class="border p-2">@user.Email</td>
                         <td class="border p-2">@user.KycStatus</td>
                         <td class="border p-2">
                             <a asp-action="ViewUserDetails" asp-route-id="@user.Id" class="bg-blue-500 text-white px-4 py-2 rounded">View Details</a>

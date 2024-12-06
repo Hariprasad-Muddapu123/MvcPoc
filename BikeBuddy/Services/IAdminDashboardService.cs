@@ -5,7 +5,7 @@
         Task<AdminDashboardViewModel> GetDashboardData();
 
         Task<IEnumerable<User>> GetAllUsers();
-
+        Task<IEnumerable<Ride>> GetAllRides();
         Task<User> GetUserById(Guid id);
 
         Task<bool> UpdateKycStatus(String userId, bool approve);

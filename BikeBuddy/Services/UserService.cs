@@ -16,6 +16,11 @@
             return await _userRepository.GetUserByNameAsync(userName);
         }
 
+        public async Task<User> GetUserByIdAsync(String userId)
+        {
+            return await _userRepository.GetUserByIdAsync(userId);
+        }
+
         public async Task<ProfileViewModel> GetUserProfileAsync(string userId)
         {
             var user = await _userRepository.GetUserByIdAsync(userId);

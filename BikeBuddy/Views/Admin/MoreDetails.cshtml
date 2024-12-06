@@ -1,0 +1,108 @@
+﻿@model BikeBuddy.ViewModels.AdminOverviewViewModel;
+@{
+    Layout = "_AdminLayout";
+    ViewData["TargetView"] = "UserFullDetails";
+}
+<div class="container mt-4">
+    <div class="bg-white p-4 rounded shadow-md mb-4">
+        <h2 class="text-xl font-bold mb-3">User Details</h2>
+        <table class="table-auto w-full border-collapse border border-gray-300">
+            <tbody>
+                <tr>
+                    <th class="border px-4 py-2 text-left">Username</th>
+                    <td class="border px-4 py-2">@Model.User.UserName</td>
+                </tr>
+                <tr>
+                    <th class="border px-4 py-2 text-left">Email</th>
+                    <td class="border px-4 py-2">@Model.User.Email</td>
+                </tr>
+                <tr>
+                    <th class="border px-4 py-2 text-left">Phone</th>
+                    <td class="border px-4 py-2">@Model.User.PhoneNumber</td>
+                </tr>
+                <tr>
+                    <th class="border px-4 py-2 text-left">KYC Status</th>
+                    <td class="border px-4 py-2">@Model.User.KycStatus</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="bg-white p-4 rounded shadow-md mb-4">
+        <h2 class="text-xl font-bold mb-3">Rides</h2>
+        @if (Model.Rides.Any())
+        {
+            <table class="table-auto w-full border-collapse border border-gray-300">
+                <thead>
+                    <tr class="bg-gray-200">
+                        <th class="border px-4 py-2">Ride ID</th>
+                        <th class="border px-4 py-2">Registered Date</th>
+                        <th class="border px-4 py-2">PickupUpDate&Time</th>
+                        <th class="border px-4 py-2">DropoffDate&Time</th>
+                        <th class="border px-4 py-2">Rented Hours</th>
+                        <th class="border px-4 py-2">Amount</th>
+                        <th class="border px-4 py-2">Rental Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var ride in Model.Rides)
+                    {
+                        <tr>
+                            <td class="border px-4 py-2">@ride.RideId</td>
+                            <td class="border px-4 py-2">@ride.RideRegisteredDate</td>
+                            <td class="border px-4 py-2">@ride.PickupDateTime</td>
+                            <td class="border px-4 py-2">@ride.DropoffDateTime</td>
+                            <td class="border px-4 py-2">@ride.</td>
+                            <td class="border px-4 py-2">@ride.RentedHours</td>
+                            <td class="border px-4 py-2">@ride.TotalAmount</td>
+                            <td class="border px-4 py-2">@ride.RentalStatus</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p class="text-gray-500">No rides found for this user.</p>
+        }
+    </div>
+    <div class="bg-white p-4 rounded shadow-md">
+        <h2 class="text-xl font-bold mb-3">Rented Bikes</h2>
+        @if (Model.Bikes.Any())
+        {
+            <table class="table-auto w-full border-collapse border border-gray-300">
+                <thead>
+                    <tr class="bg-gray-200">
+                        <th class="border px-4 py-2">Rent ID</th>
+                        <th class="border px-4 py-2">Bike Model</th>
+                        <th class="border px-4 py-2">Bike Number</th>
+                        <th class="border px-4 py-2">Bike Address</th>
+                        <th class="border px-4 py-2">Bike Location</th>
+                        <th class="border px-4 py-2">Rented price</th>
+                        <th class="border px-4 py-2">Contact No</th>
+                        <th class="border px-4 py-2">Kuc Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var rent in Model.Bikes)
+                    {
+                        <tr>
+                            <td class="border px-4 py-2">@rent.BikeId</td>
+                            <td class="border px-4 py-2">@rent.BikeModel</td>
+                            <td class="border px-4 py-2">@rent.BikeNumber</td>
+                            <td class="border px-4 py-2">@rent.BikeAddress</td>
+                            <td class="border px-4 py-2">@rent.BikeLocation</td>
+                            <td class="border px-4 py-2">@rent.BikeRentPrice</td>
+                            <td class="border px-4 py-2">@rent.ContactNo</td>
+                            <td class="border px-4 py-2">@rent.KycStatus</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p class="text-gray-500">No rented bikes found for this user.</p>
+        }
+    </div>
+</div>

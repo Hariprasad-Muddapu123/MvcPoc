@@ -4,13 +4,15 @@
     {
         private readonly IBikeRepository _bikeRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IRideRepository _rideRepository;
         private readonly SignInManager<User> _signInManager;
 
-        public AdminDashboardService(IBikeRepository bikeRepository, IUserRepository userRepository, SignInManager<User> signInManager)
+        public AdminDashboardService(IBikeRepository bikeRepository, IUserRepository userRepository, IRideRepository rideRepository, SignInManager<User> signInManager)
         {
             _bikeRepository = bikeRepository;
             _userRepository = userRepository;
             _signInManager = signInManager;
+            _rideRepository = rideRepository;
 
         }
 
@@ -65,6 +67,12 @@
         {
             return await _bikeRepository.GetAllAsync();
         }
+
+        public async Task<IEnumerable<Ride>> GetAllRides()
+        {
+            return await _rideRepository.GetAllAsync();
+        }
+
 
         public  async Task<bool> UpdateBikeStatus(int bikeId, bool approve)
         {

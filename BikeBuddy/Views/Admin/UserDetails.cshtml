@@ -44,10 +44,10 @@
         <thead>
             <tr class="bg-gray-200">
                 <th class="border p-2">SNO</th>
-                <th class="border p-2">User Id</th>
                 <th class="border p-2">Username</th>
                 <th class="border p-2">Mobile No</th>
                 <th class="border p-2">Email</th>
+                <th class="border p-2">More Details</th>
             </tr>
         </thead>
         <tbody>
@@ -58,10 +58,15 @@
                 {
                     <tr>
                         <td class="border p-2">@count</td>
-                        <td class="border p-2">@user.Id</td>
                         <td class="border p-2">@user.UserName</td>
                         <td class="border p-2">@user.PhoneNumber</td>
                         <td class="border p-2">@user.Email</td>
+                        <td class="border p-2 text-center">
+                            <a href="@Url.Action("MoreDetails", "Admin", new { userId = user.Id })"
+                               class="btn btn-primary mt-2">
+                                View Details
+                            </a>
+                        </td>
                     </tr>
                     count++;
                 }

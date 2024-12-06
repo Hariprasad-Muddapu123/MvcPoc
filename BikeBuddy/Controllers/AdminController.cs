@@ -8,11 +8,17 @@ namespace BikeBuddy.Controllers
     public class AdminController : Controller
     {
         private readonly IAdminDashboardService _adminDashboardService;
+        private readonly IUserService _userService;
+        private readonly IBikeService _bikeService;
+        private readonly IRideService _rideService;
         private readonly EmailSender _emailSender;
 
-        public AdminController(IAdminDashboardService adminDashboardService, EmailSender emailSender)
+        public AdminController(IAdminDashboardService adminDashboardService,IUserService userService,IBikeService bikeService,IRideService rideService, EmailSender emailSender)
         {
             _adminDashboardService = adminDashboardService;
+            _userService = userService;
+            _rideService = rideService;
+            _bikeService = bikeService;
             _emailSender = emailSender;
         }
         private async Task<AdminDashboardViewModel> GetDashboardDataAsync()
@@ -38,18 +44,36 @@ namespace BikeBuddy.Controllers
             }
             return null;
         }
-
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             var dashboardData = await GetDashboardDataAsync();
             return View(dashboardData);
         }
-
+        [HttpGet]
         public async Task<IActionResult> UserDetails()
         {
             var dashboardData = GetDashboardDataFromTempData() ?? await GetDashboardDataAsync();
             return View(dashboardData);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> MoreDetails(String userid)
+        {
+            User user = await _userService.GetUserByIdAsync(userid);
+            var bikes = await _bikeService.GetAllBikesByUserIdAsync(userid);
+            var rides = await _rideService.GetRidesByUserIdAsync(userid);
+
+            AdminOverviewViewModel adminOverviewViewModel = new AdminOverviewViewModel()
+            {
+                User = user,
+                Bikes = bikes,
+                Rides = rides
+            };
+            return View(adminOverviewViewModel);
+        }
+
+        [HttpGet]
         public async Task<IActionResult> KycDetails()
         {
             var dashboardData = TempData["FilteredData"] != null
@@ -57,6 +81,7 @@ namespace BikeBuddy.Controllers
                : await GetDashboardDataAsync();
                     return View(dashboardData);
         }
+
         [HttpGet]
         public async Task<IActionResult> ByStatus(KycStatus? kycStatus = null)
         {
@@ -138,7 +163,7 @@ namespace BikeBuddy.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ApproveOrRejectKyc(string userId, string action)
+        public async Task<IActionResult> ApproveOrRejectKyc(string userId, string action, string? rejectionReason)
         {
             bool isApproved = action == "approve";
             var result = await _adminDashboardService.UpdateKycStatus(userId, isApproved);
@@ -150,7 +175,7 @@ namespace BikeBuddy.Controllers
                 string subject = isApproved ? "KYC Approved" : "KYC Rejected";
                 string body = isApproved
                     ? "Congratulations! Your KYC has been approved."
-                    : "Unfortunately, your KYC has been rejected.";
+                    : $"Unfortunately, your KYC has been rejected.Reason: {rejectionReason}";
                 await _emailSender.SendEmailAsync(userEmail, subject, body);
             }
 
@@ -224,7 +249,7 @@ namespace BikeBuddy.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ApproveOrRejectBike(int bikeId, string action)
+        public async Task<IActionResult> ApproveOrRejectBike(int bikeId, string action,string? rejectionReason)
         {
             bool isApproved = action == "approve";
             var result = await _adminDashboardService.UpdateBikeStatus(bikeId, isApproved);
@@ -236,7 +261,7 @@ namespace BikeBuddy.Controllers
                 string subject = isApproved ? "Bike Approved" : "Bike Rejected";
                 string body = isApproved
                     ? "Congratulations! Your bike has been approved for renting."
-                    : "Unfortunately, your bike has been rejected. Please upload valid documents.";
+                    : $"Unfortunately, your bike has been rejected. Reason: {rejectionReason}";
                 await _emailSender.SendEmailAsync(userEmail, subject, body);
             }
 

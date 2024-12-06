@@ -49,8 +49,8 @@
         <thead>
             <tr class="bg-gray-200">
                 <th class="border p-2">SNO</th>
-                <th class="border p-2">User Id</th>
                 <th class="border p-2">UserName</th>
+                <th class="border p-2">Email</th>
                 <th class="border p-2">Bike Id</th>
                 <th class="border p-2">Model</th>
                 <th class="border p-2">Location</th>
@@ -70,8 +70,8 @@
                         {
                             <tr>
                                 <td class="border p-2">@count</td>
-                                <td class="border p-2">@user.Id</td>
                                 <td class="border p-2">@user.UserName</td>
+                                <td class="border p-2">@user.Email</td>
                                 <td class="border p-2">@bike.BikeId</td>
                                 <td class="border p-2">@bike.BikeModel</td>
                                 <td class="border p-2">@bike.BikeLocation</td>
@@ -83,7 +83,7 @@
                                     </form>
                                 </td>
                             </tr>
-                            count++; // Increment serial number
+                            count++;
                         }
                     }
                 }
