@@ -1,3 +1,5 @@
+using BikeBuddy.Filters;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -51,6 +53,8 @@ builder.Services.AddScoped<ICityService, CityService>();
 builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
+builder.Services.AddScoped<BlockedUserFilter>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

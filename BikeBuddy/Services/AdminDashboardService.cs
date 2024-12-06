@@ -13,7 +13,6 @@
             _userRepository = userRepository;
             _signInManager = signInManager;
             _rideRepository = rideRepository;
-
         }
 
         public async Task<string> GetUserEmailAsync(string userId)
@@ -25,7 +24,7 @@
         public async Task<AdminDashboardViewModel> GetDashboardData()
         {
             var Bikes = await _bikeRepository.GetAllAsync();
-            var Users=await _userRepository.GetAllUsers();
+            var Users=await _userRepository.GetAllAsync();
             return new AdminDashboardViewModel
             {
                 Bikes = Bikes.ToList(),
@@ -42,24 +41,24 @@
 
         public async  Task<IEnumerable<User>> GetAllUsers()
         {
-            return  await _userRepository.GetAllUsers();
+            return  await _userRepository.GetAllAsync();
         }
 
         public async  Task<User> GetUserById(Guid id)
         {
-            var user = await _userRepository.GetAllUsers();
+            var user = await _userRepository.GetAllAsync();
             return  user.FirstOrDefault(u => Guid.Parse(u.Id) == id);
         }
 
         
         public async  Task<bool> UpdateKycStatus(String userId, bool approve)
         {
-            var users = await _userRepository.GetAllUsers();
+            var users = await _userRepository.GetAllAsync();
             var user = users.FirstOrDefault(u => u.Id == userId.ToString());
             if (user == null) return false;
 
             user.KycStatus = approve ? KycStatus.Approved : KycStatus.Rejected;
-            _userRepository.SaveChanges();
+            await _userRepository.UpdateAsync(user);
             return true;
         }
 

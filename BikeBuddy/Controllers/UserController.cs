@@ -1,4 +1,6 @@
-﻿namespace BikeBuddy.Controllers
+﻿using Microsoft.AspNetCore.Authorization;
+
+namespace BikeBuddy.Controllers
 {
     /// <summary>
     /// Controller to manage user-related actions, including profile management, rented bikes, and ride history.
@@ -27,14 +29,11 @@
         /// </summary>
         /// <returns>A View with the profile information if the user is logged in; otherwise, redirects to the login page.</returns>
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> Profile()
         {
             // Retrieve the current user based on the logged-in username.
             var user = await _userService.GetCurrentUserAsync(User.Identity.Name);
-
-            if (user == null)
-                // Redirect to Login if no user is found.
-                return RedirectToAction("Login", "Account");
 
             // Get user profile data for the logged-in user.
             var model = await _userService.GetUserProfileAsync(user.Id);
@@ -48,15 +47,11 @@
         /// <param name="model">The profile data to update.</param>
         /// <returns>Redirects to the Profile view with a success or failure message.</returns>
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Profile(ProfileViewModel model)
         {
             // Retrieve the current user based on the logged-in username.
             var user = await _userService.GetCurrentUserAsync(User.Identity.Name);
 
-            if (user == null)
-                // Redirect to Login if no user is found.
-                return RedirectToAction("Login", "Account");
 
             // Update the user's profile data.
             var result = await _userService.UpdateUserProfileAsync(user.Id, model);

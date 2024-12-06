@@ -7,5 +7,8 @@
 
         Task<User> GetUserByIdAsync(String userId);
         Task<bool> UpdateUserProfileAsync(string userId, ProfileViewModel model);
+
+        Task BlockUserAsync(string userId, bool isBlocked);
+        Task<bool> IsUserBlockedAsync(string userId);
     }
 }

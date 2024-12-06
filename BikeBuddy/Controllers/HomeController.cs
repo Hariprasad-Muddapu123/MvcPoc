@@ -113,6 +113,13 @@ namespace BikeBuddy.Controllers
             }
         }
 
+        [HttpGet]
+        public IActionResult BlockedAccount(string message)
+        {
+            ViewBag.Message = message;
+            return View();
+        }
+
         /// <summary>
         /// Displays the generic error page.
         /// </summary>

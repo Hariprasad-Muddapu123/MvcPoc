@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using BikeBuddy.Filters;
+using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 namespace BikeBuddy.Controllers
 {
@@ -24,6 +25,7 @@ namespace BikeBuddy.Controllers
         }
 
         [HttpGet]
+        [ServiceFilter(typeof(BlockedUserFilter))]
         public async Task<IActionResult> Rent()
         {
             var user = await _userManager.GetUserAsync(User);
@@ -140,6 +142,7 @@ namespace BikeBuddy.Controllers
         }
 
         [HttpGet]
+        [ServiceFilter(typeof(BlockedUserFilter))]
         public async  Task<IActionResult> Ride()
         {
             var cities = await _cityService.GetAllCitiesAsync();
@@ -364,7 +367,6 @@ namespace BikeBuddy.Controllers
                 TotalBill = totalBill
             };
         }
-
         private string GenerateTransactionId()
         {
             return Guid.NewGuid().ToString("N").ToUpper();

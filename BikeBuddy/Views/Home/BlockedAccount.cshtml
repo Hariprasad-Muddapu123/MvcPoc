@@ -1,0 +1,28 @@
+﻿
+@{
+    ViewData["Title"] = "Account Blocked";
+}
+<html>
+<head>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+    <div class="min-h-screen flex items-center justify-center">
+        <div class="bg-white shadow-lg rounded-lg p-6 max-w-lg mx-auto">
+            <div class="text-center">
+                <h4 class="text-2xl font-bold text-red-600 mb-3">Account Blocked</h4>
+                <p class="text-gray-700 mb-4">@ViewBag.Message</p>
+                <hr class="my-4">
+                <p class="text-gray-600">
+                    Please <a asp-controller="Home" asp-action="ContactUs" class="text-blue-500 font-bold underline">contact the administrator</a> to unblock your account.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+    
+
+

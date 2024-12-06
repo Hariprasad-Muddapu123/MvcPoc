@@ -83,7 +83,15 @@
             return await _userRepository.UpdateUserAsync(user);
         }
 
-        
+        public async Task BlockUserAsync(string userId, bool isBlocked)
+        {
+            await _userRepository.BlockUserAsync(userId, isBlocked);
+        }
+
+        public async Task<bool> IsUserBlockedAsync(string userId)
+        {
+            return await _userRepository.IsUserBlockedAsync(userId);
+        }
 
     }
 }

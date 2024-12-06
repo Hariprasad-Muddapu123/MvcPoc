@@ -47,6 +47,7 @@
                 <th class="border p-2">Username</th>
                 <th class="border p-2">Mobile No</th>
                 <th class="border p-2">Email</th>
+                <th>Actions</th>
                 <th class="border p-2">More Details</th>
             </tr>
         </thead>
@@ -61,6 +62,24 @@
                         <td class="border p-2">@user.UserName</td>
                         <td class="border p-2">@user.PhoneNumber</td>
                         <td class="border p-2">@user.Email</td>
+                        <td>
+                            @if (user.IsBlocked)
+                            {
+                                <form asp-action="BlockUser" method="post">
+                                    <input type="hidden" name="userId" value="@user.Id" />
+                                    <input type="hidden" name="isBlocked" value="false" />
+                                    <button type="submit" class="btn btn-success">Unblock</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <form asp-action="BlockUser" method="post">
+                                    <input type="hidden" name="userId" value="@user.Id" />
+                                    <input type="hidden" name="isBlocked" value="true" />
+                                    <button type="submit" class="btn btn-danger">Block</button>
+                                </form>
+                            }
+                        </td>
                         <td class="border p-2 text-center">
                             <a href="@Url.Action("MoreDetails", "Admin", new { userId = user.Id })"
                                class="btn btn-primary mt-2">

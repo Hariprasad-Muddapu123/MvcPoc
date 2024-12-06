@@ -269,6 +269,14 @@ namespace BikeBuddy.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> BlockUser(string userId, bool isBlocked)
+        {
+            await _userService.BlockUserAsync(userId, isBlocked);
+            GetDashboardDataAsync();
+            return RedirectToAction("UserDetails", new { id = userId });
+        }
+
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {

@@ -9,6 +9,8 @@
 
         public KycStatus KycStatus { get; set; }
 
+        public bool IsBlocked { get; set; }
+
         public DateOnly RegistrationDate { get; set; }
         
         public bool IsAadhaarUploaded { get; set; }
