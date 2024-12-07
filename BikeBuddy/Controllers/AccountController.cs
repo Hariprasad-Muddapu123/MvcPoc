@@ -103,6 +103,7 @@ namespace BikeBuddy.Controllers
                     else
                     {
                         var result = await signInManager.PasswordSignInAsync(model.UserName, model.Password, true, lockoutOnFailure: false);
+
                         if (result.Succeeded)
                         {
                             var roles = await userManager.GetRolesAsync(user);

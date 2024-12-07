@@ -1,0 +1,53 @@
+﻿@{
+    ViewData["Title"] = "Verify OTP";
+}
+
+<html>
+<head>
+    <title>Verify OTP</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // JavaScript for Countdown Timer
+        document.addEventListener("DOMContentLoaded", function () {
+            let countdownTime = 600; // Time in seconds (10 minutes)
+            const timerElement = document.getElementById("otp-timer");
+            function updateTimer() {
+                const minutes = Math.floor(countdownTime / 60);
+                const seconds = countdownTime % 60;
+
+                timerElement.textContent = `OTP expires in: ${minutes}m ${seconds}s`;
+
+                if (countdownTime > 0) {
+                    countdownTime--;
+                    setTimeout(updateTimer, 1000);
+                } else {
+                    timerElement.textContent = "OTP has expired. Please request a new one.";
+                    document.getElementById("otp").disabled = true; // Disable the OTP input
+                    document.querySelector("button[type='submit']").disabled = true; // Disable the submit button
+                    document.querySelector("button[type='submit']").classList.add("bg-gray-400"); // Update button color
+                }
+            }
+            updateTimer();
+        });
+    </script>
+</head>
+<body>
+    <div class="container d-flex justify-content-center align-items-center main-content mt-6 mb-3 p-5">
+        <div class="bg-white p-8 rounded-lg shadow-lg w-96 mx-auto">
+            @Html.ValidationSummary()
+            <h2 class="text-black text-2xl font-bold mb-4 text-center">Verify OTP</h2>
+            <form class="w-full" asp-action="VerifyOtp" method="post">
+                <input type="hidden" name="email" value="@ViewBag.Email" />
+                <div class="mb-4">
+                    <label class="block text-gray-700 mb-2" for="otp">OTP</label>
+                    <input type="number" name="otp" id="otp" class="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="Enter OTP" required />
+                </div>
+                <div id="otp-timer" class="text-center text-gray-600 mb-4"></div>
+                <button type="submit" class="bg-orange-500 text-white font-bold py-2 px-4 rounded-full w-full mt-3">
+                    Verify OTP
+                </button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
