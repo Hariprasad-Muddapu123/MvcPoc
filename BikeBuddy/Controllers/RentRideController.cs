@@ -325,10 +325,6 @@ namespace BikeBuddy.Controllers
 
 
                 await _paymentService.AddPaymentAsync(payment);
-
-                bike.Available = false;
-                await _bikeService.UpdateBikeAsync(bike);
-
                 HttpContext.Session.Clear();
                 return View(bike);
             }

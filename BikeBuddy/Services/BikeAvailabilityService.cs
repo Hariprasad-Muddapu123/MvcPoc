@@ -22,15 +22,33 @@
             using (var scope = _serviceProvider.CreateScope())
             {
                 var bikeRepository = scope.ServiceProvider.GetRequiredService<IBikeRepository>();
+                var rideRepository = scope.ServiceProvider.GetRequiredService<IRideRepository>();
                 var bikes = await bikeRepository.GetAllAsync(); // Get all bikes
+                var ongoingRides = await rideRepository.GetAllOngoingRidesAsync();
 
                 foreach (var bike in bikes)
                 {
                     if (bike.AvailableUpto <= DateTime.Now && bike.Available == true)
                     {
                         bike.Available = false;
-                        await bikeRepository.UpdateAsync(bike);
+                        
                     }
+                    var bikeInOngoingRide = ongoingRides.Any(ride =>
+                        ride.BikeId == bike.BikeId &&
+                        DateTime.TryParse(ride.PickupDateTime, out var pickupDateTime) &&
+                        DateTime.TryParse(ride.DropoffDateTime, out var dropoffDateTime) &&
+                        pickupDateTime <= DateTime.Now &&
+                        dropoffDateTime >= DateTime.Now);
+
+                    if (bikeInOngoingRide)
+                    {
+                        bike.Available = false;
+                    }
+                    else
+                    {
+                        bike.Available = true;
+                    }
+                    await bikeRepository.UpdateAsync(bike);
                 }
             }
         }
@@ -44,7 +62,8 @@
 
                 foreach (var ride in rides)
                 {
-                    if (Convert.ToDateTime(ride.DropoffDateTime) <= DateTime.Now && ride.RentalStatus == RentStatus.Ongoing)
+                    DateTime.TryParse(ride.DropoffDateTime, out var dropoffDateTime);
+                    if (dropoffDateTime<= DateTime.Now && ride.RentalStatus == RentStatus.Ongoing)
                     {
                         ride.RentalStatus = RentStatus.Completed;
                         await rideRepository.UpdateAsync(ride);

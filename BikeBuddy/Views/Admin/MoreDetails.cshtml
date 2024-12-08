@@ -6,6 +6,25 @@
 <div class="container mt-4">
     <div class="bg-white p-4 rounded shadow-md mb-4">
         <h2 class="text-xl font-bold mb-3">User Details</h2>
+        <div class="d-flex justify-content-end">
+            @if (Model.User.IsBlocked)
+            {
+                <form asp-action="BlockUser" method="post">
+                    <input type="hidden" name="userId" value="@Model.User.Id" />
+                    <input type="hidden" name="isBlocked" value="false" />
+                    <button type="submit" class="btn btn-success">Unblock</button>
+                </form>
+            }
+            else
+            {
+                <form asp-action="BlockUser" method="post">
+                    <input type="hidden" name="userId" value="@Model.User.Id" />
+                    <input type="hidden" name="isBlocked" value="true" />
+                    <button type="submit" class="btn btn-danger">Block</button>
+                </form>
+            }
+        </div>
+
         <table class="table-auto w-full border-collapse border border-gray-300">
             <tbody>
                 <tr>
@@ -36,6 +55,8 @@
                 <thead>
                     <tr class="bg-gray-200">
                         <th class="border px-4 py-2">Ride ID</th>
+                        <th class="border px-4 py-2">Bike Id</th>
+                        <th class="border px-4 py-2">Bike Model</th>
                         <th class="border px-4 py-2">Registered Date</th>
                         <th class="border px-4 py-2">PickupUpDate&Time</th>
                         <th class="border px-4 py-2">DropoffDate&Time</th>
@@ -49,6 +70,8 @@
                     {
                         <tr>
                             <td class="border px-4 py-2">@ride.RideId</td>
+                            <td class="border px-4 py-2">@ride.Bike.BikeNumber</td>
+                            <td class="border px-4 py-2">@ride.Bike.BikeModel</td>
                             <td class="border px-4 py-2">@ride.RideRegisteredDate</td>
                             <td class="border px-4 py-2">@ride.PickupDateTime</td>
                             <td class="border px-4 py-2">@ride.DropoffDateTime</td>
@@ -72,14 +95,15 @@
             <table class="table-auto w-full border-collapse border border-gray-300">
                 <thead>
                     <tr class="bg-gray-200">
-                        <th class="border px-4 py-2">Rent ID</th>
+                        <th class="border px-4 py-2">Bike ID</th>
                         <th class="border px-4 py-2">Bike Model</th>
                         <th class="border px-4 py-2">Bike Number</th>
                         <th class="border px-4 py-2">Bike Address</th>
                         <th class="border px-4 py-2">Bike Location</th>
-                        <th class="border px-4 py-2">Rented price</th>
+                        <th class="border px-4 py-2">Rented price per Hour</th>
+                        <th class="border px-4 py-2">Rent Completed</th>
                         <th class="border px-4 py-2">Contact No</th>
-                        <th class="border px-4 py-2">Kuc Status</th>
+                        <th class="border px-4 py-2">Kyc Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -92,6 +116,7 @@
                             <td class="border px-4 py-2">@rent.BikeAddress</td>
                             <td class="border px-4 py-2">@rent.BikeLocation</td>
                             <td class="border px-4 py-2">@rent.BikeRentPrice</td>
+                            <td class="border px-4 py-2">@rent.AvailableUpto</td>
                             <td class="border px-4 py-2">@rent.ContactNo</td>
                             <td class="border px-4 py-2">@rent.KycStatus</td>
                         </tr>

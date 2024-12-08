@@ -12,9 +12,24 @@
         public async Task<IEnumerable<Ride>> GetRidesByUserIdAsync(string userId)
         {
             return await _context.Rides
+                                 .Include(r => r.Bike)
                                  .Where(r => r.UserId == userId)
                                  .ToListAsync();
         }
-       
+
+        public async Task<IEnumerable<Ride>> GetAllOngoingRidesAsync()
+        {
+            return await Task.Run(() => _context.Rides
+                .Where(ride =>
+                    ride.RentalStatus == RentStatus.Ongoing)
+                .AsEnumerable()
+                .Where(ride =>
+                    Convert.ToDateTime(ride.PickupDateTime) <= DateTime.Now &&
+                    Convert.ToDateTime(ride.DropoffDateTime) >= DateTime.Now)
+                .ToList()
+                );
+        }
+
+
     }
 }
