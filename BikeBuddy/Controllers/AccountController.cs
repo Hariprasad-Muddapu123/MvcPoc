@@ -1,4 +1,6 @@
 ﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Caching.Memory;
 namespace BikeBuddy.Controllers
 {
 
@@ -8,13 +10,15 @@ namespace BikeBuddy.Controllers
         private readonly SignInManager<User> signInManager;
         private readonly RoleManager<IdentityRole> roleManager;
         public readonly EmailSender emailSender;
-        public AccountController(UserManager<User> userManager,
-            SignInManager<User> signInManager,EmailSender emailSender,RoleManager<IdentityRole> roleManager)
+		private readonly IMemoryCache memoryCache;
+		public AccountController(UserManager<User> userManager,
+            SignInManager<User> signInManager,EmailSender emailSender,RoleManager<IdentityRole> roleManager, IMemoryCache memoryCache)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.emailSender = emailSender;
             this.roleManager = roleManager;
+            this.memoryCache = memoryCache;
         }
         [HttpGet]
         public IActionResult Signup()
@@ -95,10 +99,11 @@ namespace BikeBuddy.Controllers
                 {
                     if (!user.EmailConfirmed)
                     {
-                        SendEmail(model, user);
-                        ViewBag.Message = "A confirmation link has been sent to your email.";
-                        model.Schemes = await signInManager.GetExternalAuthenticationSchemesAsync();
-                        return View(model);
+                        await SendOtpAsync(user.Email);
+                        ViewBag.Message = "An OTP has been sent to your email for verification.";
+                        return RedirectToAction("VerifyOtp", new { Email = user.Email});
+                        //model.Schemes = await signInManager.GetExternalAuthenticationSchemesAsync();
+                        //return View(model);
                     }
                     else
                     {
@@ -147,7 +152,93 @@ namespace BikeBuddy.Controllers
             model.Schemes = await signInManager.GetExternalAuthenticationSchemesAsync();
             return View(model);
         }
-        private async void SendEmail(LoginViewModel model, User user)
+
+		[HttpGet]
+		public IActionResult VerifyOtp(string email)
+		{
+			var model = new VerifyOtpViewModel { Email = email };
+			return View(model);
+		}
+
+		[HttpPost]
+		public async Task<IActionResult> VerifyOtp(VerifyOtpViewModel model)
+		{
+			// Check OTP in memory cache
+			if (!memoryCache.TryGetValue($"OTP_{model.Email}", out string cachedOtp))
+			{
+				ModelState.AddModelError("", "The OTP has expired. Please request a new one.");
+				return View(model);
+			}
+
+			if (cachedOtp != model.Otp)
+			{
+				ModelState.AddModelError("", "The OTP is invalid.");
+				return View(model);
+			}
+
+			// OTP is valid; mark the user as confirmed
+			var user = await userManager.FindByEmailAsync(model.Email);
+			user.EmailConfirmed = true;
+			await userManager.UpdateAsync(user);
+
+			// Remove OTP from cache
+			memoryCache.Remove($"OTP_{model.Email}");
+
+			ViewBag.Message = "Your email has been successfully verified.";
+			return RedirectToAction("Login");
+		}
+        [HttpPost]
+        public async Task<IActionResult> ResendOtp(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                return Json(new { success = false, message = "Email is required." });
+            }
+
+            // Check if the email exists in the database
+            var user = await userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                return Json(new { success = false, message = "Email does not exist." });
+            }
+
+            if (user.EmailConfirmed)
+            {
+                return Json(new { success = false, message = "Email is already verified." });
+            }
+
+            try
+            {
+                // Generate and send OTP
+                await SendOtpAsync(email);
+
+                return Json(new { success = true, message = "OTP resent successfully." });
+            }
+            catch (Exception ex)
+            {
+                // Log exception for debugging
+                //_logger.LogError(ex, "Error resending OTP for email: {Email}", email);
+                return Json(new { success = false, message = "An error occurred while resending OTP." });
+            }
+        }
+
+
+        private async Task SendOtpAsync(String email)
+		{
+			// Generate a random OTP
+			var otp = new Random().Next(100000, 999999).ToString();
+
+			// Store OTP in memory cache with a 10-minute expiration
+		    memoryCache.Set($"OTP_{email}", otp, TimeSpan.FromMinutes(10));
+
+			// Send the OTP via email
+			await emailSender.SendEmailAsync(
+				email,
+				"Email Verification OTP",
+				$"Your OTP for email verification is: <strong>{otp}</strong>");
+		}
+
+		private async void SendEmail(LoginViewModel model, User user)
         {
             var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
             var callbackUrl = Url.Action(
