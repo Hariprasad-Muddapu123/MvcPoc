@@ -17,5 +17,10 @@
         {
             await _rideRepository.AddAsync(ride);
         }
+
+        public async Task<IEnumerable<Ride>> GetRidesByBikeIdAsync(int bikeId)
+        {
+            return await _rideRepository.GetRidesByBikeIdAsync(bikeId);
+        }
     }
 }

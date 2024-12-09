@@ -27,7 +27,6 @@ namespace BikeBuddy.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Signup(RegisterViewModel model)
         {
             if (ModelState.IsValid)
@@ -102,13 +101,10 @@ namespace BikeBuddy.Controllers
                         await SendOtpAsync(user.Email);
                         ViewBag.Message = "An OTP has been sent to your email for verification.";
                         return RedirectToAction("VerifyOtp", new { Email = user.Email});
-                        //model.Schemes = await signInManager.GetExternalAuthenticationSchemesAsync();
-                        //return View(model);
                     }
                     else
                     {
                         var result = await signInManager.PasswordSignInAsync(model.UserName, model.Password, true, lockoutOnFailure: false);
-
                         if (result.Succeeded)
                         {
                             var roles = await userManager.GetRolesAsync(user);
@@ -163,7 +159,6 @@ namespace BikeBuddy.Controllers
 		[HttpPost]
 		public async Task<IActionResult> VerifyOtp(VerifyOtpViewModel model)
 		{
-			// Check OTP in memory cache
 			if (!memoryCache.TryGetValue($"OTP_{model.Email}", out string cachedOtp))
 			{
 				ModelState.AddModelError("", "The OTP has expired. Please request a new one.");
@@ -175,15 +170,10 @@ namespace BikeBuddy.Controllers
 				ModelState.AddModelError("", "The OTP is invalid.");
 				return View(model);
 			}
-
-			// OTP is valid; mark the user as confirmed
 			var user = await userManager.FindByEmailAsync(model.Email);
 			user.EmailConfirmed = true;
 			await userManager.UpdateAsync(user);
-
-			// Remove OTP from cache
 			memoryCache.Remove($"OTP_{model.Email}");
-
 			ViewBag.Message = "Your email has been successfully verified.";
 			return RedirectToAction("Login");
 		}
@@ -194,8 +184,6 @@ namespace BikeBuddy.Controllers
             {
                 return Json(new { success = false, message = "Email is required." });
             }
-
-            // Check if the email exists in the database
             var user = await userManager.FindByEmailAsync(email);
             if (user == null)
             {
@@ -209,15 +197,11 @@ namespace BikeBuddy.Controllers
 
             try
             {
-                // Generate and send OTP
                 await SendOtpAsync(email);
-
                 return Json(new { success = true, message = "OTP resent successfully." });
             }
             catch (Exception ex)
             {
-                // Log exception for debugging
-                //_logger.LogError(ex, "Error resending OTP for email: {Email}", email);
                 return Json(new { success = false, message = "An error occurred while resending OTP." });
             }
         }
@@ -225,13 +209,8 @@ namespace BikeBuddy.Controllers
 
         private async Task SendOtpAsync(String email)
 		{
-			// Generate a random OTP
 			var otp = new Random().Next(100000, 999999).ToString();
-
-			// Store OTP in memory cache with a 10-minute expiration
 		    memoryCache.Set($"OTP_{email}", otp, TimeSpan.FromMinutes(10));
-
-			// Send the OTP via email
 			await emailSender.SendEmailAsync(
 				email,
 				"Email Verification OTP",
@@ -307,18 +286,12 @@ namespace BikeBuddy.Controllers
             return RedirectToAction("index", "Home");
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
-
         [HttpGet]
         public IActionResult Forgot()
         {
             return View();
         }
         
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ForgotPassword(ForgotViewModel model)

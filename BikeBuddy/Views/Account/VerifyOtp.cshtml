@@ -7,168 +7,94 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verify OTP</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="~/js/otp.js"></script>
     <style>
-        .container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: #f9f9f9;
+        body {
+            background-color: #f7fafc;
+            font-family: 'Arial', sans-serif;
+            height: 100vh;
         }
 
         .card {
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 24px;
-            width: 100%;
             max-width: 400px;
+            margin: 50px auto; /* Adds space above and below the card */
+            padding: 30px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        .text-danger {
-            color: #dc2626;
+        .btn {
+            background-color: #f97316;
+            color: white;
+            padding: 12px;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: all 0.3s;
         }
 
-        .button-disabled {
-            background-color: #d1d5db;
-            cursor: not-allowed;
-        }
+            .btn:hover {
+                background-color: #ea580c;
+            }
 
-        .resend-container {
+        .resend-message {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 16px;
-        }
-
-        .resend-message {
-            margin-left: 8px;
+            margin-top: 15px;
         }
 
         .timer-container {
-            margin-bottom: 16px;
+            text-align: center;
             font-size: 14px;
-            color: #666;
+            margin-top: 10px;
         }
-    </style>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            let timeRemaining = 10; // 10 minutes in seconds
-            const timerElement = document.getElementById("otp-timer");
-            const resendButton = document.getElementById("resendOtpButton");
-            const resendMessage = document.getElementById("resendMessage");
-            const otpInput = document.getElementById("otp");
-            const verifyButton = document.getElementById("verifyButton");
 
-            // Timer function to show countdown
-            function updateTimer() {
-                const minutes = Math.floor(timeRemaining / 60);
-                const seconds = timeRemaining % 60;
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #d1d5db;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
 
-                timerElement.textContent = `OTP expires in: ${minutes}m ${seconds}s`;
-
-                if (timeRemaining > 0) {
-                    timeRemaining--;
-                    setTimeout(updateTimer, 1000);
-                } else {
-                    timerElement.textContent = "OTP has expired. Please request a new one.";
-                    otpInput.disabled = true;
-                    verifyButton.disabled = true;
-                    verifyButton.classList.add("button-disabled");
-                    resendButton.disabled = false; // Allow resend
-                }
+            .form-control:focus {
+                border-color: #3b82f6;
+                outline: none;
             }
 
-            // Initialize timer
-            updateTimer();
-
-            // Resend OTP functionality
-            resendButton.addEventListener("click", function () {
-                const email = document.getElementById("emailInput").value;
-
-                if (!email) {
-                    resendMessage.textContent = "Email is required to resend OTP.";
-                    resendMessage.classList.remove("text-green-500");
-                    resendMessage.classList.add("text-danger");
-                    return;
-                }
-
-                resendButton.disabled = true; // Temporarily disable the button
-                resendMessage.textContent = "Resending OTP...";
-                resendMessage.classList.remove("text-danger", "text-green-500");
-                resendMessage.classList.add("text-gray-600");
-
-                // Send the email as part of the request
-                fetch('/Account/ResendOtp', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                    },
-                    body: `email=${encodeURIComponent(email)}`
-                })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            resendMessage.textContent = "OTP resent successfully.";
-                            resendMessage.classList.remove("text-danger");
-                            resendMessage.classList.add("text-green-500");
-
-                            // Reset timer and enable input fields
-                            timeRemaining = 600; // Reset to 10 minutes
-                            otpInput.disabled = false;
-                            verifyButton.disabled = false;
-                            verifyButton.classList.remove("button-disabled");
-                            updateTimer();
-                        } else {
-                            resendMessage.textContent = data.message || "Error resending OTP.";
-                            resendMessage.classList.add("text-danger");
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error:", error);
-                        resendMessage.textContent = "An error occurred while resending OTP.";
-                        resendMessage.classList.add("text-danger");
-                    })
-                    .finally(() => {
-                        resendButton.disabled = false; // Re-enable the button
-                    });
-            });
-        });
-    </script>
+        .error-message {
+            color: #e11d48;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <div class="card">
             <h2 class="text-center text-2xl font-bold text-gray-800 mb-4">Verify OTP</h2>
-
             @Html.ValidationSummary()
 
             <form asp-action="VerifyOtp" method="post">
                 <input type="hidden" asp-for="Email" />
-                <input type="hidden" name="__RequestVerificationToken" value="@Html.AntiForgeryToken()" />
                 <div class="mb-4">
                     <label for="otp" class="block text-gray-700 font-medium mb-2">Enter OTP:</label>
                     <input type="number" id="otp" name="Otp" asp-for="Otp"
-                           class="w-full px-4 py-2 border rounded focus:ring-2 focus:ring-blue-400"
-                           placeholder="Enter OTP" required />
-                    <span asp-validation-for="Otp" class="text-danger"></span>
+                           class="form-control" placeholder="Enter OTP" required />
+                    <span asp-validation-for="Otp" class="text-danger error-message"></span>
                 </div>
 
-                <!-- Timer Element -->
                 <div id="otp-timer" class="timer-container"></div>
 
-                <!-- Verify OTP Button -->
-                <button type="submit" id="verifyButton"
-                        class="w-full bg-orange-500 text-white py-2 rounded font-bold hover:bg-orange-600">
+                <button type="submit" id="verifyButton" class="btn w-full">
                     Verify OTP
                 </button>
             </form>
 
-            <!-- Resend OTP Section -->
             <div class="resend-container">
                 <div class="resend-message">
                     <input type="hidden" name="Email" value="@Model.Email" id="emailInput" />
-                    <button type="button" id="resendOtpButton" class="bg-orange-500 text-white py-2 px-4 rounded hover:bg-blue-600">
+                    <button type="button" id="resendOtpButton" class="btn">
                         Resend OTP
                     </button>
                 </div>

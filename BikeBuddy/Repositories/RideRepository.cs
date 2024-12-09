@@ -4,7 +4,7 @@
     {
         private readonly ApplicationDbContext _context;
 
-        public RideRepository(ApplicationDbContext context):base(context) 
+        public RideRepository(ApplicationDbContext context) : base(context) 
         {
             _context = context;
         }
@@ -30,6 +30,11 @@
                 );
         }
 
-
+        public async Task<IEnumerable<Ride>> GetRidesByBikeIdAsync(int bikeId)
+        {
+            return await _context.Rides
+                                 .Where(r => r.BikeId == bikeId)
+                                 .ToListAsync();
+        }
     }
 }

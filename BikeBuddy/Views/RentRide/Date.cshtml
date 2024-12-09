@@ -15,7 +15,7 @@
                 <h2 class="text-lg font-semibold mb-2">PickUp</h2>
                 <div class="flex justify-between  space-x-2 mb-4">
                     <div class="flex items-center bg-gray-200 p-2 rounded-md w-40">
-                        <input asp-for="PickupDate" type="date" class="bg-gray-200"  />  
+                            <input asp-for="PickupDate" type="date" min="@DateTime.Now.ToString("yyyy-MM-dd")" class="bg-gray-200" />
                     </div>
                     <div class="flex items-center bg-gray-200 p-2 rounded-md w-40">
                          <input asp-for="PickupTime" type="Time" class="bg-gray-200" />
@@ -26,7 +26,7 @@
                 <h2 class="text-lg font-semibold mb-2">Dropoff</h2>
                 <div class="flex justify-between space-x-2 mb-4">
                         <div class="flex items-center bg-gray-200 p-2 rounded-md w-40">
-                            <input asp-for="DropoffDate" type="date" class="bg-gray-200" />
+                            <input asp-for="DropoffDate" type="date" min="@DateTime.Now.ToString("yyyy-MM-dd")" class="bg-gray-200" />
                         </div>
                         <div class="flex items-center bg-gray-200 p-2 rounded-md w-40">
                             <input asp-for="DropoffTime" type="Time" class="bg-gray-200" />

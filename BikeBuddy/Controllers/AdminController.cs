@@ -123,7 +123,6 @@ namespace BikeBuddy.Controllers
                 default:
                     return BadRequest("Invalid target view.");
             }
-            return View(dashboardData);
         }
 
         public async Task<IActionResult> ViewUserDetails(Guid id)
@@ -170,7 +169,7 @@ namespace BikeBuddy.Controllers
 
             if (result)
             {
-                GetDashboardDataAsync();
+                await GetDashboardDataAsync();
                 var userEmail = await _adminDashboardService.GetUserEmailAsync(userId);
                 string subject = isApproved ? "KYC Approved" : "KYC Rejected";
                 string body = isApproved
@@ -178,10 +177,9 @@ namespace BikeBuddy.Controllers
                     : $"Unfortunately, your KYC has been rejected.Reason: {rejectionReason}";
                 await _emailSender.SendEmailAsync(userEmail, subject, body);
             }
-
             return RedirectToAction("KycDetails");
         }
-
+        [HttpGet]
         public async Task<IActionResult> BikeDetails()
         {
             var dashboardData = TempData["BikeFilteredData"] != null
@@ -272,7 +270,7 @@ namespace BikeBuddy.Controllers
         public async Task<IActionResult> BlockUser(string userId, bool isBlocked)
         {
             await _userService.BlockUserAsync(userId, isBlocked);
-            GetDashboardDataAsync();
+            await GetDashboardDataAsync();
             return RedirectToAction("UserDetails", new { id = userId });
         }
 

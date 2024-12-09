@@ -1,12 +1,13 @@
-﻿using BikeBuddy.Filters;
+﻿
+using BikeBuddy.Filters;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 namespace BikeBuddy.Controllers
 {
     public class RentRideController : Controller
     {
         private readonly UserManager<User> _userManager;
-
         private readonly IBikeService _bikeService;
         private readonly IRideService _rideService;
         private readonly IPaymentService _paymentService;
@@ -150,12 +151,16 @@ namespace BikeBuddy.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> DisplayBikes(string SearchAddress, string SearchModel, string SearchLocation, string[] SelectedAddresses,string SelectedModels)
+        public async Task<IActionResult> DisplayBikes(string SearchAddress, string SearchModel, string SearchLocation, string[] SelectedAddresses,string[] SelectedModels)
         {
             List<Bike> bikes = (List<Bike>)await _bikeService.GetAllBikes();
             string? currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             bikes = bikes.Where(bike => bike.UserId != currentUserId).ToList();
+            if (SearchAddress == null && SearchLocation ==null && SearchModel ==null && SelectedAddresses.Length==0 && SelectedModels.Length==0)
+            {
+                bikes = bikes.Where(bike => bike.KycStatus != KycStatus.Rejected).ToList();
+            }
 
             bikes = bikes.Where(b =>
                 (string.IsNullOrEmpty(SearchLocation) || (b.BikeLocation == SearchLocation && b.KycStatus == KycStatus.Approved)) &&
@@ -213,6 +218,19 @@ namespace BikeBuddy.Controllers
                 ViewData["Message"] = "Dropoff date and time must be later than pickup date and time.";
                 return View("Date");
             }
+
+            var rides= await _rideService.GetRidesByBikeIdAsync(bikeId);
+            foreach(var ride in rides)
+            {
+                var existingPickup = DateTime.Parse(ride.PickupDateTime);
+                var existingDropoff = DateTime.Parse(ride.DropoffDateTime);
+                if (!(dropoffDateTime <= existingPickup || pickupDateTime >= existingDropoff))
+                {
+                    ViewData["Message"] = $"This bike is already booked from {existingPickup} to {existingDropoff}.";
+                    return View("Date");
+                }
+            }
+
             TimeSpan timeDifference = dropoffDateTime - pickupDateTime;  
             double bikeRentPrice = bikes
                 .Where(b => b.BikeId == bikeId)
