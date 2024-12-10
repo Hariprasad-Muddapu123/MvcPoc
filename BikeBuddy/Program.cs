@@ -7,7 +7,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.IdleTimeout = TimeSpan.FromMinutes(15);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
@@ -39,8 +39,8 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
         .AddDefaultTokenProviders();
 // Add services to the container.
 builder.Services.AddControllersWithViews().AddSessionStateTempDataProvider();
-builder.Services.AddScoped<EmailSender>();
-builder.Services.AddHostedService<BikeAvailabilityService>();
+builder.Services.AddTransient<EmailSender>();
+builder.Services.AddSingleton<BikeAvailabilityService>();
 // Register Repositories
 builder.Services.AddScoped<IBikeRepository, BikeRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -48,12 +48,12 @@ builder.Services.AddScoped<IRideRepository, RideRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IBikeService, BikeService>();
 builder.Services.AddScoped<IRideService, RideService>();
-builder.Services.AddScoped<ICityRepository, CityRepository>();
-builder.Services.AddScoped<ICityService, CityService>();
-builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
-builder.Services.AddScoped<IPaymentService, PaymentService>();
+//builder.Services.AddScoped<ICityRepository, CityRepository>();
+builder.Services.AddScoped<CityService>();
+//builder.Services.AddScoped<IPaymentRepository, PaymentRepository>();
+builder.Services.AddScoped<PaymentService>();
 builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
-builder.Services.AddScoped<BlockedUserFilter>();
+builder.Services.AddTransient<BlockedUserFilter>();
 
 var app = builder.Build();
 

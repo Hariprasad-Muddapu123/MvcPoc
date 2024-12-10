@@ -10,9 +10,9 @@ namespace BikeBuddy.Controllers
         private readonly UserManager<User> _userManager;
         private readonly IBikeService _bikeService;
         private readonly IRideService _rideService;
-        private readonly IPaymentService _paymentService;
-        private readonly ICityService _cityService;
-        public RentRideController(UserManager<User> userManager,IBikeService bikeService, IRideService rideService, IPaymentService paymentService, ICityService cityService)
+        private readonly PaymentService _paymentService;
+        private readonly CityService _cityService;
+        public RentRideController(UserManager<User> userManager,IBikeService bikeService, IRideService rideService, PaymentService paymentService, CityService cityService)
         {
             this._userManager = userManager;
             this._bikeService = bikeService;
@@ -126,7 +126,6 @@ namespace BikeBuddy.Controllers
             {
                 TempData["ErrorMessage"] = "Bike not found!";
             }
-
             return RedirectToAction("Rent");
         }
 
@@ -193,7 +192,7 @@ namespace BikeBuddy.Controllers
             var bikeIdString = HttpContext.Session.GetString("BikeId");
             if (!int.TryParse(bikeIdString, out int bikeId))
             {
-                return BadRequest("Invalid BikeId format.");
+                return StatusCode(440);
             }
             List<Bike> bikes = (List<Bike>)await _bikeService.GetAllBikes();
             var bike = bikes.FirstOrDefault(b => b.BikeId == bikeId);
@@ -222,8 +221,8 @@ namespace BikeBuddy.Controllers
             var rides= await _rideService.GetRidesByBikeIdAsync(bikeId);
             foreach(var ride in rides)
             {
-                var existingPickup = DateTime.Parse(ride.PickupDateTime);
-                var existingDropoff = DateTime.Parse(ride.DropoffDateTime);
+                var existingPickup = DateTime.Parse(ride.PickupDateTime).AddMinutes(-30);
+                var existingDropoff = DateTime.Parse(ride.DropoffDateTime).AddMinutes(30);
                 if (!(dropoffDateTime <= existingPickup || pickupDateTime >= existingDropoff))
                 {
                     ViewData["Message"] = $"This bike is already booked from {existingPickup} to {existingDropoff}.";
@@ -274,7 +273,7 @@ namespace BikeBuddy.Controllers
             var bikeIdString = HttpContext.Session.GetString("BikeId");
             if (!int.TryParse(bikeIdString, out int bikeId))
             {
-                return BadRequest("Invalid BikeId format.");
+                return StatusCode(440);
             }
             var bike = await _bikeService.GetBikeByIdAsync(bikeId);
             var model = new BookingViewModel
@@ -300,7 +299,7 @@ namespace BikeBuddy.Controllers
             var sessionData = GetSessionData();
             if (sessionData == null || !int.TryParse(HttpContext.Session.GetString("BikeId"), out int bikeId))
             {
-                return BadRequest("Session data is incomplete or BikeId is invalid.");
+                return StatusCode(440);
             }
 
             var bikes = await _bikeService.GetAllBikes();
@@ -385,6 +384,44 @@ namespace BikeBuddy.Controllers
         {
             return Guid.NewGuid().ToString("N").ToUpper();
         }
+
+        [HttpGet]
+        public async Task<IActionResult> CancelRide(int id)
+        {
+            var ride = await _rideService.GetRideByIdAsync(id);
+            if (ride == null)
+            {
+                return NotFound();
+            }
+            ViewBag.RideId = id;
+            var model = new CancelRideViewModel
+            {
+                Ride = ride
+            };
+            return View(model);
+        }
+        [HttpPost]
+        public async Task<IActionResult> CancelRide(int rideId,String reason)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
+
+            var ride =await  _rideService.GetRideByIdAsync(rideId);
+            if (ride == null)
+            {
+                return NotFound();
+            }
+
+            ride.RentalStatus = RentStatus.Canceled;
+            ride.CancellationReason = reason;
+            await _rideService.UpdateRideAsync(ride);
+
+            TempData["Success"] = "Ride successfully cancelled.";
+            return RedirectToAction("UserRides","User");
+        }
+
 
     }
 }

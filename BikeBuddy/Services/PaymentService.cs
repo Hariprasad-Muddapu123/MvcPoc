@@ -1,17 +1,30 @@
 ﻿namespace BikeBuddy.Services
 {
-    public class PaymentService : IPaymentService
+    public class PaymentService
     {
-        private readonly IPaymentRepository _paymentRepository;
+        //private readonly IPaymentRepository _paymentRepository;
 
-        public PaymentService(IPaymentRepository paymentRepository)
+        //public PaymentService(IPaymentRepository paymentRepository)
+        //{
+        //    _paymentRepository = paymentRepository;
+        //}
+
+        //public async Task AddPaymentAsync(Payment payment)
+        //{
+        //    await _paymentRepository.AddPaymentAsync(payment);
+        //}
+
+        private readonly ApplicationDbContext _context;
+
+        public PaymentService(ApplicationDbContext context)
         {
-            _paymentRepository = paymentRepository;
+            _context = context;
         }
 
         public async Task AddPaymentAsync(Payment payment)
         {
-            await _paymentRepository.AddPaymentAsync(payment);
+            _context.Payments.Add(payment);
+            await _context.SaveChangesAsync();
         }
     }
 }

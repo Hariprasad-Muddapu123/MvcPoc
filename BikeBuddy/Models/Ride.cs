@@ -39,6 +39,8 @@ namespace BikeBuddy.Models
         [Required]
         public String TotalAmount { get; set; }
 
+        public string? CancellationReason { get; set; }
+
         // Navigation properties
         public User User { get; set; } // Foreign Key Relationship with User
         public Bike Bike { get; set; } // Foreign Key Relationship with Bike

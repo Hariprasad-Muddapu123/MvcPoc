@@ -107,6 +107,8 @@ namespace BikeBuddy.Controllers
                 case 500:
                     // Handle 500 Server Error.
                     return View("ServerError");
+                case 440:
+                    return View("SessionExpired");
                 default:
                     // Handle other errors.
                     return View("Error");

@@ -16,11 +16,13 @@
                     <th>Status</th>
                     <th>Rental Hours</th>
                     <th>Bill Paid</th>
+                    <th>Cancel</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var ride in Model)
                 {
+                    var canCancel = (DateTime.Parse(ride.PickupDateTime) - DateTime.Now).TotalDays > 1;
                     <tr>
                         <td>@ride.RideId</td>
                         <td>@ride.PickupDateTime</td>
@@ -28,6 +30,20 @@
                         <td>@ride.RentalStatus</td>
                         <td>@(decimal.Parse(ride.RentedHours).ToString("F2"))</td>
                         <td>@(decimal.Parse(ride.TotalAmount).ToString("F2"))</td>
+                        <td>
+                            @if (canCancel && ride.RentalStatus!=RentStatus.Canceled)
+                            {
+                                <form method="get" asp-action="CancelRide" asp-controller="RentRide" asp-route-id="@ride.RideId">
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        Cancel
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Not Allowed</span>
+                            }
+                        </td>
                     </tr>
                 }
             </tbody>

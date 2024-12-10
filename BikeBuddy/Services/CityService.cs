@@ -1,17 +1,28 @@
 ﻿namespace BikeBuddy.Services
 {
-    public class CityService : ICityService
+    public class CityService
     {
-        private readonly ICityRepository _cityRepository;
+        //private readonly ICityRepository _cityRepository;
 
-        public CityService(ICityRepository cityRepository)
+        //public CityService(ICityRepository cityRepository)
+        //{
+        //    _cityRepository = cityRepository;
+        //}
+
+        //public async Task<List<City>> GetAllCitiesAsync()
+        //{
+        //    return await _cityRepository.GetAllCitiesAsync();
+        //}
+        private readonly ApplicationDbContext _context;
+
+        public CityService(ApplicationDbContext context)
         {
-            _cityRepository = cityRepository;
+            _context = context;
         }
 
         public async Task<List<City>> GetAllCitiesAsync()
         {
-            return await _cityRepository.GetAllCitiesAsync();
+            return await _context.Cities.ToListAsync();
         }
     }
 

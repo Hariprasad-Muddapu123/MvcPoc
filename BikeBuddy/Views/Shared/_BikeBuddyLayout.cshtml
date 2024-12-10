@@ -51,7 +51,10 @@
                         }
                         else
                         { 
+                            <div class="flex flex-lg-row">
+                            <form><button asp-controller="Account" asp-action="signup">Signup</button></form>
                             <form><button asp-controller="Account" asp-action="login">Login</button></form>
+                            </div>
                         }
                     </li>
 
@@ -59,7 +62,7 @@
             </div>
         </nav>
     </header>
-    <div style="margin-top:80px" >
+    <div style="margin-top:120px" >
             @RenderBody()   
     </div>
     <footer>
