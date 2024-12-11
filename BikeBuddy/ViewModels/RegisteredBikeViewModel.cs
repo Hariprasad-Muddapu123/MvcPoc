@@ -8,5 +8,6 @@
         public List<Bike> Bikes {  get; set; }
 
         public List<String> BikeLocation { get; set; }
+
     }
 }

@@ -95,20 +95,21 @@ footer .bottom-container p {
 }
 
 .dropdown-menu {
-    display: none!important;
+    display: none !important;
     position: absolute;
-    
 }
+
 .dropdown-menu.show {
     display: block !important;
 }
+
 #dropdownmenulink {
-    background-color: #f97316 !important; 
+    background-color: #f97316 !important;
     color: white;
 }
 
 #dropdownmenulink:hover {
-    background-color: #f97316 !important; 
+    background-color: #f97316 !important;
     color: white;
 }
    

@@ -1,5 +1,4 @@
-﻿using BikeBuddy.Models;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json;
 
 namespace BikeBuddy.Controllers
@@ -74,28 +73,15 @@ namespace BikeBuddy.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> KycDetails()
-        {
-            var dashboardData = TempData["FilteredData"] != null
-               ? JsonConvert.DeserializeObject<AdminDashboardViewModel>((string)TempData["FilteredData"])
-               : await GetDashboardDataAsync();
-                    return View(dashboardData);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> ByStatus(KycStatus? kycStatus = null)
+        public async Task<IActionResult> KycDetails(KycStatus? kycStatus = null)
         {
             var dashboardData = GetDashboardDataFromTempData() ?? await GetDashboardDataAsync();
             if (kycStatus.HasValue)
             {
                 dashboardData.Users = dashboardData.Users
-                    .Where(b => b.KycStatus == kycStatus.Value);
+                    .Where(b => b.KycStatus == kycStatus.Value).ToList();
             }
-            TempData["FilteredData"] = JsonConvert.SerializeObject(dashboardData,new JsonSerializerSettings
-            {
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-            });
-            return RedirectToAction("KycDetails");
+            return View("KycDetails",dashboardData);
         }
         [HttpGet]
         public async Task<IActionResult> SearchByUsername(string username, string targetView)
@@ -179,16 +165,9 @@ namespace BikeBuddy.Controllers
             }
             return RedirectToAction("KycDetails");
         }
+
         [HttpGet]
-        public async Task<IActionResult> BikeDetails()
-        {
-            var dashboardData = TempData["BikeFilteredData"] != null
-               ? JsonConvert.DeserializeObject<AdminDashboardViewModel>((string)TempData["BikeFilteredData"])
-               : await GetDashboardDataAsync();
-            return View(dashboardData);
-        }
-        [HttpGet]
-        public async Task<IActionResult> BikeStatus(KycStatus? kycStatus = null)
+        public async Task<IActionResult> BikeDetails(KycStatus? kycStatus = null)
         {
 
             var dashboardData = GetDashboardDataFromTempData() ?? await GetDashboardDataAsync();
@@ -201,17 +180,13 @@ namespace BikeBuddy.Controllers
                     {
                         Id = user.Id,
                         UserName = user.UserName,
+                        Email=user.Email,
                         Bikes = user.Bikes.Where(bike => bike.KycStatus == kycStatus.Value).ToList()
                     })
                     .ToList();
             }
 
-            TempData["BikeFilteredData"] = JsonConvert.SerializeObject(dashboardData, new JsonSerializerSettings
-            {
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-            });
-
-            return RedirectToAction("BikeDetails");
+            return View("BikeDetails",dashboardData);
         }
 
 

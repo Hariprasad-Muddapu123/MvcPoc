@@ -14,6 +14,7 @@ namespace BikeBuddy.ViewModels
         [Display(Name = "Password")]
         [DataType(DataType.Password)]
         public string Password { get; set; }
+        public string? ReturnUrl { get; set; }
         public IEnumerable<AuthenticationScheme>? Schemes { get; set; }
     }
 }

@@ -24,7 +24,11 @@
                         <td>@bike.BikeNumber</td>
                         <td>@bike.BikeLocation</td>
                         <td>
-                            @if (bike.AvailableUpto <= DateTime.Now)
+                            @if(bike.KycStatus==KycStatus.Pending)
+                            {
+                                <span>Yet to approved</span>
+                            }
+                            else if (bike.AvailableUpto <= DateTime.Now)
                             {
                                 <span >Completed - Your rented bike period ended on @bike.AvailableUpto</span>
                             }

@@ -1,7 +1,5 @@
-﻿
-using BikeBuddy.Filters;
+﻿using BikeBuddy.Filters;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 namespace BikeBuddy.Controllers
 {
@@ -27,14 +25,10 @@ namespace BikeBuddy.Controllers
 
         [HttpGet]
         [ServiceFilter(typeof(BlockedUserFilter))]
+        [Authorize]
         public async Task<IActionResult> Rent()
         {
             var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                TempData["Message"] = "Please log in to continue.";
-                return RedirectToAction("Login", "Account");
-            }
             List<Bike> bikes=(List<Bike>) await _bikeService.GetAllBikes();
             var userBikes = bikes
                    .Where(b => b.UserId.Equals(user.Id) && !b.IsRemoved)
@@ -153,6 +147,7 @@ namespace BikeBuddy.Controllers
         public async Task<IActionResult> DisplayBikes(string SearchAddress, string SearchModel, string SearchLocation, string[] SelectedAddresses,string[] SelectedModels)
         {
             List<Bike> bikes = (List<Bike>)await _bikeService.GetAllBikes();
+
             string? currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             bikes = bikes.Where(bike => bike.UserId != currentUserId).ToList();
@@ -175,7 +170,7 @@ namespace BikeBuddy.Controllers
                 BikesAddress = bikes.Select(b => b.BikeAddress).Distinct().ToList(),
                 BikeModels = bikes.Select(b => b.BikeModel).Distinct().ToList()
             };
-
+            ViewBag.Location = SearchLocation;
             return View(viewModel);
         }
 
@@ -250,22 +245,16 @@ namespace BikeBuddy.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> BookBike()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                TempData["Message"] = "Please log in to continue.";
-                return RedirectToAction("Login", "Account");
-            }
-
             if (user.KycStatus != KycStatus.Approved)
             {
                 TempData["Message"] = "Your KYC status is pending approval. You cannot book a bike until all required documents are uploaded and verified.";
                 return RedirectToAction("Profile", "User");
             }
-
             var totalPrice = HttpContext.Session.GetString("TotalPrice");
             var rentedHours = HttpContext.Session.GetString("RentedHours");
             var gst = HttpContext.Session.GetString("Gst");

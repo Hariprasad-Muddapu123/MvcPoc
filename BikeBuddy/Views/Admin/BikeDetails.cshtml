@@ -36,9 +36,9 @@
 <div class="bg-white p-6 rounded shadow-md">
     <div class="flex justify-between items-center mb-4">
         <div class="filters mb-4">
-            <a asp-action="BikeStatus" asp-controller="Admin" asp-route-kycStatus="Pending" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">Pending</a>
-            <a asp-action="BikeStatus" asp-route-kycStatus="Approved" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Approved</a>
-            <a asp-action="BikeStatus" asp-route-kycStatus="Rejected" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Rejected</a>
+            <a asp-action="BikeDetails" asp-controller="Admin" asp-route-kycStatus="@(KycStatus.Pending)" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">Pending</a>
+            <a asp-action="BikeDetails" asp-route-kycStatus="@KycStatus.Approved" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Approved</a>
+            <a asp-action="BikeDetails" asp-route-kycStatus="@KycStatus.Rejected" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Rejected</a>
         </div>
         <div class="flex justify-between  space-x-1 items-center">
             @await Html.PartialAsync("_SearchForm")

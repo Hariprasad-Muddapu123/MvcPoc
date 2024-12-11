@@ -1,4 +1,4 @@
-﻿@model BikeBuddy.ViewModels.UserDetailsViewModel
+﻿@model UserDetailsViewModel
 @{
     Layout = "_AdminLayout";
 }
@@ -24,7 +24,7 @@
                 <span>No Aadhaar image uploaded.</span>
             }
         </p>
-        </br>
+        <br>
         <p>
             <strong>Driving License:</strong>
             @if (Model.DrivingLicenseImage != null)

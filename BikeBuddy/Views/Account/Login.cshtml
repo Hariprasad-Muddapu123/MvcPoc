@@ -11,6 +11,7 @@
         <h2 class="text-2xl font-bold mb-6 text-center">Login</h2>
         @Html.ValidationSummary()
         <form asp-action="login" method="post">
+            <input type="text" asp-for="ReturnUrl" hidden value="@Model.ReturnUrl" />
             <div class="mb-4">
                 <label class="block text-sm font-medium mb-2">User Name</label>
                 <div class="flex items-center border-b border-gray-300 py-2">
