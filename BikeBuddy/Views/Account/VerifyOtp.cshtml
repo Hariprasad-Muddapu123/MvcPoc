@@ -15,16 +15,17 @@
         <div class="card">
             <h2 class="text-center text-2xl font-bold text-gray-800 mb-4">Verify OTP</h2>
             @Html.ValidationSummary()
-
             <form asp-action="VerifyOtp" method="post">
                 <input type="hidden" asp-for="Email" />
+                <input type="hidden" asp-for="ExpirationTime" value="@Model.ExpirationTime.ToString(@"hh\:mm\:ss")" />
                 <div class="mb-4">
                     <label for="otp" class="block text-gray-700 font-medium mb-2">Enter OTP:</label>
                     <input type="number" id="otp" name="Otp" asp-for="Otp"
                            class="form-control" placeholder="Enter OTP" required />
                     <span asp-validation-for="Otp" class="text-danger error-message"></span>
                 </div>
-
+                <div >@Model.ExpirationTime</div>
+                <div id="expirationCountDown" data-otp-count="@Model.ExpirationTime.TotalSeconds"></div>
                 <div id="otp-timer" class="timer-container"></div>
 
                 <button type="submit" id="verifyButton" class="btn w-full">

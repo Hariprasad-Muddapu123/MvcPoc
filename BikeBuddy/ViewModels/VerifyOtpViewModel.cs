@@ -10,5 +10,7 @@ namespace BikeBuddy.ViewModels
 
 		[Required]
 		public string Otp { get; set; }
+
+		public TimeSpan ExpirationTime {  get; set; }
 	}
 }

@@ -1,6 +1,7 @@
 ﻿
-    document.addEventListener("DOMContentLoaded", function () {
-    let timeRemaining = 10*60; // 10 minutes in seconds
+document.addEventListener("DOMContentLoaded", function () {
+    const expirationCountDown = document.getElementById("expirationCountDown");
+    let timeRemaining = parseInt(expirationCountDown.dataset.otpCount, 10);// 10 minutes in seconds
     const timerElement = document.getElementById("otp-timer");
     const resendButton = document.getElementById("resendOtpButton");
     const resendMessage = document.getElementById("resendMessage");
@@ -15,14 +16,15 @@
     timerElement.textContent = `OTP expires in: ${minutes}m ${seconds}s`;
 
                 if (timeRemaining > 0) {
-        timeRemaining--;
-    setTimeout(updateTimer, 1000);
-                } else {
-        timerElement.textContent = "OTP has expired. Please request a new one.";
-    otpInput.disabled = true;
-    verifyButton.disabled = true;
-    verifyButton.classList.add("button-disabled");
-    resendButton.disabled = false; // Allow resend
+                        timeRemaining--;
+                    setTimeout(updateTimer, 1000);
+                }
+                else {
+                    timerElement.textContent = "OTP has expired. Please request a new one.";
+                    otpInput.disabled = true;
+                    verifyButton.disabled = true;
+                    verifyButton.classList.add("button-disabled");
+                    resendButton.disabled = false; // Allow resend
                 }
             }
 
@@ -30,8 +32,9 @@
     updateTimer();
 
     // Resend OTP functionality
-    resendButton.addEventListener("click", function () {
-                const email = document.getElementById("emailInput").value;
+        resendButton.addEventListener("click", function () {
+            clearTimeout(timerId);
+            const email = document.getElementById("emailInput").value;
 
     if (!email) {
         resendMessage.textContent = "Email is required to resend OTP.";

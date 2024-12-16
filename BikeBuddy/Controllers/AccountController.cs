@@ -11,6 +11,7 @@ namespace BikeBuddy.Controllers
         private readonly RoleManager<IdentityRole> roleManager;
         public readonly EmailSender emailSender;
 		private readonly IMemoryCache memoryCache;
+        private static DateTime expirationTime;
 
         /// <summary>
         /// Constructor to initialize dependencies for the AccountController.
@@ -144,8 +145,11 @@ namespace BikeBuddy.Controllers
                     if (!user.EmailConfirmed)
                     {
                         await SendOtpAsync(user.Email);
+                        expirationTime = DateTime.Now.AddMinutes(10);
+                        var countdownTime = expirationTime - DateTime.Now;
+                      
                         ViewBag.Message = "An OTP has been sent to your email for verification.";
-                        return RedirectToAction("VerifyOtp", new { Email = user.Email});
+                        return RedirectToAction("VerifyOtp", new { Email = user.Email, ExpirationTime = countdownTime});
                     }
                     else
                     {
@@ -204,10 +208,10 @@ namespace BikeBuddy.Controllers
         /// <param name="email">The email address of the user to verify.</param>
         /// <returns>The OTP verification view with the user's email passed as a model.</returns>
         [HttpGet]
-		public IActionResult VerifyOtp(string email)
+		public IActionResult VerifyOtp(string email,TimeSpan expirationTime)
 		{
-			var model = new VerifyOtpViewModel { Email = email };
-			return View(model);
+			var model = new VerifyOtpViewModel { Email = email, ExpirationTime= expirationTime };
+            return View(model);
 		}
 
         /// <summary>
@@ -234,6 +238,8 @@ namespace BikeBuddy.Controllers
                 ModelState.AddModelError("", "The OTP is invalid.");
 				return View(model);
 			}
+            var countdownTime = expirationTime - DateTime.Now;
+            model.ExpirationTime = countdownTime;
 
             // Find the user by email and mark their email as confirmed.
             var user = await userManager.FindByEmailAsync(model.Email);
