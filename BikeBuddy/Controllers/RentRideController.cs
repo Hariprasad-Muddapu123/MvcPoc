@@ -100,7 +100,9 @@ namespace BikeBuddy.Controllers
                 RegistrationDate = DateTime.UtcNow,
                 AvailableUpto = model.AvailableUpto,
                 BikeImageBytes = model.BikeImageBytes,
-                BikeDocumentsBytes = model.BikeDocumentsBytes
+                BikeDocumentsBytes = model.BikeDocumentsBytes,
+                Latitude = model.Latitude,     
+                Longitude = model.Longitude
             };
         }
 

@@ -41,6 +41,10 @@ namespace BikeBuddy.Models
         public DateTime? RemovedDate { get; set; }
         public bool IsRemoved { get; set; }
 
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+
+
         // Navigation property to User (One-to-Many)
         public User User { get; set; }
 

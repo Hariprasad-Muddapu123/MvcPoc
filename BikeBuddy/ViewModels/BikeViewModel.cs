@@ -37,6 +37,9 @@ namespace BikeBuddy.ViewModels
 
         public byte[]? BikeDocumentsBytes { get; set; }
 
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+
         //public String? UserId {  get; set; }//Foriegn Key to user
     }
 }

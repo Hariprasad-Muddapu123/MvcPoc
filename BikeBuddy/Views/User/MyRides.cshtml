@@ -3,19 +3,24 @@
 <head>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script async defer
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAvDqyvZprgTJ6GxYo89BtLPTCPScHdnpg">
+    </script>
 </head>
 <body>
     <div class="container min-vh-100 py-5">
-                <h2 class="text-center mb-4">Bikes Ride by User</h2>
+        <h2 class="text-center mb-4">Bikes Ride by User</h2>
         <table class="table table-bordered table-hover table-striped">
             <thead class="thead-dark">
                 <tr>
                     <th>Ride ID</th>
+                    <th>Bike Model</th>
                     <th>Pick-Up Date & Time</th>
                     <th>Drop-Off Date & Time</th>
                     <th>Status</th>
                     <th>Rental Hours</th>
                     <th>Bill Paid</th>
+                    <th>Show Route</th>
                     <th>Cancel</th>
                 </tr>
             </thead>
@@ -23,20 +28,34 @@
                 @foreach (var ride in Model)
                 {
                     var canCancel = (DateTime.Parse(ride.PickupDateTime) - DateTime.Now).TotalDays > 1;
+
                     <tr>
                         <td>@ride.RideId</td>
+                        <td>@ride.Bike.BikeModel</td>
                         <td>@ride.PickupDateTime</td>
                         <td>@ride.DropoffDateTime</td>
                         <td>@ride.RentalStatus</td>
                         <td>@(decimal.Parse(ride.RentedHours).ToString("F2"))</td>
                         <td>@(decimal.Parse(ride.TotalAmount).ToString("F2"))</td>
                         <td>
-                            @if (canCancel && ride.RentalStatus!=RentStatus.Canceled)
+                            @if (ride.Bike.Latitude != null && ride.Bike.Longitude != null)
+                            {
+                                <button type="button"
+                                        class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg"
+                                        onclick="loadRoute(@ride.Bike.Latitude, @ride.Bike.Longitude)">
+                                    <i class="fas fa-map-marker-alt mr-2"></i> Show Route
+                                </button>
+                            }
+                            else
+                            {
+                                <span class="text-muted">No Location</span>
+                            }
+                        </td>
+                        <td>
+                            @if (canCancel && ride.RentalStatus != RentStatus.Canceled)
                             {
                                 <form method="get" asp-action="CancelRide" asp-controller="RentRide" asp-route-id="@ride.RideId">
-                                    <button type="submit" class="btn btn-danger btn-sm">
-                                        Cancel
-                                    </button>
+                                    <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
                                 </form>
                             }
                             else
@@ -48,7 +67,70 @@
                 }
             </tbody>
         </table>
+
+        <!-- Map container -->
+        <div id="map" style="height: 500px; width: 100%; display: none;"></div>
     </div>
+
+    <script>
+        let map, directionsService, directionsRenderer;
+
+        // Initialize Google Maps components
+        function initMap() {
+            if (!map) {
+                map = new google.maps.Map(document.getElementById('map'), {
+                    zoom: 12,
+                    center: { lat: 0, lng: 0 } // Placeholder coordinates
+                });
+
+                directionsService = new google.maps.DirectionsService();
+                directionsRenderer = new google.maps.DirectionsRenderer({
+                    map: map
+                });
+            }
+        }
+
+        // Load route from user's location to bike location
+        function loadRoute(bikeLat, bikeLng) {
+            initMap();
+            document.getElementById('map').style.display = 'block'; // Show the map container
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    const userLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+
+                    const bikeLocation = {
+                        lat: parseFloat(bikeLat),
+                        lng: parseFloat(bikeLng)
+                    };
+
+                    // Center the map at user's location
+                    map.setCenter(userLocation);
+
+                    // Request route between user's location and bike's location
+                    const request = {
+                        origin: userLocation,
+                        destination: bikeLocation,
+                        travelMode: google.maps.TravelMode.DRIVING
+                    };
+
+                    directionsService.route(request, function (response, status) {
+                        if (status === google.maps.DirectionsStatus.OK) {
+                            directionsRenderer.setDirections(response);
+                        } else {
+                            alert('Could not display route: ' + status);
+                        }
+                    });
+                }, function () {
+                    alert('Unable to retrieve your location. Please enable location access.');
+                });
+            } else {
+                alert('Geolocation is not supported by this browser.');
+            }
+        }
+    </script>
 </body>
 </html>
-

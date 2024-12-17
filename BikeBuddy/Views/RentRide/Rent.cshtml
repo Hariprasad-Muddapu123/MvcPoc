@@ -3,6 +3,23 @@
 <head>
     <title>Register Your Bike</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function (position) {
+                        document.getElementById("latitude").value = position.coords.latitude;
+                        document.getElementById("longitude").value = position.coords.longitude;
+                    },
+                    function (error) {
+                        alert("Unable to retrieve your location. Please allow location access.");
+                    }
+                );
+            } else {
+                alert("Geolocation is not supported by your browser.");
+            }
+        }
+    </script>
 </head>
 <body class="bg-white">    
     <div class="flex flex-col justify-center items-center space-y-6 px-8">
@@ -60,6 +77,23 @@
                         <label class="block text-gray-700">Bike Documents<span class="text-danger">*</span></label>
                         <input asp-for="NewBike.BikeDocuments" class="w-full p-2 border border-orange-500 rounded" type="file" accept=".pdf" />
                     </div>
+
+                    <!-- Location Update Fields -->
+                    <div class="mb-4">
+                        <label class="block text-gray-700">Latitude</label>
+                        <input asp-for="NewBike.Latitude" id="latitude" class="w-full p-2 border border-orange-500 rounded" placeholder="Latitude" readonly />
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700">Longitude</label>
+                        <input asp-for="NewBike.Longitude" id="longitude" class="w-full p-2 border border-orange-500 rounded" placeholder="Longitude" readonly />
+                    </div>
+
+                    <div class="mb-4">
+                        <button type="button" onclick="getLocation()" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
+                            Get Current Location
+                        </button>
+                    </div>
+
                     <button type="submit" class="w-full bg-orange-500 text-white p-2 rounded hover:bg-orange-600">
                         Register
                     </button>
