@@ -1,6 +1,7 @@
 ﻿@model BikeBuddy.ViewModels.AdminDashboardViewModel;
 @{
     Layout = "_AdminLayout";
+    ViewData["Title"] = "BikeDetails";
     ViewData["TargetView"] = "BikeDetails";
 }
 <div class="bg-white p-6 rounded shadow-md mb-6 ">
@@ -54,6 +55,7 @@
                 <th class="border p-2">Bike Id</th>
                 <th class="border p-2">Model</th>
                 <th class="border p-2">Location</th>
+                <th class="border p-2">Reviewed By</th>
                 <th class="border p-2">Status</th>
                 <th class="border p-2">Actions</th>
             </tr>
@@ -75,6 +77,7 @@
                                 <td class="border p-2">@bike.BikeId</td>
                                 <td class="border p-2">@bike.BikeModel</td>
                                 <td class="border p-2">@bike.BikeLocation</td>
+                                <td class="border p-2">@bike.ReviewedByAdmin</td>
                                 <td class="border p-2">@bike.KycStatus</td>
                                 <td class="border p-2 ">
                                     <form class="text-center" asp-action="ApproveOrRejectBike" method="post">

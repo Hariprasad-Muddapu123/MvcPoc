@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using BikeBuddy.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System.Security.Claims;
 
 namespace BikeBuddy.Controllers
 {
@@ -151,8 +154,9 @@ namespace BikeBuddy.Controllers
         public async Task<IActionResult> ApproveOrRejectKyc(string userId, string action, string? rejectionReason)
         {
             bool isApproved = action == "approve";
-            var result = await _adminDashboardService.UpdateKycStatus(userId, isApproved);
-
+            var adminName = User.FindFirstValue(ClaimTypes.Name);
+            if (adminName == null) return NotFound();
+            var result = await _adminDashboardService.UpdateKycStatus(userId, isApproved, adminName);
             if (result)
             {
                 await GetDashboardDataAsync();
@@ -189,8 +193,6 @@ namespace BikeBuddy.Controllers
             return View("BikeDetails",dashboardData);
         }
 
-
-
         [HttpGet]
         public async Task<IActionResult> ViewBikeDetails(int bikeId)
         {
@@ -225,7 +227,9 @@ namespace BikeBuddy.Controllers
         public async Task<IActionResult> ApproveOrRejectBike(int bikeId, string action,string? rejectionReason)
         {
             bool isApproved = action == "approve";
-            var result = await _adminDashboardService.UpdateBikeStatus(bikeId, isApproved);
+            var adminName = User.FindFirstValue(ClaimTypes.Name);
+            if(adminName == null) return NotFound();  
+            var result = await _adminDashboardService.UpdateBikeStatus(bikeId, isApproved,adminName);
 
             if (result)
             {
@@ -237,7 +241,6 @@ namespace BikeBuddy.Controllers
                     : $"Unfortunately, your bike has been rejected. Reason: {rejectionReason}";
                 await _emailSender.SendEmailAsync(userEmail, subject, body);
             }
-
             return RedirectToAction("BikeDetails");
         }
 

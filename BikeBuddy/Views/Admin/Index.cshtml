@@ -77,5 +77,73 @@
     </div>
 </div>
 
+<!-- Graphs Section -->
+<div class="mt-8 px-8 max-w-7xl w-full">
+    <h2 class="text-3xl font-bold mb-6">Monthly Trends</h2>
 
+    <!-- Monthly User Registrations Graph -->
+    <div class="bg-[#D9D9D9] p-10 rounded-lg shadow-lg transform transition-transform hover:scale-105 mt-8">
+        <h3 class="text-2xl font-bold mb-6">Monthly User Registrations</h3>
+        <canvas id="userRegistrationChart" width="400" height="200" style="background-color: #f0f0f0;"></canvas>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Fetch user registration data from the controller
+    fetch('@Url.Action("GetMonthlyUserRegistrationData", "Admin")')
+        .then(response => response.json())
+        .then(data => {
+            const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const userCounts = Array(12).fill(0); // Initialize array with 12 months (set all counts to 0)
+
+            // Process the data to map the registration counts to the corresponding month
+            data.forEach(entry => {
+                if (entry.Month >= 1 && entry.Month <= 12) {
+                    userCounts[entry.Month - 1] = entry.Count; // Fill the count for the given month (entry.Month - 1 for zero-based index)
+                }
+            });
+
+            // Get the canvas element for the chart
+            const ctx = document.getElementById('userRegistrationChart').getContext('2d');
+
+            // Create the chart
+            new Chart(ctx, {
+                type: 'bar', // Use bar chart type
+                data: {
+                    labels: months, // Labels for each month
+                    datasets: [{
+                        label: 'Users Registered', // Label for the dataset
+                        data: userCounts, // Data array (userCounts)
+                        backgroundColor: 'rgba(75, 192, 192, 0.5)', // Bar color
+                        borderColor: 'rgba(75, 192, 192, 1)', // Border color for bars
+                        borderWidth: 1 // Border width
+                    }]
+                },
+                options: {
+                    responsive: true, // Make the chart responsive
+                    plugins: {
+                        legend: {
+                            position: 'top' // Position the legend at the top
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    return context.dataset.label + ': ' + context.raw; // Display the count in tooltip
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true // Ensure the y-axis starts from 0
+                        }
+                    }
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Error loading chart data:', error); // Log any errors that occur during data fetch
+        });
+</script>
 

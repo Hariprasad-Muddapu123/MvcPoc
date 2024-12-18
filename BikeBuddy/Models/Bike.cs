@@ -27,6 +27,7 @@ namespace BikeBuddy.Models
 
         public KycStatus KycStatus { get; set; }
 
+
         public DateTime RegistrationDate { get; set; }
 
         public DateTime AvailableUpto{ get; set; }
@@ -44,10 +45,11 @@ namespace BikeBuddy.Models
         public double Latitude { get; set; }
         public double Longitude { get; set; }
 
+        public string ReviewedByAdmin { get; set; }
+        public DateTime? ApprovalOrRejectionDate { get; set; }
 
         // Navigation property to User (One-to-Many)
         public User User { get; set; }
-
 
         public ICollection<Ride> Rides { get; set; }
 

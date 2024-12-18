@@ -8,10 +8,10 @@
         Task<IEnumerable<Ride>> GetAllRides();
         Task<User> GetUserById(Guid id);
 
-        Task<bool> UpdateKycStatus(String userId, bool approve);
+        Task<bool> UpdateKycStatus(String userId, bool approve, string adminName);
 
-        Task<IEnumerable<Bike>> GetAllBikes(); // Add this line
-        Task<bool> UpdateBikeStatus(int bikeId, bool isApproved);
+        Task<IEnumerable<Bike>> GetAllBikes();
+        Task<bool> UpdateBikeStatus(int bikeId, bool isApproved,string adminName);
         Task<string> GetUserEmailAsync(string userId);
         Task LogoutAdminAsync();
 

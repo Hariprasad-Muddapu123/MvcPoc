@@ -51,13 +51,15 @@
         }
 
         
-        public async  Task<bool> UpdateKycStatus(String userId, bool approve)
+        public async  Task<bool> UpdateKycStatus(String userId, bool approve, string adminName)
         {
             var users = await _userRepository.GetAllAsync();
             var user = users.FirstOrDefault(u => u.Id == userId.ToString());
             if (user == null) return false;
 
             user.KycStatus = approve ? KycStatus.Approved : KycStatus.Rejected;
+            user.ReviewedByAdmin = adminName;
+            user.ApprovalOrRejectionDate = DateTime.Now;
             await _userRepository.UpdateAsync(user);
             return true;
         }
@@ -73,12 +75,14 @@
         }
 
 
-        public  async Task<bool> UpdateBikeStatus(int bikeId, bool approve)
+        public  async Task<bool> UpdateBikeStatus(int bikeId, bool approve,string adminName)
         {
             var bike =  await _bikeRepository.GetByIdAsync(bikeId);
             if (bike == null) return false;
 
             bike.KycStatus = approve ? KycStatus.Approved : KycStatus.Rejected;
+            bike.ReviewedByAdmin = adminName;
+            bike.ApprovalOrRejectionDate=DateTime.Now;
             await  _bikeRepository.UpdateAsync(bike);
             return true;
         }
