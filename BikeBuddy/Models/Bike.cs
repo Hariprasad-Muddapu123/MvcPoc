@@ -45,7 +45,7 @@ namespace BikeBuddy.Models
         public double Latitude { get; set; }
         public double Longitude { get; set; }
 
-        public string ReviewedByAdmin { get; set; }
+        public string? ReviewedByAdmin { get; set; }
         public DateTime? ApprovalOrRejectionDate { get; set; }
 
         // Navigation property to User (One-to-Many)

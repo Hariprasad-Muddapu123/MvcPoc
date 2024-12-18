@@ -53,6 +53,10 @@ builder.Services.AddScoped<PaymentService>();
 builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
 builder.Services.AddTransient<BlockedUserFilter>();
 
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
+builder.Services.AddHostedService<RideNotificationService>();
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

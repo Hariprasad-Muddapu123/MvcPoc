@@ -3,7 +3,7 @@
     public class BikeAvailabilityService : BackgroundService
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly TimeSpan _interval = TimeSpan.FromMinutes(100);
+        private readonly TimeSpan _interval = TimeSpan.FromMinutes(10);
         public BikeAvailabilityService(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
