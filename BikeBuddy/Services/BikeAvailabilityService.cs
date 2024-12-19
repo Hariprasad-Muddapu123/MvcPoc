@@ -1,9 +1,13 @@
-﻿namespace BikeBuddy.Services
+﻿using BikeBuddy.Notification;
+using BikeBuddy.Repositories;
+using Microsoft.AspNetCore.SignalR;
+
+namespace BikeBuddy.Services
 {
     public class BikeAvailabilityService : BackgroundService
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly TimeSpan _interval = TimeSpan.FromMinutes(10);
+        private readonly TimeSpan _interval = TimeSpan.FromMinutes(1);
         public BikeAvailabilityService(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
@@ -14,6 +18,7 @@
             {
                 await UpdateBikeAvailability();
                 await UpdateRideStatus();
+                await Notification();
                 await Task.Delay(_interval, stoppingToken);
             }
         }
@@ -71,5 +76,47 @@
                 }
             }
         }
+
+        private async Task Notification()
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var rideRepository = scope.ServiceProvider.GetRequiredService<IRideRepository>();
+                var hubContext = scope.ServiceProvider.GetRequiredService<IHubContext<NotificationHub>>();
+
+                var ongoingRides = await rideRepository.GetAllRidesAsync();
+                var currentTime = DateTime.UtcNow;
+
+
+                foreach (var ride in ongoingRides)
+                {
+                    DateTime.TryParse(ride.PickupDateTime, out var pickupDateTime);
+                    DateTime.TryParse(ride.DropoffDateTime, out var dropoffDateTime);
+                    var pickupTimeDifference = pickupDateTime - currentTime;
+
+                    if (pickupTimeDifference.TotalMinutes <=30) //&& pickupTimeDifference.TotalMinutes >= 29)
+                    {
+                        await hubContext.Clients.User(ride.UserId.ToString())
+                            .SendAsync("ReceiveNotification", $"Your ride for the bike '{ride.RideId}' is scheduled to begin in 30 minutes. Please be prepared.");
+
+                        Console.WriteLine($"Notification sent for ride: {ride.RideId} to user: {ride.UserId}");
+                    }
+
+                    TimeSpan dropOffTimeDifference = dropoffDateTime - DateTime.UtcNow;
+                    if (dropOffTimeDifference.TotalMinutes <= 10 && dropOffTimeDifference.TotalMinutes > 9)
+                    {
+                        await hubContext.Clients.User(ride.UserId.ToString())
+                            .SendAsync("ReceiveNotification", $"Your ride for the bike '{ride.RideId}' is scheduled to end in 10 minutes. Please be ready to submit the bike.");
+
+                        Console.WriteLine($"Notification sent for bike submission for ride: {ride.RideId} to user: {ride.UserId}");
+                    }
+
+                }
+            }
+        }
+
+
     }
 }
+
+

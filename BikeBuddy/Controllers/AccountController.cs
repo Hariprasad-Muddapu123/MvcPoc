@@ -139,8 +139,10 @@ namespace BikeBuddy.Controllers
             {
                 // Find the user by username
                 var user = await userManager.FindByNameAsync(model.UserName);
-                if (user != null)
+                var res = await userManager.CheckPasswordAsync(user, model.Password);
+                if (user != null &&  res)
                 {
+
                     // Check if the user's email is confirmed
                     if (!user.EmailConfirmed)
                     {
@@ -193,8 +195,7 @@ namespace BikeBuddy.Controllers
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid User Name.");
-                    ViewBag.Message = "User does not exist.";
+                    ModelState.AddModelError(string.Empty, "Invalid User Name or password");
                 }
             }
             // Populate external authentication schemes and re-display the login view

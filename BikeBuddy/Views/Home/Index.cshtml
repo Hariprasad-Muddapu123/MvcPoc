@@ -6,25 +6,7 @@
     <title>Bike Buddy</title>
     <script src="https://cdn.tailwindcss.com">
     </script>
-    <script>
-
-        // function toggleActive(activeId, inactiveId) {
-        //     document.getElementById(inactiveId).classList.remove("bg-orange-500", "text-white");
-        //     document.getElementById(inactiveId).classList.add("border-orange-500", "text-orange-500");
-        //     document.getElementById(activeId).classList.add("bg-orange-500", "text-white");
-        //     document.getElementById(activeId).classList.remove("border-orange-500", "text-orange-500");
-        // }
-        // window.onload = function () {
-        //     const params = new URLSearchParams(window.location.search);
-        //     const serviceType = params.get('type');
-        //     if (serviceType === 'owner') {
-        //         toggleActive('ownerButton', 'riderButton');
-        //     }
-        //     else if (serviceType === 'rider') {
-        //         toggleActive('riderButton', 'ownerButton');
-        //     }
-        // }
-    </script>
+    <script src="~/js/ownerrider.js"></script>  
 </head>
 <body class="font-roboto">
     <div class="container mx-auto p-4">
@@ -42,21 +24,16 @@
                     A platform to connect the "Bike-User" who has need of the bike and "Bike-Owner" rent to earn without any third-party rental shop.
                 </p>
                 <div class="flex space-x-4  justify-content-center  m-3 rent-group">
-                    <a asp-action="Rent" asp-controller="RentRide">
-                        <button id="rentButton" class="px-12 py-2 border text-white bg-orange-500 rounded-full text-xl">
-                            Rent
-                        </button>
+                    <a asp-action="Rent" asp-controller="RentRide" class="px-12 py-2 border text-white bg-orange-500 rounded-full text-xl">
+                        Rent
                     </a>
 
-                    <a asp-action="Ride" asp-controller="RentRide">
-                        <button id="rideButton" class="px-12 py-2 border border-orange-500 text-orange-500 rounded-full text-xl">
-                            Ride
-                        </button>
+                    <a asp-action="Ride" asp-controller="RentRide" class="px-12 py-2 border text-black border-orange-500 text-orange-500 rounded-full text-xl">
+                        Ride
                     </a>
                 </div>
 
             </div>
-
             <div class="flex-1 p-4 flex items-center justify-center">
                 <img alt="Illustration of two bikes with the text 'Bike Buddy' in the background"
                      src="~/Images/MainPageLogo.png"

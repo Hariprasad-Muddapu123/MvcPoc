@@ -9,7 +9,7 @@
 
         public KycStatus KycStatus { get; set; }
 
-        public string ReviewedByAdmin { get; set; }
+        public string? ReviewedByAdmin { get; set; }
         public DateTime? ApprovalOrRejectionDate { get; set; }
 
         public bool IsBlocked { get; set; }

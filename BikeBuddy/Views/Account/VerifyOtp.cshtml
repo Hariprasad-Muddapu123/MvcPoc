@@ -24,7 +24,6 @@
                            class="form-control" placeholder="Enter OTP" required />
                     <span asp-validation-for="Otp" class="text-danger error-message"></span>
                 </div>
-                <div >@Model.ExpirationTime</div>
                 <div id="expirationCountDown" data-otp-count="@Model.ExpirationTime.TotalSeconds"></div>
                 <div id="otp-timer" class="timer-container"></div>
 

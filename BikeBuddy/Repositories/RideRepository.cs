@@ -36,5 +36,11 @@
                                  .Where(r => r.BikeId == bikeId)
                                  .ToListAsync();
         }
+
+        public async Task<IEnumerable<Ride>> GetAllRidesAsync()
+        {
+            return await _context.Rides.Where(ride =>
+                    ride.RentalStatus == RentStatus.Ongoing).Include(r => r.Bike).ToListAsync();
+        }
     }
 }

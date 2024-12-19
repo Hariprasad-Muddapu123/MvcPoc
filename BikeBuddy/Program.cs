@@ -1,4 +1,5 @@
 using BikeBuddy.Filters;
+using BikeBuddy.Notification;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,7 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+builder.Services.AddSignalR();
 builder.Services.AddAuthentication()
 .AddGoogle(options =>
 {
@@ -40,7 +42,7 @@ builder.Services.AddIdentity<User, IdentityRole>(options =>
 // Add services to the container.
 builder.Services.AddControllersWithViews().AddSessionStateTempDataProvider();
 builder.Services.AddTransient<EmailSender>();
-builder.Services.AddSingleton<BikeAvailabilityService>();
+builder.Services.AddHostedService<BikeAvailabilityService>();
 // Register Repositories
 builder.Services.AddScoped<IBikeRepository, BikeRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -52,9 +54,6 @@ builder.Services.AddScoped<CityService>();
 builder.Services.AddScoped<PaymentService>();
 builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
 builder.Services.AddTransient<BlockedUserFilter>();
-
-builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
-builder.Services.AddHostedService<RideNotificationService>();
 
 
 var app = builder.Build();
@@ -71,6 +70,7 @@ app.UseStatusCodePagesWithReExecute("/Home/HandleError", "?statusCode={0}");
 app.UseSession();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.MapHub<NotificationHub>("/notificationHub");
 app.UseRouting();
 app.UseAuthorization();
 app.MapControllerRoute(

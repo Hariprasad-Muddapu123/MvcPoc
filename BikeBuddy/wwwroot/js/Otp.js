@@ -2,12 +2,13 @@
 document.addEventListener("DOMContentLoaded", function () {
     const expirationCountDown = document.getElementById("expirationCountDown");
     let timeRemaining = parseInt(expirationCountDown.dataset.otpCount, 10);// 10 minutes in seconds
+    let countup = 0;
     const timerElement = document.getElementById("otp-timer");
     const resendButton = document.getElementById("resendOtpButton");
     const resendMessage = document.getElementById("resendMessage");
     const otpInput = document.getElementById("otp");
     const verifyButton = document.getElementById("verifyButton");
-
+    
     // Timer function to show countdown
     function updateTimer() {
                 const minutes = Math.floor(timeRemaining / 60);
@@ -17,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 if (timeRemaining > 0) {
                         timeRemaining--;
-                    setTimeout(updateTimer, 1000);
+                    countup = setTimeout(updateTimer, 1000);
                 }
                 else {
                     timerElement.textContent = "OTP has expired. Please request a new one.";
@@ -32,8 +33,8 @@ document.addEventListener("DOMContentLoaded", function () {
     updateTimer();
 
     // Resend OTP functionality
-        resendButton.addEventListener("click", function () {
-            clearTimeout(timerId);
+   resendButton.addEventListener("click", function () {
+       if (countup) clearTimeout(countup);
             const email = document.getElementById("emailInput").value;
 
     if (!email) {
@@ -60,8 +61,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     .then(data => {
                         if (data.success) {
         resendMessage.textContent = "OTP resent successfully.";
-    resendMessage.classList.remove("text-danger");
-    resendMessage.classList.add("text-green-500");
+        resendMessage.classList.remove("text-danger");
+        resendMessage.classList.add("text-green-500");
 
     // Reset timer and enable input fields
     timeRemaining = 600; // Reset to 10 minutes
