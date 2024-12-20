@@ -12,7 +12,7 @@
 
         public async Task SendMessage(string userId, string message)
         {
-            var senderId = Context.UserIdentifier;  // Get the UserId (Citizen or Officer)
+            var senderId = Context.UserIdentifier;  
 
             // Broadcast the message to the relevant group
             await Clients.Group(userId).SendAsync("ReceiveMessage", message);

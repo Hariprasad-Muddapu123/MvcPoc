@@ -85,7 +85,7 @@ namespace BikeBuddy.Services
                 var hubContext = scope.ServiceProvider.GetRequiredService<IHubContext<NotificationHub>>();
 
                 var ongoingRides = await rideRepository.GetAllRidesAsync();
-                var currentTime = DateTime.UtcNow;
+                var currentTime = DateTime.Now;
 
 
                 foreach (var ride in ongoingRides)
@@ -94,7 +94,7 @@ namespace BikeBuddy.Services
                     DateTime.TryParse(ride.DropoffDateTime, out var dropoffDateTime);
                     var pickupTimeDifference = pickupDateTime - currentTime;
 
-                    if (pickupTimeDifference.TotalMinutes <=30) //&& pickupTimeDifference.TotalMinutes >= 29)
+                    if (pickupTimeDifference.TotalMinutes <=30 && pickupTimeDifference.TotalMinutes >= 29)
                     {
                         await hubContext.Clients.User(ride.UserId.ToString())
                             .SendAsync("ReceiveNotification", $"Your ride for the bike '{ride.RideId}' is scheduled to begin in 30 minutes. Please be prepared.");
@@ -102,7 +102,7 @@ namespace BikeBuddy.Services
                         Console.WriteLine($"Notification sent for ride: {ride.RideId} to user: {ride.UserId}");
                     }
 
-                    TimeSpan dropOffTimeDifference = dropoffDateTime - DateTime.UtcNow;
+                    TimeSpan dropOffTimeDifference = dropoffDateTime - DateTime.Now;
                     if (dropOffTimeDifference.TotalMinutes <= 10 && dropOffTimeDifference.TotalMinutes > 9)
                     {
                         await hubContext.Clients.User(ride.UserId.ToString())
