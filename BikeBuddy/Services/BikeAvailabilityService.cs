@@ -20,7 +20,7 @@ namespace BikeBuddy.Services
                 await UpdateRideStatus();
                 await Notification();
                 await Task.Delay(_interval, stoppingToken);
-            }
+            og}
         }
         private async Task UpdateBikeAvailability()
         {
@@ -83,6 +83,8 @@ namespace BikeBuddy.Services
             {
                 var rideRepository = scope.ServiceProvider.GetRequiredService<IRideRepository>();
                 var hubContext = scope.ServiceProvider.GetRequiredService<IHubContext<NotificationHub>>();
+                var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>(); // Get access to the database
+
 
                 var ongoingRides = await rideRepository.GetAllRidesAsync();
                 var currentTime = DateTime.Now;
@@ -94,25 +96,63 @@ namespace BikeBuddy.Services
                     DateTime.TryParse(ride.DropoffDateTime, out var dropoffDateTime);
                     var pickupTimeDifference = pickupDateTime - currentTime;
 
-                    if (pickupTimeDifference.TotalMinutes <=30 && pickupTimeDifference.TotalMinutes >= 29)
+                    if (pickupTimeDifference.TotalMinutes <=30) //&& pickupTimeDifference.TotalMinutes >= 29)
                     {
-                        await hubContext.Clients.User(ride.UserId.ToString())
-                            .SendAsync("ReceiveNotification", $"Your ride for the bike '{ride.RideId}' is scheduled to begin in 30 minutes. Please be prepared.");
-
-                        Console.WriteLine($"Notification sent for ride: {ride.RideId} to user: {ride.UserId}");
+                        if (NotificationHub.IsUserOnline(ride.UserId.ToString()))
+                        {
+                            await hubContext.Clients.User(ride.UserId.ToString())
+                                .SendAsync("ReceiveNotification", $"Your ride for bike '{ride.RideId}' starts in 30 minutes.");
+                        }
+                        else
+                        {
+                            await StoreNotification(ride.UserId.ToString(), $"Your ride for bike '{ride.RideId}' starts in 30 minutes.");
+                        }
                     }
+                    
 
                     TimeSpan dropOffTimeDifference = dropoffDateTime - DateTime.Now;
-                    if (dropOffTimeDifference.TotalMinutes <= 10 && dropOffTimeDifference.TotalMinutes > 9)
+                    if (dropOffTimeDifference.TotalMinutes <= 10000)// && dropOffTimeDifference.TotalMinutes > 9)
                     {
-                        await hubContext.Clients.User(ride.UserId.ToString())
-                            .SendAsync("ReceiveNotification", $"Your ride for the bike '{ride.RideId}' is scheduled to end in 10 minutes. Please be ready to submit the bike.");
-
-                        Console.WriteLine($"Notification sent for bike submission for ride: {ride.RideId} to user: {ride.UserId}");
+                        if (NotificationHub.IsUserOnline(ride.UserId.ToString()))
+                        {
+                            await hubContext.Clients.User(ride.UserId.ToString())
+                                .SendAsync("ReceiveNotification", $"Your ride for bike '{ride.RideId}' ends in 10 minutes.");
+                        }
+                        else
+                        {
+                            await StoreNotification(ride.UserId.ToString(), $"Your ride for bike '{ride.RideId}' ends in 10 minutes.");
+                        }
                     }
 
                 }
             }
+        }
+
+        // Store notification in the database if the user is offline
+        private async Task StoreNotification(string userId, string message)
+        {
+            using var scope = _serviceProvider.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>(); // Replace ApplicationUser with your User class name
+
+            // Retrieve the user's email using the UserManager
+            var user = await userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                throw new Exception($"User with ID {userId} not found.");
+            }
+
+            var notification = new Models.Notification
+            {
+                UserId = userId,
+                UserEmail = user.Email, // Use the email from the user object
+                Message = message,
+                CreatedAt = DateTime.UtcNow,
+                IsRead = false
+            };
+
+            dbContext.Notifications.Add(notification);
+            await dbContext.SaveChangesAsync();
         }
 
 

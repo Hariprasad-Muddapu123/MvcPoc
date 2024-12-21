@@ -1,5 +1,6 @@
 using BikeBuddy.Filters;
 using BikeBuddy.Notification;
+using BikeBuddy.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,7 +55,7 @@ builder.Services.AddScoped<CityService>();
 builder.Services.AddScoped<PaymentService>();
 builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
 builder.Services.AddTransient<BlockedUserFilter>();
-
+builder.Services.AddScoped<NotificationRepository>();
 
 var app = builder.Build();
 

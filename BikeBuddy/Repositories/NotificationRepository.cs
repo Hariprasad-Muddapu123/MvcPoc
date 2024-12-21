@@ -12,14 +12,14 @@
 
         public async Task AddNotificationAsync(Notification notification)
         {
-            _context.Notifications.Add(notification);
-            await _context.SaveChangesAsync();
+            await _context.Notifications.AddAsync(notification);
         }
 
-        public async Task<IEnumerable<Notification>> GetUnreadNotificationsAsync(string userId)
+        public async Task<List<Notification>> GetUnreadNotificationsAsync(string userId)
         {
             return await _context.Notifications
                 .Where(n => n.UserId == userId && !n.IsRead)
+                .OrderBy(n => n.CreatedAt)
                 .ToListAsync();
         }
 
@@ -31,6 +31,10 @@
             {
                 notification.IsRead = true;
             }
+            await _context.SaveChangesAsync();
+        }
+        public async Task SaveChangesAsync()
+        {
             await _context.SaveChangesAsync();
         }
     }
