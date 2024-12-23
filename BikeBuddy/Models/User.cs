@@ -26,5 +26,8 @@
 
         public ICollection<Payment> Payments { get; set; } // Navigation property
 
+        public ICollection<Wishlist> Wishlists { get; set; } // Add this line
+
+
     }
 }

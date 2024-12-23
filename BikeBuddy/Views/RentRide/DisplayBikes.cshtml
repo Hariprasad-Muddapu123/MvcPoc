@@ -1,9 +1,26 @@
 ﻿@model RegisteredBikeViewModel
+@using System.Security.Claims
 <html>
 <head>
     <title>Bike Rental</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <style>
+        .wishlist-icon i {
+            font-size: 1.5rem; /* Adjust the size of the heart icon */
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+            .wishlist-icon i:hover {
+                color: red; /* Change color on hover */
+            }
+
+        .disabled {
+            cursor: not-allowed;
+        }
+    </style>
+    
 </head>
     <body class="bg-gray-100">
         <div class="container mx-auto p-4">
@@ -79,9 +96,17 @@
                         {
                             foreach (var bike in Model.Bikes)
                             {
+                                var isInWishlist = Model.UserWishlist.Contains(bike.BikeId);
+
                                 <form asp-action="Date" asp-controller="RentRide" method="get"  >
                                     <input type="hidden" name="BikeId" value="@bike.BikeId" />
-                                    <div class="bg-white p-4 rounded shadow-md">
+                                    <div class="bg-white p-4 rounded shadow-md relative">
+                                    <div class="absolute top-2 right-2">
+                                        <i class="fas fa-heart @(isInWishlist ? "text-orange-600" : "text-gray-600") cursor-pointer"
+                                           data-bike-id="@bike.BikeId"
+                                           onclick="addToWishlist(this)" ></i>
+
+                                    </div>
                                         <img alt="Bike Image"
                                              src="@(bike.BikeImageBytes != null ? $"data:image/png;base64,{Convert.ToBase64String(bike.BikeImageBytes)}" : "/images/default-profile.png")"
                                              class="w-full h mb-4" style="height:120px;" />
@@ -93,13 +118,13 @@
                                         @{
                                             if(@bike.Available)
                                             {
-                                                <p class="text-green-600 flex justify-content-center"> Available</p>
-                                                <button class="w-full bg-orange-500 text-white py-2 mt-2 rounded-lg">Book Now</button>
+                                                        <p class="text-green-600 flex justify-content-center"> Available</p>
+                                                        <button class="w-full bg-orange-500 text-white py-2 mt-2 rounded-lg">Book Now</button>
                                             }
                                             else
                                             {
-                                                <p class="text-red-600 flex justify-content-center">Not available</p>
-                                                <button class="w-full bg-gray-400 text-white py-2 mt-2 rounded-lg" disabled>Book Now</button>
+                                                        <p class="text-red-600 flex justify-content-center">Not available</p>
+                                                        <button class="w-full bg-gray-400 text-white py-2 mt-2 rounded-lg" disabled>Book Now</button>
                                             }
                                          }  
                                     </div>
@@ -115,6 +140,31 @@
                 </div>
             </div>
         </div>
+    <script>
+        function addToWishlist(iconElement) {
+            const bikeId = $(iconElement).data('bike-id'); // Correct variable name formatting
+
+            if (!bikeId) {
+                alert('Invalid bike ID.');
+                return;
+            }
+
+            $.ajax({
+                url: '@Url.Action("AddToWishlist", "WishList")',
+                method: 'POST',
+                data: { bikeId: bikeId },
+                success: function (response) {
+                    alert(response.message || 'Bike added to your wishlist!');
+                    $(iconElement).css('color', 'Orange');
+                },
+                error: function (xhr) {
+                    const errorMessage = xhr.responseJSON?.message || 'Error adding bike to wishlist.';
+                    alert(errorMessage);
+                }
+            });
+        }
+    </script>
+
     </body>
 </html>
 

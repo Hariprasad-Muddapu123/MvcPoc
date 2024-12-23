@@ -1,5 +1,5 @@
 ﻿document.addEventListener("DOMContentLoaded", async function () {
-    const userId = "@User.FindFirstValue(ClaimTypes.NameIdentifier)";
+    const userId = '@User.FindFirstValue(ClaimTypes.NameIdentifier)';
 
     if (userId) {
         const connection = new signalR.HubConnectionBuilder()

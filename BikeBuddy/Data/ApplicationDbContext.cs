@@ -21,6 +21,8 @@ namespace BikeBuddy.Data
 
         public DbSet<Payment> Payments { get; set; }
 
+        public DbSet<Wishlist> Wishlists { get; set; }
+
         public DbSet<Models.Notification> Notifications {  get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -68,6 +70,21 @@ namespace BikeBuddy.Data
                 .WithMany(b => b.Payments)
                 .HasForeignKey(p => p.BikeId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Wishlist>()
+            .HasKey(w => w.WishlistId);
+
+            builder.Entity<Wishlist>()
+                .HasOne(w => w.User)
+                .WithMany(w=> w.Wishlists)
+                .HasForeignKey(w => w.UserId)
+                .OnDelete(DeleteBehavior.Restrict); 
+
+            builder.Entity<Wishlist>()
+                .HasOne(w => w.Bike)
+                .WithMany(w=>w.Wishlists)
+                .HasForeignKey(w => w.BikeId)
+                .OnDelete(DeleteBehavior.Cascade); 
 
         }
 

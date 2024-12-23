@@ -1,14 +1,12 @@
 ﻿namespace BikeBuddy.Notification
 {
     using Microsoft.AspNetCore.SignalR;
-    using System.Collections.Concurrent;
     using System.Threading.Tasks;
     using Microsoft.EntityFrameworkCore;
-
     public class NotificationHub : Hub
     {
         private readonly IServiceProvider _serviceProvider;
-        private static readonly ConcurrentDictionary<string, string> _connectedUsers = new();
+        private static List<string> _connectedUsers = new();
 
         public NotificationHub(IServiceProvider serviceProvider)
         {
@@ -20,7 +18,7 @@
         {
             // Add user to the group
             await Groups.AddToGroupAsync(Context.ConnectionId, userId);
-            _connectedUsers[userId] = Context.ConnectionId;
+            _connectedUsers.Add(userId);
             Console.WriteLine($"User {Context.UserIdentifier} joined group {userId}");
         }
 
@@ -33,7 +31,7 @@
                 // Remove user from the group when disconnected
                 await Groups.RemoveFromGroupAsync(Context.ConnectionId, userId);
                 // Remove user from the connected users list
-                _connectedUsers.TryRemove(userId, out _);
+                _connectedUsers.Remove(userId);
                 Console.WriteLine($"User {userId} disconnected.");
             }
 
@@ -63,7 +61,7 @@
         public async Task SendMessage(string userId, string message)
         {
             // Check if user is online
-            if (_connectedUsers.ContainsKey(userId))
+            if (_connectedUsers.Contains(userId))
             {
                 // If user is online, send notification directly
                 await Clients.Group(userId).SendAsync("ReceiveNotification", message);
@@ -96,7 +94,7 @@
         // Method to check if a user is online
         public static bool IsUserOnline(string userId)
         {
-            return _connectedUsers.ContainsKey(userId);
+            return _connectedUsers.Contains(userId);
         }
     }
 }

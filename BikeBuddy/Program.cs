@@ -1,6 +1,5 @@
 using BikeBuddy.Filters;
 using BikeBuddy.Notification;
-using BikeBuddy.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +12,11 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
-builder.Services.AddSignalR();
+builder.Services.AddSignalR(options =>
+{
+    options.KeepAliveInterval = TimeSpan.FromSeconds(10); // How often the server sends keep-alive pings
+    options.ClientTimeoutInterval = TimeSpan.FromSeconds(30); // How long the server waits for a client
+});
 builder.Services.AddAuthentication()
 .AddGoogle(options =>
 {
@@ -56,7 +59,8 @@ builder.Services.AddScoped<PaymentService>();
 builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
 builder.Services.AddTransient<BlockedUserFilter>();
 builder.Services.AddScoped<NotificationRepository>();
-
+builder.Services.AddScoped<WishlistRepository>();
+builder.Services.AddScoped<WishlistService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

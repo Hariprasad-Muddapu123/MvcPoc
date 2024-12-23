@@ -53,7 +53,10 @@ namespace BikeBuddy.Models
 
         public ICollection<Ride> Rides { get; set; }
 
-        public ICollection<Payment> Payments { get; set; } 
+        public ICollection<Payment> Payments { get; set; }
+
+        public ICollection<Wishlist> Wishlists { get; set; } // Add this line
+
 
     }
 }

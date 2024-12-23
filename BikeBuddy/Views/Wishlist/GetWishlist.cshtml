@@ -1,0 +1,71 @@
+﻿@model IEnumerable<BikeBuddy.Models.Bike>
+
+@{
+    ViewData["Title"] = "My Wishlist";
+   // Layout = "_BikeBuddyLayout";
+}
+<html>
+<head>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div class="max-w-7xl mx-auto p-8 min-h-screen">
+        <h1 class="text-2xl font-bold mb-6">My Wishlist</h1>
+
+        @if (Model == null || !Model.Any())
+        {
+            <p class="text-gray-600">Your wishlist is empty.</p>
+        }
+        else
+        {
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                @foreach (var bike in Model)
+                {
+                    <div class="border rounded-lg shadow-lg p-4 bg-white">
+                        <div class="rounded overflow-hidden mb-4">
+                            <img alt="Bike Image"
+                                 src="@(bike.BikeImageBytes != null ? $"data:image/png;base64,{Convert.ToBase64String(bike.BikeImageBytes)}" : "/images/default-profile.png")"
+                                 class="w-full h-48 object-cover" />
+                        </div>
+                        <div class="mb-4">
+                            <div class="flex items-center justify-content-center mb-2">
+                                @if (bike.AvailableUpto > DateTime.Now)
+                                {
+                                    <span class="inline-block px-3 py-1 text-sm font-medium text-green-800 bg-green-100 rounded-full">
+                                        Available
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="inline-block px-3 py-1 text-sm font-medium text-red-800 bg-red-100 rounded-full">
+                                        Not Available
+                                    </span>
+                                }
+                            </div>
+                            <h2 class="text-lg font-semibold mb-2 text-gray-800">
+                                <span class="text-gray-600 font-medium">Model:</span> @bike.BikeModel
+                            </h2>
+                            <h2 class="text-lg font-semibold mb-2 text-gray-800">
+                                <span class="text-gray-600 font-medium">Address:</span> @bike.BikeAddress
+                            </h2>
+                        </div>
+                        <div class="flex flex-col sm:flex-row sm:justify-between gap-4">
+                            <form method="post" action="@Url.Action("RemoveFromWishlist", "Wishlist")" class="w-full sm:w-auto">
+                                <input type="hidden" name="bikeId" value="@bike.BikeId" />
+                                <button type="submit" class="w-full px-6 py-2 bg-red-500 text-white text-lg font-semibold rounded-lg hover:bg-red-600 transition">
+                                    Remove
+                                </button>
+                            </form>
+                            <form asp-action="Date" asp-controller="RentRide" method="get" class="w-full sm:w-auto">
+                                <button class="w-full px-6 py-2 bg-orange-500 text-white text-lg font-semibold rounded-lg hover:bg-orange-700 transition">
+                                    Book Now
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</body>
+</html>

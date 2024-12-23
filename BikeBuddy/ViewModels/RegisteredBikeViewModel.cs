@@ -9,5 +9,8 @@
 
         public List<String> BikeLocation { get; set; }
 
+
+        public List<int> UserWishlist { get; set; }
+
     }
 }

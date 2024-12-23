@@ -1,5 +1,4 @@
 ﻿using BikeBuddy.Notification;
-using BikeBuddy.Repositories;
 using Microsoft.AspNetCore.SignalR;
 
 namespace BikeBuddy.Services
@@ -20,7 +19,7 @@ namespace BikeBuddy.Services
                 await UpdateRideStatus();
                 await Notification();
                 await Task.Delay(_interval, stoppingToken);
-            og}
+            }
         }
         private async Task UpdateBikeAvailability()
         {

@@ -1,4 +1,5 @@
 ﻿using BikeBuddy.Filters;
+using BikeBuddy.Services;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 namespace BikeBuddy.Controllers
@@ -10,13 +11,15 @@ namespace BikeBuddy.Controllers
         private readonly IRideService _rideService;
         private readonly PaymentService _paymentService;
         private readonly CityService _cityService;
-        public RentRideController(UserManager<User> userManager,IBikeService bikeService, IRideService rideService, PaymentService paymentService, CityService cityService)
+        private readonly WishlistService _wishlistService;
+        public RentRideController(UserManager<User> userManager,IBikeService bikeService, IRideService rideService, PaymentService paymentService, CityService cityService,WishlistService wishlistService)
         {
             this._userManager = userManager;
             this._bikeService = bikeService;
             this._rideService = rideService;
             this._paymentService = paymentService;
             this._cityService = cityService;
+            this._wishlistService = wishlistService;
         }
         public IActionResult Index()
         {
@@ -152,6 +155,10 @@ namespace BikeBuddy.Controllers
 
             string? currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
+            var userWishlist = await _wishlistService.GetWishlistAsync(currentUserId);
+            var userWishlistBikeIds = userWishlist.Select(w => w.BikeId).ToList();
+
+
             bikes = bikes.Where(bike => bike.UserId != currentUserId).ToList();
             if (SearchAddress == null && SearchLocation ==null && SearchModel ==null && SelectedAddresses.Length==0 && SelectedModels.Length==0)
             {
@@ -170,7 +177,9 @@ namespace BikeBuddy.Controllers
             {
                 Bikes = bikes,
                 BikesAddress = bikes.Select(b => b.BikeAddress).Distinct().ToList(),
-                BikeModels = bikes.Select(b => b.BikeModel).Distinct().ToList()
+                BikeModels = bikes.Select(b => b.BikeModel).Distinct().ToList(),
+                UserWishlist = userWishlistBikeIds  // Pass only BikeIds here
+
             };
             ViewBag.Location = SearchLocation;
             return View(viewModel);
