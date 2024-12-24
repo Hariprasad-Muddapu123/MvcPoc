@@ -32,7 +32,7 @@ namespace BikeBuddy.Controllers
         public async Task<IActionResult> Rent()
         {
             var user = await _userManager.GetUserAsync(User);
-            List<Bike> bikes=(List<Bike>) await _bikeService.GetAllBikes();
+            List<Bike> bikes = (List<Bike>)await _bikeService.GetAllBikes();
             var userBikes = bikes
                    .Where(b => b.UserId.Equals(user.Id) && !b.IsRemoved)
                    .ToList();
@@ -186,7 +186,7 @@ namespace BikeBuddy.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Date(int bikeId)
+        public  async Task<IActionResult> Date(int bikeId)
         {
             HttpContext.Session.SetString("BikeId",bikeId.ToString());
             return View();

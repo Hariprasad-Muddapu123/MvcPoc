@@ -49,13 +49,13 @@ namespace BikeBuddy.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var dashboardData = await GetDashboardDataAsync();
+            var dashboardData = await _adminDashboardService.GetDashboardData();
             return View(dashboardData);
         }
         [HttpGet]
         public async Task<IActionResult> UserDetails()
         {
-            var dashboardData = GetDashboardDataFromTempData() ?? await GetDashboardDataAsync();
+            var dashboardData = await _adminDashboardService.GetDashboardData();
             return View(dashboardData);
         }
 
@@ -78,7 +78,7 @@ namespace BikeBuddy.Controllers
         [HttpGet]
         public async Task<IActionResult> KycDetails(KycStatus? kycStatus = null)
         {
-            var dashboardData = GetDashboardDataFromTempData() ?? await GetDashboardDataAsync();
+            var dashboardData = await _adminDashboardService.GetDashboardData();
             if (kycStatus.HasValue)
             {
                 dashboardData.Users = dashboardData.Users
@@ -89,7 +89,7 @@ namespace BikeBuddy.Controllers
         [HttpGet]
         public async Task<IActionResult> SearchByUsername(string username, string targetView)
         {
-            var dashboardData = GetDashboardDataFromTempData() ?? await GetDashboardDataAsync();
+            var dashboardData = await _adminDashboardService.GetDashboardData();
             var users = dashboardData.Users;
 
             if (!string.IsNullOrEmpty(username))
@@ -159,7 +159,6 @@ namespace BikeBuddy.Controllers
             var result = await _adminDashboardService.UpdateKycStatus(userId, isApproved, adminName);
             if (result)
             {
-                await GetDashboardDataAsync();
                 var userEmail = await _adminDashboardService.GetUserEmailAsync(userId);
                 string subject = isApproved ? "KYC Approved" : "KYC Rejected";
                 string body = isApproved
@@ -174,7 +173,7 @@ namespace BikeBuddy.Controllers
         public async Task<IActionResult> BikeDetails(KycStatus? kycStatus = null)
         {
 
-            var dashboardData = GetDashboardDataFromTempData() ?? await GetDashboardDataAsync();
+            var dashboardData = await _adminDashboardService.GetDashboardData();
 
             if (kycStatus.HasValue)
             {
@@ -189,7 +188,6 @@ namespace BikeBuddy.Controllers
                     })
                     .ToList();
             }
-
             return View("BikeDetails",dashboardData);
         }
 

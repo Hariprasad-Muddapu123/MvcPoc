@@ -12,11 +12,21 @@ namespace BikeBuddy.Services
             _wishlistRepository = wishlistRepository;
         }
 
-        public async Task AddToWishlistAsync(string userId, int bikeId)
+        public async Task<bool> ToggleWishlistAsync(string userId, int bikeId)
         {
-            await _wishlistRepository.AddToWishlistAsync(userId, bikeId);
-        }
+            var wishlistItem = await _wishlistRepository.GetWishlistAsync(userId);
 
+            if (wishlistItem.Any())
+            {
+                await _wishlistRepository.RemoveFromWishlistAsync(userId, bikeId);
+                return false;
+            }
+            else
+            {
+                await _wishlistRepository.AddToWishlistAsync(userId, bikeId);
+                return true;
+            }
+        }
         public async Task RemoveFromWishlistAsync(string userId, int bikeId)
         {
             await _wishlistRepository.RemoveFromWishlistAsync(userId, bikeId);
@@ -26,6 +36,7 @@ namespace BikeBuddy.Services
         {
             return await _wishlistRepository.GetWishlistAsync(userId);
         }
+        
 
     }
 

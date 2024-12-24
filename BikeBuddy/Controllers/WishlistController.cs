@@ -12,9 +12,8 @@ namespace BikeBuddy.Controllers
         {
             _wishlistService = wishlistService;
         }
-
         [HttpPost]
-        public async Task<IActionResult> AddToWishlist(int bikeId)
+        public async Task<IActionResult> ToggleWishlist(int bikeId)
         {
             if (bikeId <= 0)
                 return BadRequest(new { message = "Invalid bike ID." });
@@ -22,10 +21,10 @@ namespace BikeBuddy.Controllers
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null) return Unauthorized();
 
-            await _wishlistService.AddToWishlistAsync(userId, bikeId);
-            return RedirectToAction("Getwishlist");
+            var isInWishlist = await _wishlistService.ToggleWishlistAsync(userId, bikeId);
+            return Json(new { isInWishlist });
+            //return RedirectToAction("Getwishlist");
         }
-
 
         [HttpPost("remove")]
         public async Task<IActionResult> RemoveFromWishlist(int bikeId)

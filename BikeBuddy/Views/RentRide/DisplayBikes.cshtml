@@ -7,13 +7,13 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
     <style>
         .wishlist-icon i {
-            font-size: 1.5rem; /* Adjust the size of the heart icon */
+            font-size: 1.5rem;
             cursor: pointer;
             transition: color 0.3s ease;
         }
 
             .wishlist-icon i:hover {
-                color: red; /* Change color on hover */
+                color: red;
             }
 
         .disabled {
@@ -104,8 +104,7 @@
                                     <div class="absolute top-2 right-2">
                                         <i class="fas fa-heart @(isInWishlist ? "text-orange-600" : "text-gray-600") cursor-pointer"
                                            data-bike-id="@bike.BikeId"
-                                           onclick="addToWishlist(this)" ></i>
-
+                                           onclick="toggleWishlist(this)"></i>
                                     </div>
                                         <img alt="Bike Image"
                                              src="@(bike.BikeImageBytes != null ? $"data:image/png;base64,{Convert.ToBase64String(bike.BikeImageBytes)}" : "/images/default-profile.png")"
@@ -140,31 +139,35 @@
                 </div>
             </div>
         </div>
-    <script>
-        function addToWishlist(iconElement) {
-            const bikeId = $(iconElement).data('bike-id'); // Correct variable name formatting
+        <script>
+            function toggleWishlist(iconElement) {
+                const bikeId = $(iconElement).data('bike-id');
 
-            if (!bikeId) {
-                alert('Invalid bike ID.');
-                return;
-            }
-
-            $.ajax({
-                url: '@Url.Action("AddToWishlist", "WishList")',
-                method: 'POST',
-                data: { bikeId: bikeId },
-                success: function (response) {
-                    alert(response.message || 'Bike added to your wishlist!');
-                    $(iconElement).css('color', 'Orange');
-                },
-                error: function (xhr) {
-                    const errorMessage = xhr.responseJSON?.message || 'Error adding bike to wishlist.';
-                    alert(errorMessage);
+                if (!bikeId) {
+                    alert('Invalid bike ID.');
+                    return;
                 }
-            });
-        }
-    </script>
 
+                $.ajax({
+                    url: '@Url.Action("ToggleWishlist", "Wishlist")',
+                    method: 'POST',
+                    data: { bikeId: bikeId },
+                    success: function (response) {
+                        if (response.isInWishlist) {
+                            alert('Bike added to your wishlist');
+                            $(iconElement).css('color', 'Orange');
+                        } else {
+                            alert('Bike removed from your wishlist!');
+                            $(iconElement).css('color', 'Gray');
+                        }
+                    },
+                    error: function (xhr) {
+                        const errorMessage = xhr.responseJSON?.message || 'Error toggling wishlist status.';
+                        alert(errorMessage);
+                    }
+                });
+            }
+        </script>
     </body>
 </html>
 

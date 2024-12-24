@@ -14,7 +14,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* Notification wrapper styling */
         #notification-wrapper {
             position: fixed;
             top: 80px;
@@ -26,8 +25,6 @@
             flex-direction: column;
             gap: 12px;
         }
-
-        /* Notification container styling */
         #notification-overlay {
             background-color: white;
             border: 1px solid #ddd;
@@ -41,8 +38,6 @@
             gap: 12px;
             position: relative;
         }
-
-        /* "Clear All" cross mark styling */
         #clear-all-btn {
             position: absolute;
             top: 2px;
@@ -58,10 +53,8 @@
         #clear-all-btn:hover {
             color: #ff4d4d;
         }
-
-        /* Individual notification styling */
         .notification {
-            background-color: #007bff; /* Bootstrap primary color */
+            background-color: #007bff;
             color: white;
             padding: 12px 16px;
             border-radius: 8px;
@@ -70,8 +63,6 @@
             justify-content: space-between;
             align-items: center;
         }
-
-        /* Close button styling for individual notifications */
         .close-btn {
             background: none;
             border: none;
@@ -88,7 +79,6 @@
     </style>
 </head>
 <body class="d-flex flex-column min-vh-100">
-    <!-- Notification Wrapper (Initially Hidden) -->
     <div id="notification-wrapper" style="display: none;">
         <div id="notification-overlay" class="notification-container">
             <button id="clear-all-btn" class="clear-all-btn">&times;</button>
@@ -115,7 +105,7 @@
                         {
                             <div class="flex space-x-6 ">
                                 <a asp-controller="Wishlist" asp-action="GetWishlist" title="Wishlist">
-                                    <i class="fa fa-heart  mt-3 mr-3"></i> <!-- Heart Icon for Wishlist -->
+                                    <i class="fa fa-heart  mt-3 mr-3"></i>
                                 </a>
                                 <div class="dropdown">
                                     <a class="btn btn-secondary dropdown-toggle  bg-orange-500" href="#" role="button" id="dropdownmenulink" data-bs-toggle="dropdown" aria-expanded="false" >
@@ -197,10 +187,9 @@
                     await connection.invoke("JoinChat", userId);
                     console.log(`User joined group: ${userId}`);
 
-                    // Fetch unread notifications
                     await connection.invoke("FetchNotifications", userId);
 
-                    // Listen for new notifications
+
                     connection.on("ReceiveNotification", function (message) {
                         displayNotification(message);
                     });
@@ -218,31 +207,25 @@
             function displayNotification(message) {
                 const overlay = document.getElementById("notification-overlay");
 
-                // Create a notification element
                 const notification = document.createElement("div");
                 notification.className = "notification";
 
-                // Add message content
                 const messageText = document.createElement("span");
                 messageText.textContent = message;
 
-                // Add close button
                 const closeButton = document.createElement("button");
                 closeButton.className = "close-btn";
                 closeButton.innerHTML = "&times;";
                 closeButton.onclick = () => {
                     notification.remove();
-                    toggleNotificationContainer(); // Check and hide container if empty
+                    toggleNotificationContainer();
                 };
 
-                // Append message and close button to notification
                 notification.appendChild(messageText);
                 notification.appendChild(closeButton);
 
-                // Add notification to overlay
                 overlay.appendChild(notification);
 
-                // Ensure the container is visible
                 toggleNotificationContainer();
             }
 
@@ -250,20 +233,16 @@
                 const overlay = document.getElementById("notification-overlay");
                 const wrapper = document.getElementById("notification-wrapper");
 
-                // Check if the overlay has notifications
                 if (overlay.children.length > 0) {
-                    wrapper.style.display = "block"; // Show the wrapper and overlay
+                    wrapper.style.display = "block";
                 } else {
-                    wrapper.style.display = "none"; // Hide the wrapper and overlay
+                    wrapper.style.display = "none";
                 }
             }
-
-            // Clear all notifications
             document.getElementById("clear-all-btn").addEventListener("click", function () {
                 const overlay = document.getElementById("notification-overlay");
-                // Remove all notifications
-                overlay.innerHTML = ''; // Clear notifications
-                toggleNotificationContainer(); // Hide container
+                overlay.innerHTML = '';
+                toggleNotificationContainer();
             });
         });
     </script>
