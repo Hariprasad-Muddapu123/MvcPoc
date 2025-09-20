@@ -23,29 +23,29 @@ namespace BikeBuddy.Controllers
             _bikeService = bikeService;
             _emailSender = emailSender;
         }
-        private async Task<AdminDashboardViewModel> GetDashboardDataAsync()
-        {
-            var dashboardData = await _adminDashboardService.GetDashboardData();
+        //private async Task<AdminDashboardViewModel> GetDashboardDataAsync()
+        //{
+        //    var dashboardData = await _adminDashboardService.GetDashboardData();
 
-            TempData["DashBoardData"] = JsonConvert.SerializeObject(dashboardData, new JsonSerializerSettings
-            {
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-            });
+        //    TempData["DashBoardData"] = JsonConvert.SerializeObject(dashboardData, new JsonSerializerSettings
+        //    {
+        //        ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+        //    });
 
-            TempData.Keep("DashBoardData");
-            return dashboardData;
-        }
+        //    TempData.Keep("DashBoardData");
+        //    return dashboardData;
+        //}
 
-        private AdminDashboardViewModel GetDashboardDataFromTempData()
-        {
-            if (TempData.ContainsKey("DashBoardData"))
-            {
-                var jsonData = TempData["DashBoardData"]?.ToString();
-                TempData.Keep("DashBoardData");
-                return JsonConvert.DeserializeObject<AdminDashboardViewModel>(jsonData);
-            }
-            return null;
-        }
+        //private AdminDashboardViewModel GetDashboardDataFromTempData()
+        //{
+        //    if (TempData.ContainsKey("DashBoardData"))
+        //    {
+        //        var jsonData = TempData["DashBoardData"]?.ToString();
+        //        TempData.Keep("DashBoardData");
+        //        return JsonConvert.DeserializeObject<AdminDashboardViewModel>(jsonData);
+        //    }
+        //    return null;
+        //}
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -74,7 +74,11 @@ namespace BikeBuddy.Controllers
             };
             return View(adminOverviewViewModel);
         }
-
+        /// <summary>
+        /// Fetching Kyc details
+        /// </summary>
+        /// <param name="kycStatus"></param>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> KycDetails(KycStatus? kycStatus = null)
         {
@@ -246,7 +250,6 @@ namespace BikeBuddy.Controllers
         public async Task<IActionResult> BlockUser(string userId, bool isBlocked)
         {
             await _userService.BlockUserAsync(userId, isBlocked);
-            await GetDashboardDataAsync();
             return RedirectToAction("UserDetails", new { id = userId });
         }
 
